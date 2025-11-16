@@ -11,6 +11,12 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Pencil, Plus } from "lucide-react";
+import { DeleteUserButton } from "@/components/users/delete-user-button";
+
+export const dynamic = "force-dynamic";
 
 export default async function UsersPage() {
   await requireAdmin();
@@ -35,6 +41,15 @@ export default async function UsersPage() {
         </p>
       </div>
 
+      <div className="mb-4">
+        <Link href="/dashboard/users/new">
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Neuer Benutzer
+          </Button>
+        </Link>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>Benutzer</CardTitle>
@@ -48,6 +63,7 @@ export default async function UsersPage() {
                   <TableHead>E-Mail</TableHead>
                   <TableHead>Rolle</TableHead>
                   <TableHead>Registriert am</TableHead>
+                  <TableHead className="text-right">Aktionen</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -58,6 +74,16 @@ export default async function UsersPage() {
                     <TableCell>{u.role}</TableCell>
                     <TableCell>
                       {format(new Date(u.createdAt), "dd.MM.yyyy HH:mm", { locale: de })}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Link href={`/dashboard/users/${u.id}`}>
+                          <Button size="sm" variant="outline">
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <DeleteUserButton userId={u.id} />
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
