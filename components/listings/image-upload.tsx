@@ -17,8 +17,8 @@ export function ImageUpload({
   existingImages = [],
   onImagesChange,
 }: ImageUploadProps) {
-  const [images, setImages] = useState<Array<{ url: string; id?: string }>>(
-    existingImages.map((img) => ({ url: img.url, id: img.id }))
+  const [images, setImages] = useState<Array<{ url: string; id?: string; alt?: string | null }>>(
+    existingImages.map((img) => ({ url: img.url, id: img.id, alt: img.alt }))
   );
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
