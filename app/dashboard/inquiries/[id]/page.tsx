@@ -11,15 +11,13 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Mail, MapPin } from "lucide-react";
 import { UpdateInquiryStatusButton } from "@/components/inquiries/update-status-button";
 
-export default async function InquiryDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function InquiryDetailPage({ params }: any) {
+  const idParam = params?.id;
+  const id = Array.isArray(idParam) ? idParam[0] : idParam;
   const user = await requireAuth();
 
   const inquiry = await prisma.inquiry.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       listing: {
         include: {
