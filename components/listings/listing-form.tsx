@@ -28,8 +28,8 @@ const listingSchema = z.object({
   seats: z.coerce.number().min(1, "Mindestens 1 Sitzplatz erforderlich"),
   beds: z.coerce.number().min(1, "Mindestens 1 Bett erforderlich"),
   location: z.string().min(2, "Standort ist erforderlich"),
-  features: z.array(z.string()).default([]),
-  published: z.boolean().default(false),
+  features: z.array(z.string()),
+  published: z.boolean(),
 });
 
 type ListingFormData = z.infer<typeof listingSchema>;
