@@ -1,9 +1,15 @@
 import { requireAdmin } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { GlossaryTermForm } from "@/components/lexikon/glossary-term-form";
 
-export default async function EditGlossaryTermPage({ params }: any) {
+export const dynamic = "force-dynamic";
+
+export default async function EditGlossaryTermPage(props: any) {
+  const params =
+    props?.params && typeof props.params?.then === "function"
+      ? await props.params
+      : props?.params;
   const idParam = params?.id;
   const id = Array.isArray(idParam) ? idParam[0] : idParam;
   await requireAdmin();
@@ -13,7 +19,7 @@ export default async function EditGlossaryTermPage({ params }: any) {
   });
 
   if (!term) {
-    notFound();
+    redirect("/dashboard/lexikon");
   }
 
   return (
