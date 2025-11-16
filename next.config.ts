@@ -20,7 +20,7 @@ const nextConfig: NextConfig = {
       config.externals = config.externals || [];
       if (Array.isArray(config.externals)) {
         // Prisma Client als extern markieren
-        config.externals.push(({ request }, callback) => {
+        config.externals.push(({ request }: { request?: string }, callback: (err?: Error | null, result?: string) => void) => {
           if (request && (request === '@prisma/client' || request.includes('.prisma/client'))) {
             return callback(null, `commonjs ${request}`);
           }
