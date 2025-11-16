@@ -12,12 +12,10 @@ const articleSchema = z.object({
   published: z.boolean().default(false),
 });
 
-export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: Request, context: any) {
   try {
-    const idParam = params?.id;
+    const ctx = context && typeof context?.then === "function" ? await context : context;
+    const idParam = ctx?.params?.id;
     const id = Array.isArray(idParam) ? idParam[0] : idParam;
     const session = await auth();
     if (!session?.user || session.user.role !== "ADMIN") {
@@ -71,12 +69,10 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: Request, context: any) {
   try {
-    const idParam = params?.id;
+    const ctx = context && typeof context?.then === "function" ? await context : context;
+    const idParam = ctx?.params?.id;
     const id = Array.isArray(idParam) ? idParam[0] : idParam;
     const session = await auth();
     if (!session?.user || session.user.role !== "ADMIN") {

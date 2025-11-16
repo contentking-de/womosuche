@@ -9,12 +9,10 @@ const termSchema = z.object({
   content: z.string().min(10),
 });
 
-export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: Request, context: any) {
   try {
-    const idParam = params?.id;
+    const ctx = context && typeof context?.then === "function" ? await context : context;
+    const idParam = ctx?.params?.id;
     const id = Array.isArray(idParam) ? idParam[0] : idParam;
     if (!id) {
       return NextResponse.json({ error: "ID fehlt" }, { status: 400 });
@@ -71,12 +69,10 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: Request, context: any) {
   try {
-    const idParam = params?.id;
+    const ctx = context && typeof context?.then === "function" ? await context : context;
+    const idParam = ctx?.params?.id;
     const id = Array.isArray(idParam) ? idParam[0] : idParam;
     if (!id) {
       return NextResponse.json({ error: "ID fehlt" }, { status: 400 });
