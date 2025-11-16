@@ -9,16 +9,18 @@ const updateInquirySchema = z.object({
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { [key: string]: string | string[] } }
 ) {
   try {
+    const idParam = context.params?.id;
+    const id = Array.isArray(idParam) ? idParam[0] : idParam;
     const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
     }
 
     const inquiry = await prisma.inquiry.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         listing: true,
       },
@@ -40,7 +42,7 @@ export async function PATCH(
     const validatedData = updateInquirySchema.parse(body);
 
     const updatedInquiry = await prisma.inquiry.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         status: validatedData.status,
       },

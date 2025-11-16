@@ -14,16 +14,18 @@ const articleSchema = z.object({
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { [key: string]: string | string[] } }
 ) {
   try {
+    const idParam = context.params?.id;
+    const id = Array.isArray(idParam) ? idParam[0] : idParam;
     const session = await auth();
     if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
     }
 
     const article = await prisma.article.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!article) {
@@ -48,7 +50,7 @@ export async function PUT(
     }
 
     const updatedArticle = await prisma.article.update({
-      where: { id: params.id },
+      where: { id },
       data: validatedData,
     });
 
@@ -71,16 +73,18 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { [key: string]: string | string[] } }
 ) {
   try {
+    const idParam = context.params?.id;
+    const id = Array.isArray(idParam) ? idParam[0] : idParam;
     const session = await auth();
     if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
     }
 
     const article = await prisma.article.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!article) {
@@ -88,7 +92,7 @@ export async function DELETE(
     }
 
     await prisma.article.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: "Artikel gelöscht" });

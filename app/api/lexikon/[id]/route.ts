@@ -11,16 +11,18 @@ const termSchema = z.object({
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { [key: string]: string | string[] } }
 ) {
   try {
+    const idParam = context.params?.id;
+    const id = Array.isArray(idParam) ? idParam[0] : idParam;
     const session = await auth();
     if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
     }
 
     const term = await prisma.glossaryTerm.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!term) {
@@ -45,7 +47,7 @@ export async function PUT(
     }
 
     const updatedTerm = await prisma.glossaryTerm.update({
-      where: { id: params.id },
+      where: { id },
       data: validatedData,
     });
 
@@ -68,16 +70,18 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { [key: string]: string | string[] } }
 ) {
   try {
+    const idParam = context.params?.id;
+    const id = Array.isArray(idParam) ? idParam[0] : idParam;
     const session = await auth();
     if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
     }
 
     const term = await prisma.glossaryTerm.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!term) {
@@ -85,7 +89,7 @@ export async function DELETE(
     }
 
     await prisma.glossaryTerm.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: "Begriff gelöscht" });

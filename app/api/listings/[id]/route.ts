@@ -17,16 +17,18 @@ const listingSchema = z.object({
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { [key: string]: string | string[] } }
 ) {
   try {
+    const idParam = context.params?.id;
+    const id = Array.isArray(idParam) ? idParam[0] : idParam;
     const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
     }
 
     const listing = await prisma.listing.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!listing) {
@@ -56,7 +58,7 @@ export async function PUT(
     }
 
     const updatedListing = await prisma.listing.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...validatedData,
         slug,
@@ -82,16 +84,18 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { [key: string]: string | string[] } }
 ) {
   try {
+    const idParam = context.params?.id;
+    const id = Array.isArray(idParam) ? idParam[0] : idParam;
     const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
     }
 
     const listing = await prisma.listing.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!listing) {
@@ -104,7 +108,7 @@ export async function DELETE(
     }
 
     await prisma.listing.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: "Wohnmobil gelöscht" });
