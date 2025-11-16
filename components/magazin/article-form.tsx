@@ -25,8 +25,8 @@ const articleSchema = z.object({
   slug: z.string().min(2, "Slug muss mindestens 2 Zeichen lang sein"),
   excerpt: z.string().optional(),
   content: z.string().min(10, "Inhalt muss mindestens 10 Zeichen lang sein"),
-  tags: z.array(z.string()).default([]),
-  published: z.boolean().default(false),
+  tags: z.array(z.string()),
+  published: z.boolean(),
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
