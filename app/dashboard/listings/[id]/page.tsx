@@ -3,15 +3,13 @@ import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import { ListingForm } from "@/components/listings/listing-form";
 
-export default async function EditListingPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function EditListingPage({ params }: any) {
+  const idParam = params?.id;
+  const id = Array.isArray(idParam) ? idParam[0] : idParam;
   const user = await requireAuth();
 
   const listing = await prisma.listing.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       images: true,
     },

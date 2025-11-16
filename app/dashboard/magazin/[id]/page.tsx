@@ -3,15 +3,13 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { ArticleForm } from "@/components/magazin/article-form";
 
-export default async function EditArticlePage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function EditArticlePage({ params }: any) {
+  const idParam = params?.id;
+  const id = Array.isArray(idParam) ? idParam[0] : idParam;
   await requireAdmin();
 
   const article = await prisma.article.findUnique({
-    where: { id: params.id },
+    where: { id },
   });
 
   if (!article) {
