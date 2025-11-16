@@ -15,11 +15,12 @@ import { Plus, Pencil, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { DeleteListingButton } from "@/components/listings/delete-listing-button";
+import type { Listing } from "@prisma/client";
 
 export default async function ListingsPage() {
   const user = await requireAuth();
 
-  const listings = await prisma.listing.findMany({
+  const listings = (await prisma.listing.findMany({
     where: user.role === "ADMIN" ? {} : { ownerId: user.id },
     include: {
       owner: {
@@ -38,7 +39,11 @@ export default async function ListingsPage() {
     orderBy: {
       createdAt: "desc",
     },
-  });
+  })) as (Listing & {
+    owner: { name: string | null; email: string | null };
+    images: any[];
+    _count: { inquiries: number };
+  })[];
 
   return (
     <div>
@@ -84,7 +89,11 @@ export default async function ListingsPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              listings.map((listing) => (
+              listings.map((listing: Listing & {
+                owner: { name: string | null; email: string | null };
+                images: any[];
+                _count: { inquiries: number };
+              }) => (
                 <TableRow key={listing.id}>
                   <TableCell className="font-medium">{listing.title}</TableCell>
                   <TableCell>{listing.location}</TableCell>
