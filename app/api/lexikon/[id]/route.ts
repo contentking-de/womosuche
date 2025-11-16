@@ -11,10 +11,10 @@ const termSchema = z.object({
 
 export async function PUT(
   request: Request,
-  context: { params: { [key: string]: string | string[] } }
+  { params }: any
 ) {
   try {
-    const idParam = context.params?.id;
+    const idParam = params?.id;
     const id = Array.isArray(idParam) ? idParam[0] : idParam;
     const session = await auth();
     if (!session?.user || session.user.role !== "ADMIN") {
@@ -70,10 +70,10 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  context: { params: { [key: string]: string | string[] } }
+  { params }: any
 ) {
   try {
-    const idParam = context.params?.id;
+    const idParam = params?.id;
     const id = Array.isArray(idParam) ? idParam[0] : idParam;
     const session = await auth();
     if (!session?.user || session.user.role !== "ADMIN") {
