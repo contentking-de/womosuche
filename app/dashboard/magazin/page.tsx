@@ -16,6 +16,7 @@ import { Plus, Pencil, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { DeleteArticleButton } from "@/components/magazin/delete-article-button";
+import type { Article } from "@prisma/client";
 
 function decodeAmp(value: string): string {
   return value.replace(/&amp;/g, "&");
@@ -51,12 +52,12 @@ export default async function MagazinPage({
     ],
   } as any;
 
-  const articles = await prisma.article.findMany({
+  const articles = (await prisma.article.findMany({
     where,
     orderBy: {
       createdAt: "desc",
     },
-  });
+  })) as Article[];
 
   // Alle Kategorien aggregieren (für Filter-Dropdown)
   const allCatsRows = await prisma.article.findMany({
@@ -135,7 +136,7 @@ export default async function MagazinPage({
                 </TableCell>
               </TableRow>
             ) : (
-              articles.map((article) => (
+              articles.map((article: Article) => (
                 <TableRow key={article.id}>
                   <TableCell className="font-medium max-w-[420px] truncate">
                     {article.title}
