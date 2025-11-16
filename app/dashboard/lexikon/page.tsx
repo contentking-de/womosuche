@@ -15,6 +15,7 @@ import { Plus, Pencil, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { DeleteGlossaryTermButton } from "@/components/lexikon/delete-term-button";
+import type { GlossaryTerm } from "@prisma/client";
 
 export default async function LexikonPage({
   searchParams,
@@ -35,12 +36,12 @@ export default async function LexikonPage({
         }
       : {};
 
-  const terms = await prisma.glossaryTerm.findMany({
+  const terms = (await prisma.glossaryTerm.findMany({
     where,
     orderBy: {
       term: "asc",
     },
-  });
+  })) as GlossaryTerm[];
 
   return (
     <div>
@@ -92,7 +93,7 @@ export default async function LexikonPage({
                 </TableCell>
               </TableRow>
             ) : (
-              terms.map((term) => (
+              terms.map((term: GlossaryTerm) => (
                 <TableRow key={term.id}>
                   <TableCell className="font-medium">{term.term}</TableCell>
                   <TableCell className="text-muted-foreground">{term.slug}</TableCell>
