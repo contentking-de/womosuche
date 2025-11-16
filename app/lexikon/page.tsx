@@ -37,6 +37,8 @@ export default async function LexikonPage({
     },
   });
 
+  type GlossaryTerm = typeof terms[number];
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
@@ -59,7 +61,7 @@ export default async function LexikonPage({
               Alle
             </Link>
           </li>
-          {LETTERS.map((ltr) => (
+          {LETTERS.map((ltr: string) => (
             <li key={ltr}>
               <Link
                 href={{ pathname: "/lexikon", query: { letter: ltr } }}
@@ -81,7 +83,7 @@ export default async function LexikonPage({
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {terms.map((term) => (
+          {terms.map((term: GlossaryTerm) => (
             <Link key={term.id} href={`/lexikon/${term.slug}`}>
               <Card className="h-full transition-shadow hover:shadow-lg">
                 <CardContent className="p-6">

@@ -45,21 +45,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  const listingRoutes = listings.map((listing) => ({
+  const listingRoutes = listings.map((listing: typeof listings[number]) => ({
     url: `${baseUrl}/wohnmobile/${listing.slug}`,
     lastModified: listing.updatedAt,
     changeFrequency: "weekly" as const,
     priority: 0.7,
   }));
 
-  const articleRoutes = articles.map((article) => ({
+  const articleRoutes = articles.map((article: typeof articles[number]) => ({
     url: `${baseUrl}/magazin/${article.slug}`,
     lastModified: article.updatedAt,
     changeFrequency: "monthly" as const,
     priority: 0.6,
   }));
 
-  const termRoutes = terms.map((term) => ({
+  const termRoutes = terms.map((term: typeof terms[number]) => ({
     url: `${baseUrl}/lexikon/${term.slug}`,
     lastModified: term.updatedAt,
     changeFrequency: "monthly" as const,

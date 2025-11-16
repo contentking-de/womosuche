@@ -120,7 +120,7 @@ export default async function ListingsPage({
                 {totalCount} Wohnmobile gefunden
               </div>
               <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                {listings.map((listing) => (
+                {listings.map((listing: typeof listings[number]) => (
                   <ListingCard key={listing.id} listing={listing} />
                 ))}
               </div>

@@ -69,7 +69,7 @@ export default async function ListingDetailPage({
     "@type": "Product",
     name: listing.title,
     description: listing.description,
-    image: listing.images.length > 0 ? listing.images.map((img) => img.url) : [],
+    image: listing.images.length > 0 ? listing.images.map((img: typeof listing.images[number]) => img.url) : [],
     offers: {
       "@type": "Offer",
       price: listing.pricePerDay,
@@ -106,7 +106,7 @@ export default async function ListingDetailPage({
               </div>
               {listing.images.length > 1 && (
                 <div className="grid grid-cols-4 gap-2">
-                  {listing.images.slice(1, 5).map((image, index) => (
+                  {listing.images.slice(1, 5).map((image: typeof listing.images[number], index: number) => (
                     <div
                       key={image.id}
                       className="relative aspect-square overflow-hidden rounded-lg border"
@@ -180,7 +180,7 @@ export default async function ListingDetailPage({
             <div>
               <h2 className="mb-2 text-xl font-semibold">Ausstattung</h2>
               <div className="flex flex-wrap gap-2">
-                {listing.features.map((feature) => (
+                {listing.features.map((feature: string) => (
                   <Badge key={feature} variant="secondary">
                     {feature}
                   </Badge>

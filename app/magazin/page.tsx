@@ -36,7 +36,7 @@ export default async function MagazinPage() {
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {articles.map((article) => (
+          {articles.map((article: typeof articles[number]) => (
             <Link key={article.id} href={`/magazin/${article.slug}`}>
               <Card className="h-full transition-shadow hover:shadow-lg">
                 <CardContent className="p-6">
@@ -54,7 +54,7 @@ export default async function MagazinPage() {
                     </span>
                     {article.tags.length > 0 && (
                       <div className="flex gap-1">
-                        {article.tags.slice(0, 2).map((tag) => (
+                        {article.tags.slice(0, 2).map((tag: string) => (
                           <Badge key={tag} variant="secondary" className="text-xs">
                             {tag}
                           </Badge>
