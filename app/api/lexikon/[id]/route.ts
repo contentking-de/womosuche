@@ -11,11 +11,10 @@ const termSchema = z.object({
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const p = params && typeof (params as any)?.then === "function" ? await (params as Promise<{ id: string }>) : (params as { id: string });
-    const idParam = p?.id;
+    const idParam = params?.id;
     const id = Array.isArray(idParam) ? idParam[0] : idParam;
     if (!id) {
       return NextResponse.json({ error: "ID fehlt" }, { status: 400 });
@@ -74,11 +73,10 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const p = params && typeof (params as any)?.then === "function" ? await (params as Promise<{ id: string }>) : (params as { id: string });
-    const idParam = p?.id;
+    const idParam = params?.id;
     const id = Array.isArray(idParam) ? idParam[0] : idParam;
     if (!id) {
       return NextResponse.json({ error: "ID fehlt" }, { status: 400 });
