@@ -91,9 +91,9 @@ export default async function ListingsPage({
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold">Wohnmobile</h1>
+        <h1 className="text-4xl font-bold">Wohnmobile mieten</h1>
         <p className="mt-2 text-muted-foreground">
-          Finden Sie das perfekte Wohnmobil für Ihren nächsten Urlaub
+          Finde und miete das perfekte Wohnmobil für deinen nächsten Trip – vom kompakten Campervan bis zum großzügigen Familienmobil. Filtere nach Preis, Sitzplätzen, Betten, Ausstattung und Standort, vergleiche Angebote und buche direkt bei verifizierten Vermietern.
         </p>
       </div>
 

@@ -38,7 +38,7 @@ export async function Navbar() {
                 href="/wohnmobile"
                 className="text-sm font-medium hover:text-primary transition-colors"
               >
-                Wohnmobile
+                Wohnmobile mieten
               </Link>
               <Link
                 href="/lexikon"

@@ -25,7 +25,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/wohnmobile" className="text-muted-foreground hover:text-foreground">
-                  Wohnmobile
+                  Wohnmobile mieten
                 </Link>
               </li>
               <li>
