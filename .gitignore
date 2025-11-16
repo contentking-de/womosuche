@@ -29,4 +29,6 @@ pnpm-debug.log*
 .turbo
 .cache
 
+# Local secrets/vars
+meinevars.txt
 
