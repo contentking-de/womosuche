@@ -146,7 +146,7 @@ export default async function ArticlePage({
               </div>
               <h1 className="mb-4 text-4xl font-bold">{article.title}</h1>
               {article.excerpt && (
-                <p className="mb-6 text-xl text-muted-foreground">{article.excerpt}</p>
+                <p className="mb-6 text-xl font-semibold text-muted-foreground">{article.excerpt}</p>
               )}
               <div
                 className="prose prose-lg max-w-none"
