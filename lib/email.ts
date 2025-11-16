@@ -23,7 +23,7 @@ export async function sendNewInquiryEmailToOwner({
   inquiryUrl: string;
 }) {
   try {
-    const emailHtml = render(
+    const emailHtml = await render(
       NewInquiryToOwnerEmail({
         ownerName: ownerName || undefined,
         listingTitle,
@@ -58,7 +58,7 @@ export async function sendInquiryConfirmationToRenter({
   ownerName?: string | null;
 }) {
   try {
-    const emailHtml = render(
+    const emailHtml = await render(
       InquiryConfirmationToRenterEmail({
         renterName,
         listingTitle,
