@@ -24,9 +24,9 @@ import { Separator } from "@/components/ui/separator";
 const listingSchema = z.object({
   title: z.string().min(3, "Titel muss mindestens 3 Zeichen lang sein"),
   description: z.string().min(10, "Beschreibung muss mindestens 10 Zeichen lang sein"),
-  pricePerDay: z.number({ invalid_type_error: "Preis muss eine Zahl sein" }).min(1, "Preis muss größer als 0 sein"),
-  seats: z.number({ invalid_type_error: "Sitzplätze muss eine Zahl sein" }).min(1, "Mindestens 1 Sitzplatz erforderlich"),
-  beds: z.number({ invalid_type_error: "Betten muss eine Zahl sein" }).min(1, "Mindestens 1 Bett erforderlich"),
+  pricePerDay: z.number().min(1, "Preis muss größer als 0 sein"),
+  seats: z.number().min(1, "Mindestens 1 Sitzplatz erforderlich"),
+  beds: z.number().min(1, "Mindestens 1 Bett erforderlich"),
   location: z.string().min(2, "Standort ist erforderlich"),
   features: z.array(z.string()),
   published: z.boolean(),
