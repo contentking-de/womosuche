@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Home, Users, Shield, Search } from "lucide-react";
+import { PricingSection } from "@/components/marketing/pricing-section";
 
 export default function HomePage() {
   return (
@@ -80,6 +81,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Pricing Section */}
+      <PricingSection />
 
       {/* CTA Section */}
       <section className="container mx-auto px-4 py-24">
