@@ -2,14 +2,14 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth-helpers";
 import { LoginForm } from "@/components/auth/login-form";
 
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams: { callbackUrl?: string };
-}) {
+export default async function LoginPage({ searchParams }: any) {
+  const callbackUrl =
+    typeof searchParams?.callbackUrl === "string"
+      ? searchParams.callbackUrl
+      : undefined;
   const user = await getCurrentUser();
   if (user) {
-    redirect(searchParams.callbackUrl || "/dashboard");
+    redirect(callbackUrl || "/dashboard");
   }
 
   return (
@@ -21,7 +21,7 @@ export default async function LoginPage({
             Melden Sie sich in Ihrem Konto an
           </p>
         </div>
-        <LoginForm callbackUrl={searchParams.callbackUrl} />
+        <LoginForm callbackUrl={callbackUrl} />
       </div>
     </div>
   );
