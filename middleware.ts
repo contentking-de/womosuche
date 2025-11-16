@@ -12,7 +12,7 @@ export default auth((req) => {
   if (
     !pathname.startsWith("/api") &&
     !pathname.startsWith("/_next") &&
-    !pathname.startsWith("/favicon.ico")
+    !pathname.startsWith("/favicon.png")
   ) {
     // Pfad vereinheitlichen (ohne trailing slash)
     const normalized =
@@ -91,9 +91,9 @@ export const config = {
      * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
+     * - favicon.png (favicon file)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    "/((?!api|_next/static|_next/image|favicon.png).*)",
   ],
   runtime: 'experimental-edge', // Edge Runtime ist unter Webpack aktuell experimentell
 };
