@@ -17,6 +17,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Wohnmobil Vermietung - Ihre Plattform für Wohnmobile",
   description: "Mieten Sie Wohnmobile oder vermieten Sie Ihr eigenes Wohnmobil. Finden Sie das perfekte Fahrzeug für Ihren nächsten Camping-Urlaub.",
+  icons: {
+    icon: [
+      { url: "/favicon.png", type: "image/png" },
+    ],
+  },
 };
 
 export default function RootLayout({

@@ -16,11 +16,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Eye, Mail } from "lucide-react";
 import { UpdateInquiryStatusButton } from "@/components/inquiries/update-status-button";
+import type { Inquiry } from "@prisma/client";
 
 export default async function InquiriesPage() {
   const user = await requireAuth();
 
-  const inquiries = await prisma.inquiry.findMany({
+  const inquiries = (await prisma.inquiry.findMany({
     where:
       user.role === "ADMIN"
         ? {}
@@ -41,7 +42,7 @@ export default async function InquiriesPage() {
     orderBy: {
       createdAt: "desc",
     },
-  });
+  })) as (Inquiry & { listing: { id: string; title: string; slug: string } })[];
 
   const statusCounts = {
     OPEN: inquiries.filter((i) => i.status === "OPEN").length,
