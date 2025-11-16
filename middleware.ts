@@ -95,6 +95,6 @@ export const config = {
      */
     "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
-  runtime: 'edge', // Edge Runtime für bessere Performance
+  runtime: 'experimental-edge', // Edge Runtime ist unter Webpack aktuell experimentell
 };
 
