@@ -58,6 +58,8 @@ export function GlossaryTermForm({ term }: GlossaryTermFormProps) {
   });
 
   const termValue = watch("term");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   // Auto-generate slug when term changes
   const handleTermChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,6 +98,33 @@ export function GlossaryTermForm({ term }: GlossaryTermFormProps) {
     } catch (err) {
       setError("Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.");
       setIsLoading(false);
+    }
+  };
+
+  const handleAiSuggest = async () => {
+    setAiError(null);
+    if (!termValue || termValue.trim().length < 2) {
+      setAiError("Bitte geben Sie zuerst einen Begriff ein.");
+      return;
+    }
+    setAiLoading(true);
+    try {
+      const res = await fetch("/api/lexikon", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ __action: "generate", term: termValue }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error ?? "KI-Vorschlag fehlgeschlagen");
+      }
+      if (typeof data?.content === "string") {
+        setValue("content", data.content);
+      }
+    } catch (e) {
+      setAiError((e as Error).message);
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -148,7 +177,14 @@ export function GlossaryTermForm({ term }: GlossaryTermFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="content">Inhalt *</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="content">Inhalt *</Label>
+              <div className="flex items-center gap-2">
+                <Button type="button" variant="secondary" onClick={handleAiSuggest} disabled={isLoading || aiLoading}>
+                  {aiLoading ? "KI schreibt..." : "Mit KI vorschlagen"}
+                </Button>
+              </div>
+            </div>
             <Textarea
               id="content"
               placeholder="Erklären Sie den Begriff..."
@@ -158,6 +194,9 @@ export function GlossaryTermForm({ term }: GlossaryTermFormProps) {
             />
             {errors.content && (
               <p className="text-sm text-destructive">{errors.content.message}</p>
+            )}
+            {aiError && (
+              <p className="text-sm text-destructive">{aiError}</p>
             )}
             <p className="text-sm text-muted-foreground">
               Sie können Markdown verwenden
