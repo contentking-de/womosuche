@@ -18,9 +18,9 @@ export const metadata: Metadata = {
   title: "Wohnmobil Vermietung - Ihre Plattform für Wohnmobile",
   description: "Mieten Sie Wohnmobile oder vermieten Sie Ihr eigenes Wohnmobil. Finden Sie das perfekte Fahrzeug für Ihren nächsten Camping-Urlaub.",
   icons: {
-    icon: [
-      { url: "/favicon.png", type: "image/png" },
-    ],
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
   },
 };
 
