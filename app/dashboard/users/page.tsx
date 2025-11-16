@@ -15,13 +15,14 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Pencil, Plus } from "lucide-react";
 import { DeleteUserButton } from "@/components/users/delete-user-button";
+import type { User } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
 export default async function UsersPage() {
   await requireAdmin();
 
-  const users = await prisma.user.findMany({
+  const users = (await prisma.user.findMany({
     select: {
       id: true,
       name: true,
@@ -30,7 +31,7 @@ export default async function UsersPage() {
       createdAt: true,
     },
     orderBy: { createdAt: "desc" },
-  });
+  })) as Pick<User, "id" | "name" | "email" | "role" | "createdAt">[];
 
   return (
     <div>
@@ -67,7 +68,7 @@ export default async function UsersPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {users.map((u) => (
+                {users.map((u: Pick<User, "id" | "name" | "email" | "role" | "createdAt">) => (
                   <TableRow key={u.id}>
                     <TableCell className="font-medium">{u.name ?? "–"}</TableCell>
                     <TableCell>{u.email}</TableCell>

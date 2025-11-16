@@ -101,7 +101,7 @@ export default async function InquiriesPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              inquiries.map((inquiry) => (
+              inquiries.map((inquiry: Inquiry & { listing: { id: string; title: string; slug: string } }) => (
                 <TableRow key={inquiry.id}>
                   <TableCell className="font-medium">
                     <Link
