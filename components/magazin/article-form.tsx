@@ -40,6 +40,8 @@ export function ArticleForm({ article }: ArticleFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [tagInput, setTagInput] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   const {
     register,
@@ -122,6 +124,62 @@ export function ArticleForm({ article }: ArticleFormProps) {
     }
   };
 
+  const handleAiSuggest = async () => {
+    setAiError(null);
+    const t = titleValue?.trim() || "";
+    if (t.length < 3) {
+      setAiError("Bitte geben Sie zuerst einen Titel ein.");
+      return;
+    }
+    setAiLoading(true);
+    try {
+      const res = await fetch("/api/magazin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ __action: "generate", title: t }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error ?? "KI-Vorschlag fehlgeschlagen");
+      }
+      if (typeof data?.content === "string") {
+        setValue("content", data.content);
+      }
+    } catch (e) {
+      setAiError((e as Error).message);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleAiReformat = async () => {
+    setAiError(null);
+    const current = watch("content") || "";
+    if (current.trim().length < 3) {
+      setAiError("Kein Inhalt zum Bereinigen vorhanden.");
+      return;
+    }
+    setAiLoading(true);
+    try {
+      const res = await fetch("/api/magazin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ __action: "reformat", html: current }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error ?? "KI-Bereinigung fehlgeschlagen");
+      }
+      if (typeof data?.content === "string") {
+        setValue("content", data.content);
+      }
+    } catch (e) {
+      setAiError((e as Error).message);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -180,7 +238,17 @@ export function ArticleForm({ article }: ArticleFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="content">Inhalt *</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="content">Inhalt *</Label>
+              <div className="flex items-center gap-2">
+                <Button type="button" variant="secondary" onClick={handleAiSuggest} disabled={isLoading || aiLoading}>
+                  {aiLoading ? "KI arbeitet..." : "Mit KI vorschlagen"}
+                </Button>
+                <Button type="button" variant="outline" onClick={handleAiReformat} disabled={isLoading || aiLoading}>
+                  {aiLoading ? "KI arbeitet..." : "Inhalt bereinigen"}
+                </Button>
+              </div>
+            </div>
             <Textarea
               id="content"
               placeholder="Schreiben Sie Ihren Artikel..."
@@ -191,9 +259,8 @@ export function ArticleForm({ article }: ArticleFormProps) {
             {errors.content && (
               <p className="text-sm text-destructive">{errors.content.message}</p>
             )}
-            <p className="text-sm text-muted-foreground">
-              Sie können Markdown verwenden
-            </p>
+            {aiError && <p className="text-sm text-destructive">{aiError}</p>}
+            <p className="text-sm text-muted-foreground">Sie können HTML verwenden. Die Ausgabe wird direkt gerendert.</p>
           </div>
 
           <div className="space-y-2">

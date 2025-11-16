@@ -199,7 +199,7 @@ export function GlossaryTermForm({ term }: GlossaryTermFormProps) {
               <p className="text-sm text-destructive">{aiError}</p>
             )}
             <p className="text-sm text-muted-foreground">
-              Sie können Markdown verwenden
+              Sie können HTML verwenden. Die Ausgabe wird direkt gerendert.
             </p>
           </div>
 

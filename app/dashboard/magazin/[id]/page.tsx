@@ -3,7 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { ArticleForm } from "@/components/magazin/article-form";
 
-export default async function EditArticlePage({ params }: any) {
+export default async function EditArticlePage(props: any) {
+  const params =
+    props?.params && typeof props.params?.then === "function"
+      ? await props.params
+      : props?.params;
   const idParam = params?.id;
   const id = Array.isArray(idParam) ? idParam[0] : idParam;
   await requireAdmin();

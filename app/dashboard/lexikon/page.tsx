@@ -2,6 +2,7 @@ import { requireAdmin } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -15,10 +16,27 @@ import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { DeleteGlossaryTermButton } from "@/components/lexikon/delete-term-button";
 
-export default async function LexikonPage() {
+export default async function LexikonPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
   await requireAdmin();
+  const params = await searchParams;
+  const q = (params?.q || "").trim();
+
+  const where =
+    q.length > 0
+      ? {
+          OR: [
+            { term: { contains: q, mode: "insensitive" as const } },
+            { slug: { contains: q, mode: "insensitive" as const } },
+          ],
+        }
+      : {};
 
   const terms = await prisma.glossaryTerm.findMany({
+    where,
     orderBy: {
       term: "asc",
     },
@@ -26,19 +44,29 @@ export default async function LexikonPage() {
 
   return (
     <div>
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <h1 className="text-3xl font-bold">Lexikon</h1>
           <p className="mt-2 text-muted-foreground">
             Verwalten Sie Fachbegriffe aus der Camping- und Wohnmobilwelt
           </p>
         </div>
-        <Link href="/dashboard/lexikon/new">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Neuer Begriff
-          </Button>
-        </Link>
+        <div className="flex w-full items-end gap-3 md:w-auto">
+          <form action="/dashboard/lexikon" className="flex w-full items-center gap-2">
+            <Input
+              name="q"
+              placeholder="Begriff oder Slug suchen…"
+              defaultValue={q}
+            />
+            <Button type="submit" variant="outline">Suchen</Button>
+          </form>
+          <Link href="/dashboard/lexikon/new">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Neuer Begriff
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <div className="rounded-md border">

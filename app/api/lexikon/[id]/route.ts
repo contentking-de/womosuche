@@ -11,11 +11,15 @@ const termSchema = z.object({
 
 export async function PUT(
   request: Request,
-  { params }: any
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
-    const idParam = params?.id;
+    const p = params && typeof (params as any)?.then === "function" ? await (params as Promise<{ id: string }>) : (params as { id: string });
+    const idParam = p?.id;
     const id = Array.isArray(idParam) ? idParam[0] : idParam;
+    if (!id) {
+      return NextResponse.json({ error: "ID fehlt" }, { status: 400 });
+    }
     const session = await auth();
     if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
@@ -29,7 +33,7 @@ export async function PUT(
       return NextResponse.json({ error: "Begriff nicht gefunden" }, { status: 404 });
     }
 
-    const body = await request.json();
+    const body = await request.json().catch(() => ({}));
     const validatedData = termSchema.parse(body);
 
     // Prüfe ob Slug bereits existiert (außer für aktuellen Begriff)
@@ -70,11 +74,15 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: any
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
-    const idParam = params?.id;
+    const p = params && typeof (params as any)?.then === "function" ? await (params as Promise<{ id: string }>) : (params as { id: string });
+    const idParam = p?.id;
     const id = Array.isArray(idParam) ? idParam[0] : idParam;
+    if (!id) {
+      return NextResponse.json({ error: "ID fehlt" }, { status: 400 });
+    }
     const session = await auth();
     if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
