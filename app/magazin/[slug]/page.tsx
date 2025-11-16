@@ -102,9 +102,7 @@ export default async function ArticlePage({
     notFound();
   }
 
-  const { htmlWithIds, toc } = buildHtmlAndToc(
-    article.content?.replace(/\n/g, "<br />") ?? ""
-  );
+  const { htmlWithIds, toc } = buildHtmlAndToc(article.content ?? "");
   const grouped = (() => {
     const groups: { id: string; text: string; children: TocItem[] }[] = [];
     for (const item of toc) {
