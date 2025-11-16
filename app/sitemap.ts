@@ -1,22 +1,35 @@
 import { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
 
-  const [listings, articles, terms] = await Promise.all([
-    prisma.listing.findMany({
-      where: { published: true },
-      select: { slug: true, updatedAt: true },
-    }),
-    prisma.article.findMany({
-      where: { published: true },
-      select: { slug: true, updatedAt: true },
-    }),
-    prisma.glossaryTerm.findMany({
-      select: { slug: true, updatedAt: true },
-    }),
-  ]);
+  let listings: Array<{ slug: string; updatedAt: Date }> = [];
+  let articles: Array<{ slug: string; updatedAt: Date }> = [];
+  let terms: Array<{ slug: string; updatedAt: Date }> = [];
+
+  try {
+    [listings, articles, terms] = await Promise.all([
+      prisma.listing.findMany({
+        where: { published: true },
+        select: { slug: true, updatedAt: true },
+      }),
+      prisma.article.findMany({
+        where: { published: true },
+        select: { slug: true, updatedAt: true },
+      }),
+      prisma.glossaryTerm.findMany({
+        select: { slug: true, updatedAt: true },
+      }),
+    ]);
+  } catch (error) {
+    // Falls DB-Verbindung fehlschlägt, verwende leere Arrays
+    // Die statischen Routen werden trotzdem zurückgegeben
+    console.error("Sitemap: Fehler beim Laden der Datenbank-Daten:", error);
+  }
 
   const routes = [
     {
