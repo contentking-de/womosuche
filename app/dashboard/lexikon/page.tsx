@@ -1,0 +1,93 @@
+import { requireAdmin } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Plus, Pencil, Trash2 } from "lucide-react";
+import { format } from "date-fns";
+import { de } from "date-fns/locale";
+import { DeleteGlossaryTermButton } from "@/components/lexikon/delete-term-button";
+
+export default async function LexikonPage() {
+  await requireAdmin();
+
+  const terms = await prisma.glossaryTerm.findMany({
+    orderBy: {
+      term: "asc",
+    },
+  });
+
+  return (
+    <div>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Lexikon</h1>
+          <p className="mt-2 text-muted-foreground">
+            Verwalten Sie Fachbegriffe aus der Camping- und Wohnmobilwelt
+          </p>
+        </div>
+        <Link href="/dashboard/lexikon/new">
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Neuer Begriff
+          </Button>
+        </Link>
+      </div>
+
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Begriff</TableHead>
+              <TableHead>Slug</TableHead>
+              <TableHead>Erstellt</TableHead>
+              <TableHead className="text-right">Aktionen</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {terms.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-8">
+                  <p className="text-muted-foreground">Noch keine Begriffe vorhanden</p>
+                  <Link href="/dashboard/lexikon/new">
+                    <Button variant="outline" className="mt-4">
+                      Ersten Begriff anlegen
+                    </Button>
+                  </Link>
+                </TableCell>
+              </TableRow>
+            ) : (
+              terms.map((term) => (
+                <TableRow key={term.id}>
+                  <TableCell className="font-medium">{term.term}</TableCell>
+                  <TableCell className="text-muted-foreground">{term.slug}</TableCell>
+                  <TableCell>
+                    {format(new Date(term.createdAt), "dd.MM.yyyy", { locale: de })}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Link href={`/dashboard/lexikon/${term.id}`}>
+                        <Button variant="ghost" size="sm">
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      </Link>
+                      <DeleteGlossaryTermButton termId={term.id} />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+}
+

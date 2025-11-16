@@ -1,35 +1,32 @@
 # Dependencies
 node_modules/
 
-# Next.js / Build outputs
+# Next.js build output (lokal)
 .next/
-.vercel/
-.turbo/
+next/
 out/
+
+# Production
 build/
 dist/
-coverage/
 
 # Logs
-logs/
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# OS / Editor
+# OS
 .DS_Store
-*.swp
-*.swo
 
-# Env (keep only examples in repo)
+# Env
 .env
-.env.*
-!.env.example
+.env.local
+.env.*.local
 
 # Misc
-.cache/
-*.local
+.vercel
+.turbo
+.cache
 
 
