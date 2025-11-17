@@ -135,32 +135,37 @@ export function ListingFilters() {
           />
         </div>
 
-        {location && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="radius">Umkreis</Label>
-              <span className="text-sm font-medium text-primary">
-                {radius} km
-              </span>
-            </div>
-            <Slider
-              id="radius"
-              min={1}
-              max={200}
-              step={1}
-              value={[parseInt(radius) || 50]}
-              onValueChange={(value) => setRadius(value[0].toString())}
-              className="w-full"
-            />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>1 km</span>
-              <span>200 km</span>
-            </div>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="radius">Umkreis</Label>
+            <span className="text-sm font-medium text-primary">
+              {radius} km
+            </span>
+          </div>
+          <Slider
+            id="radius"
+            min={1}
+            max={200}
+            step={1}
+            value={[parseInt(radius) || 50]}
+            onValueChange={(value) => setRadius(value[0].toString())}
+            className="w-full"
+            disabled={!location}
+          />
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>1 km</span>
+            <span>200 km</span>
+          </div>
+          {location ? (
             <p className="text-xs text-muted-foreground">
               Zeige Wohnmobile im Umkreis von {radius} km um {location}
             </p>
-          </div>
-        )}
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              Bitte geben Sie zuerst einen Standort ein
+            </p>
+          )}
+        </div>
 
         <Separator />
 
