@@ -22,7 +22,7 @@ const subscriberSchema = z.object({
   email: z.string().email("Ungültige E-Mail-Adresse"),
   name: z.string().optional(),
   lists: z.array(z.enum(["NEWS", "REISEBERICHTE", "VERMIETUNGEN"])).min(1, "Mindestens eine Liste erforderlich"),
-  confirmed: z.boolean().default(false),
+  confirmed: z.boolean(),
 }).refine((data) => data.lists.length > 0, {
   message: "Mindestens eine Liste muss ausgewählt werden",
   path: ["lists"],
