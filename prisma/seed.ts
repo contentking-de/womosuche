@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { generateSlug } from "../lib/slug";
+import { randomUUID } from "crypto";
 
 const prisma = new PrismaClient();
 
@@ -18,11 +19,13 @@ async function main() {
     
     admin = await prisma.user.create({
       data: {
+        id: randomUUID(),
         email: adminEmail,
         name: "Admin",
         password: hashedPassword,
         role: "ADMIN",
         emailVerified: new Date(),
+        updatedAt: new Date(),
       },
     });
 
@@ -42,11 +45,13 @@ async function main() {
     
     landlord = await prisma.user.create({
       data: {
+        id: randomUUID(),
         email: landlordEmail,
         name: "Max Mustermann",
         password: hashedPassword,
         role: "LANDLORD",
         emailVerified: new Date(),
+        updatedAt: new Date(),
       },
     });
 
@@ -64,6 +69,7 @@ async function main() {
   if (!existingListing && landlord) {
     const listing = await prisma.listing.create({
       data: {
+        id: randomUUID(),
         ownerId: landlord.id,
         title: "Luxuriöses Wohnmobil für 4 Personen",
         slug: listingSlug,
@@ -101,6 +107,7 @@ Perfekt für Familien oder Gruppen bis zu 4 Personen. Ideal für Wochenendausfl�
           "WLAN",
         ],
         published: true,
+        updatedAt: new Date(),
       },
     });
 
@@ -108,16 +115,19 @@ Perfekt für Familien oder Gruppen bis zu 4 Personen. Ideal für Wochenendausfl�
     await prisma.image.createMany({
       data: [
         {
+          id: randomUUID(),
           listingId: listing.id,
           url: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop",
           alt: "Wohnmobil Außenansicht",
         },
         {
+          id: randomUUID(),
           listingId: listing.id,
           url: "https://images.unsplash.com/photo-1605540436563-5bca91984b30?w=800&h=600&fit=crop",
           alt: "Wohnmobil Innenraum",
         },
         {
+          id: randomUUID(),
           listingId: listing.id,
           url: "https://images.unsplash.com/photo-1605540436563-5bca91984b30?w=800&h=600&fit=crop",
           alt: "Wohnmobil Küche",
@@ -139,6 +149,7 @@ Perfekt für Familien oder Gruppen bis zu 4 Personen. Ideal für Wochenendausfl�
   if (!existingGlossary) {
     await prisma.glossaryTerm.create({
       data: {
+        id: randomUUID(),
         term: "Stellplatz",
         slug: glossarySlug,
         content: `Ein **Stellplatz** ist ein ausgewiesener Platz zum Abstellen und Übernachten eines Wohnmobils oder Wohnwagens.
@@ -155,6 +166,7 @@ Perfekt für Familien oder Gruppen bis zu 4 Personen. Ideal für Wochenendausfl�
 Während ein Campingplatz meist umfangreichere Einrichtungen wie Sanitäranlagen, Geschäfte und Freizeitmöglichkeiten bietet, ist ein Stellplatz einfacher ausgestattet und fokussiert sich auf das reine Abstellen des Fahrzeugs.
 
 Stellplätze sind besonders beliebt bei Reisenden, die eine einfache und kostengünstige Übernachtungsmöglichkeit suchen.`,
+        updatedAt: new Date(),
       },
     });
 
@@ -172,6 +184,7 @@ Stellplätze sind besonders beliebt bei Reisenden, die eine einfache und kosteng
   if (!existingArticle) {
     await prisma.article.create({
       data: {
+        id: randomUUID(),
         title: "Die besten Camping-Tipps für Anfänger",
         slug: articleSlug,
         excerpt: "Entdecken Sie die wichtigsten Tipps und Tricks für einen gelungenen Camping-Urlaub mit dem Wohnmobil. Von der Planung bis zur praktischen Umsetzung.",
@@ -239,6 +252,7 @@ Camping mit dem Wohnmobil ist eine großartige Möglichkeit, die Welt zu erkunde
 Viel Spaß beim Camping! 🚐✨`,
         tags: ["Anfänger", "Tipps", "Camping", "Wohnmobil"],
         published: true,
+        updatedAt: new Date(),
       },
     });
 
