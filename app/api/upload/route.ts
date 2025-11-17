@@ -10,6 +10,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
     }
 
+    // Prüfe ob BLOB Token vorhanden ist
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      console.error("BLOB_READ_WRITE_TOKEN nicht konfiguriert");
+      return NextResponse.json(
+        { error: "Upload-Service nicht konfiguriert" },
+        { status: 500 }
+      );
+    }
+
     const formData = await request.formData();
     const file = formData.get("file") as File;
     const listingId = formData.get("listingId") as string;
@@ -53,7 +62,12 @@ export async function POST(request: Request) {
     }
 
     // Upload zu Vercel Blob
-    const blob = await put(file.name, file, {
+    // Verwende einen eindeutigen Dateinamen basierend auf Timestamp
+    const fileExtension = file.name.split('.').pop() || 'jpg';
+    const timestamp = Date.now();
+    const uniqueFileName = `uploads/${timestamp}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+    
+    const blob = await put(uniqueFileName, file, {
       access: "public",
       token: process.env.BLOB_READ_WRITE_TOKEN,
     });
@@ -75,8 +89,9 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Upload error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unbekannter Fehler";
     return NextResponse.json(
-      { error: "Fehler beim Hochladen" },
+      { error: `Fehler beim Hochladen: ${errorMessage}` },
       { status: 500 }
     );
   }

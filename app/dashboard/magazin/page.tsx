@@ -1,4 +1,4 @@
-import { requireAdmin } from "@/lib/auth-helpers";
+import { requireAdminOrEditor } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,7 @@ export default async function MagazinPage({
 }: {
   searchParams: Promise<{ q?: string; category?: string }>;
 }) {
-  await requireAdmin();
+  await requireAdminOrEditor();
   const params = await searchParams;
   const q = (params?.q || "").trim();
   const category = (params?.category || "").trim();

@@ -10,15 +10,17 @@ const articleSchema = z.object({
   content: z.string().min(10),
   tags: z.array(z.string()).default([]),
   published: z.boolean().default(false),
+  editorId: z.string().optional().nullable(),
 });
 
-export async function PUT(request: Request, context: any) {
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const ctx = context && typeof context?.then === "function" ? await context : context;
-    const idParam = ctx?.params?.id;
-    const id = Array.isArray(idParam) ? idParam[0] : idParam;
+    const { id } = await params;
     const session = await auth();
-    if (!session?.user || session.user.role !== "ADMIN") {
+    if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "EDITOR")) {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
     }
 
@@ -47,9 +49,25 @@ export async function PUT(request: Request, context: any) {
       }
     }
 
+    // Stelle sicher, dass editorId explizit gesetzt wird
+    // Wenn editorId im Body vorhanden ist (auch wenn null), verwende es, sonst lasse es undefined
+    const updateData: any = {
+      title: validatedData.title,
+      slug: validatedData.slug,
+      excerpt: validatedData.excerpt,
+      content: validatedData.content,
+      tags: validatedData.tags,
+      published: validatedData.published,
+    };
+    
+    // editorId explizit setzen, auch wenn es null ist
+    if ('editorId' in body) {
+      updateData.editorId = body.editorId || null;
+    }
+
     const updatedArticle = await prisma.article.update({
       where: { id },
-      data: validatedData,
+      data: updateData,
     });
 
     return NextResponse.json(updatedArticle);
@@ -69,13 +87,14 @@ export async function PUT(request: Request, context: any) {
   }
 }
 
-export async function DELETE(request: Request, context: any) {
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const ctx = context && typeof context?.then === "function" ? await context : context;
-    const idParam = ctx?.params?.id;
-    const id = Array.isArray(idParam) ? idParam[0] : idParam;
+    const { id } = await params;
     const session = await auth();
-    if (!session?.user || session.user.role !== "ADMIN") {
+    if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "EDITOR")) {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
     }
 

@@ -18,7 +18,7 @@ export async function PUT(request: Request, context: any) {
       return NextResponse.json({ error: "ID fehlt" }, { status: 400 });
     }
     const session = await auth();
-    if (!session?.user || session.user.role !== "ADMIN") {
+    if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "EDITOR")) {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
     }
 
@@ -78,7 +78,7 @@ export async function DELETE(request: Request, context: any) {
       return NextResponse.json({ error: "ID fehlt" }, { status: 400 });
     }
     const session = await auth();
-    if (!session?.user || session.user.role !== "ADMIN") {
+    if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "EDITOR")) {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
     }
 

@@ -33,7 +33,7 @@ export default async function HomePage() {
       pricePerDay: true,
       lat: true,
       lng: true,
-      images: {
+      Image: {
         take: 1,
         select: {
           url: true,
@@ -68,7 +68,7 @@ export default async function HomePage() {
       <NewsletterConfirmationMessage />
       
       {/* Hero Section */}
-      <HeroSection listings={listings} />
+      <HeroSection listings={listings.map((l: any) => ({ ...l, images: l.Image || [] }))} />
 
       {/* Beliebte Wohnmobile Section */}
       <PopularListings />

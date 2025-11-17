@@ -77,7 +77,7 @@ async function generateContent(term: string): Promise<string | null> {
 export async function POST(request: Request) {
   try {
     const session = await auth();
-    if (!session?.user || session.user.role !== "ADMIN") {
+    if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "EDITOR")) {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
     }
 

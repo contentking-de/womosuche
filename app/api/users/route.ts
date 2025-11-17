@@ -7,8 +7,14 @@ import bcrypt from "bcryptjs";
 const createUserSchema = z.object({
   name: z.string().min(2).optional(),
   email: z.string().email(),
-  role: z.enum(["ADMIN", "LANDLORD"]).default("LANDLORD"),
+  role: z.enum(["ADMIN", "LANDLORD", "EDITOR"]).default("LANDLORD"),
   password: z.string().min(6),
+  editorProfile: z.object({
+    biographie: z.string().optional(),
+    schwerpunkt: z.string().optional(),
+    referenzen: z.string().optional(),
+  }).optional(),
+  profileImage: z.string().url().optional().nullable().or(z.literal("")),
 });
 
 export async function GET() {
@@ -42,10 +48,14 @@ export async function POST(request: Request) {
     const hashed = await bcrypt.hash(data.password, 10);
     const user = await prisma.user.create({
       data: {
+        id: crypto.randomUUID(),
         name: data.name,
         email: data.email,
         password: hashed,
         role: data.role,
+        editorProfile: data.editorProfile || null,
+        profileImage: data.profileImage || null,
+        updatedAt: new Date(),
       },
       select: { id: true, name: true, email: true, role: true, createdAt: true },
     });

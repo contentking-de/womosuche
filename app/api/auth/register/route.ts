@@ -32,10 +32,12 @@ export async function POST(request: Request) {
     // Erstelle User
     const user = await prisma.user.create({
       data: {
+        id: crypto.randomUUID(),
         name: validatedData.name,
         email: validatedData.email,
         password: hashedPassword,
         role: "LANDLORD",
+        updatedAt: new Date(),
       },
       select: {
         id: true,

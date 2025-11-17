@@ -1,8 +1,8 @@
-import { requireAdmin } from "@/lib/auth-helpers";
+import { requireAdminOrEditor } from "@/lib/auth-helpers";
 import { BatchGlossaryForm } from "@/components/lexikon/batch-glossary-form";
 
 export default async function BatchLexikonPage() {
-  await requireAdmin();
+  await requireAdminOrEditor();
 
   return (
     <div>

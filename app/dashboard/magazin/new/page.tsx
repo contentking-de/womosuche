@@ -1,8 +1,21 @@
-import { requireAdmin } from "@/lib/auth-helpers";
+import { requireAdminOrEditor } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
 import { ArticleForm } from "@/components/magazin/article-form";
 
 export default async function NewArticlePage() {
-  await requireAdmin();
+  await requireAdminOrEditor();
+
+  // Lade alle Editoren
+  const editors = await prisma.user.findMany({
+    where: { role: "EDITOR" },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      profileImage: true,
+    },
+    orderBy: { name: "asc" },
+  });
 
   return (
     <div>
@@ -12,7 +25,7 @@ export default async function NewArticlePage() {
           Erstellen Sie einen neuen Artikel für das Magazin
         </p>
       </div>
-      <ArticleForm />
+      <ArticleForm editors={editors} />
     </div>
   );
 }

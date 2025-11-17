@@ -8,6 +8,50 @@ import { List, MessageSquare, Plus } from "lucide-react";
 export default async function DashboardPage() {
   const user = await requireAuth();
 
+  // EDITORs sehen keine Statistiken für Wohnmobile/Anfragen
+  if (user.role === "EDITOR") {
+    return (
+      <div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold">Willkommen zurück, {user.name || user.email}!</h1>
+          <p className="mt-2 text-muted-foreground">
+            Verwalten Sie Lexikon und Magazin
+          </p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Lexikon</CardTitle>
+              <CardDescription>Verwalten Sie Lexikon-Begriffe</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/dashboard/lexikon">
+                <Button variant="outline" className="mt-4 w-full">
+                  <List className="mr-2 h-4 w-4" />
+                  Lexikon verwalten
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Magazin</CardTitle>
+              <CardDescription>Verwalten Sie Magazin-Artikel</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/dashboard/magazin">
+                <Button variant="outline" className="mt-4 w-full">
+                  <List className="mr-2 h-4 w-4" />
+                  Magazin verwalten
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   const stats = await Promise.all([
     prisma.listing.count({
       where: user.role === "ADMIN" ? {} : { ownerId: user.id },

@@ -12,6 +12,7 @@ import { TocSearchArticles } from "@/components/magazin/toc-search-articles";
 import { RecentArticles } from "@/components/magazin/recent-articles";
 import { NewsletterSubscriptionForm } from "@/components/newsletter/newsletter-subscription-form";
 import { getFirstCategorySlug, generateSlug } from "@/lib/slug";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 // Prüft, ob eine Kategorie ausgeblendet werden soll
 function shouldHideCategory(category: string): boolean {
@@ -151,6 +152,17 @@ export default async function ArticlePage({
   // Versuche zuerst den Artikel direkt zu finden
   const article = await prisma.article.findFirst({
     where: { slug, published: true },
+    include: {
+      editor: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          profileImage: true,
+          editorProfile: true,
+        },
+      },
+    },
   });
 
   if (!article) {
@@ -247,6 +259,43 @@ export default async function ArticlePage({
                   __html: htmlWithIds,
                 }}
               />
+              
+              {/* Autorenbox */}
+              {article.editor && (
+                <div className="mt-12 border-t pt-8">
+                  <div className="flex flex-col sm:flex-row gap-6">
+                    {article.editor.profileImage && (
+                      <Avatar className="h-24 w-24">
+                        <AvatarImage src={article.editor.profileImage} alt={article.editor.name || article.editor.email} />
+                        <AvatarFallback>
+                          {(article.editor.name || article.editor.email).charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
+                    <div className="flex-1">
+                      <h3 className="text-xl font-semibold mb-2">Über den Autor</h3>
+                      <p className="text-lg font-medium mb-2">{article.editor.name || article.editor.email}</p>
+                      {article.editor.editorProfile && typeof article.editor.editorProfile === 'object' && 'biographie' in article.editor.editorProfile && article.editor.editorProfile.biographie && (
+                        <p className="text-muted-foreground mb-4 whitespace-pre-line">
+                          {String(article.editor.editorProfile.biographie)}
+                        </p>
+                      )}
+                      {article.editor.editorProfile && typeof article.editor.editorProfile === 'object' && 'schwerpunkt' in article.editor.editorProfile && article.editor.editorProfile.schwerpunkt && (
+                        <div className="mb-2">
+                          <span className="font-semibold">Schwerpunkt: </span>
+                          <span className="text-muted-foreground">{String(article.editor.editorProfile.schwerpunkt)}</span>
+                        </div>
+                      )}
+                      {article.editor.editorProfile && typeof article.editor.editorProfile === 'object' && 'referenzen' in article.editor.editorProfile && article.editor.editorProfile.referenzen && (
+                        <div>
+                          <span className="font-semibold">Referenzen: </span>
+                          <span className="text-muted-foreground whitespace-pre-line">{String(article.editor.editorProfile.referenzen)}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 

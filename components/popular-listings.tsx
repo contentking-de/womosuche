@@ -27,7 +27,7 @@ export async function PopularListings() {
       published: true,
     },
     include: {
-      images: {
+      Image: {
         orderBy: {
           createdAt: "asc", // Erstes Bild zuerst
         },
@@ -35,20 +35,13 @@ export async function PopularListings() {
     },
   });
 
-  // Debug: Prüfe welche Bild-URLs vorhanden sind
-  listings.forEach((listing: { title: string; slug: string; images: { url: string }[] }) => {
-    if (listing.images.length === 0) {
-      console.log(`Listing ${listing.title} (${listing.slug}) hat keine Bilder`);
-    } else {
-      listing.images.forEach((img: { url: string }) => {
-        if (img.url.includes(".jpeg")) {
-          console.log(`Listing ${listing.title} hat .jpeg Bild: ${img.url}`);
-        }
-      });
-    }
-  });
+  // Transformiere Image zu images für Kompatibilität mit Komponenten
+  const listingsWithImages = listings.map((listing: any) => ({
+    ...listing,
+    images: listing.Image || [],
+  }));
 
-  if (listings.length === 0) {
+  if (listingsWithImages.length === 0) {
     return null;
   }
 
@@ -72,7 +65,7 @@ export async function PopularListings() {
           </Link>
         </div>
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {listings.map((listing: Listing & { images: ImageType[] }) => (
+          {listingsWithImages.map((listing: Listing & { images: ImageType[] }) => (
             <ListingCard key={listing.id} listing={listing} />
           ))}
         </div>

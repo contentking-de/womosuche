@@ -39,7 +39,7 @@ export default async function DashboardLayout({
     },
   ];
 
-  const adminNavItems = [
+  const editorNavItems = [
     {
       title: "Lexikon",
       href: "/dashboard/lexikon",
@@ -50,6 +50,9 @@ export default async function DashboardLayout({
       href: "/dashboard/magazin",
       icon: FileText,
     },
+  ];
+
+  const adminNavItems = [
     {
       title: "Newsletter",
       href: "/dashboard/newsletter",
@@ -72,7 +75,7 @@ export default async function DashboardLayout({
             <p className="text-sm text-muted-foreground">{user.email}</p>
           </div>
           <nav className="flex-1 space-y-1 p-4">
-            {navItems.map((item) => (
+            {user.role !== "EDITOR" && navItems.map((item) => (
               <Link key={item.href} href={item.href}>
                 <Button
                   variant="ghost"
@@ -86,6 +89,25 @@ export default async function DashboardLayout({
                 </Button>
               </Link>
             ))}
+            {(user.role === "ADMIN" || user.role === "EDITOR") && (
+              <>
+                <div className="my-4 border-t" />
+                {editorNavItems.map((item) => (
+                  <Link key={item.href} href={item.href}>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start"
+                      asChild
+                    >
+                      <span>
+                        <item.icon className="mr-2 h-4 w-4" />
+                        {item.title}
+                      </span>
+                    </Button>
+                  </Link>
+                ))}
+              </>
+            )}
             {user.role === "ADMIN" && (
               <>
                 <div className="my-4 border-t" />

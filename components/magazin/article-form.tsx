@@ -17,6 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Article } from "@prisma/client";
 import { generateSlug } from "@/lib/slug";
 
@@ -27,15 +28,17 @@ const articleSchema = z.object({
   content: z.string().min(10, "Inhalt muss mindestens 10 Zeichen lang sein"),
   tags: z.array(z.string()),
   published: z.boolean(),
+  editorId: z.string().optional().nullable(),
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
 
 interface ArticleFormProps {
-  article?: Article;
+  article?: Article & { editorId?: string | null };
+  editors?: Array<{ id: string; name: string | null; email: string; profileImage: string | null }>;
 }
 
-export function ArticleForm({ article }: ArticleFormProps) {
+export function ArticleForm({ article, editors = [] }: ArticleFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,10 +62,12 @@ export function ArticleForm({ article }: ArticleFormProps) {
           content: article.content,
           tags: article.tags,
           published: article.published,
+          editorId: article.editorId || null,
         }
       : {
           tags: [],
           published: false,
+          editorId: null,
         },
   });
 
@@ -102,10 +107,16 @@ export function ArticleForm({ article }: ArticleFormProps) {
       const url = article ? `/api/magazin/${article.id}` : "/api/magazin";
       const method = article ? "PUT" : "POST";
 
+      // Stelle sicher, dass editorId explizit gesetzt wird
+      const payload = {
+        ...data,
+        editorId: data.editorId || null,
+      };
+
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       const result = await response.json();
@@ -302,6 +313,29 @@ export function ArticleForm({ article }: ArticleFormProps) {
               </div>
             )}
           </div>
+
+          {editors.length > 0 && (
+            <div className="space-y-2">
+              <Label htmlFor="editorId">Editor zuordnen (optional)</Label>
+              <Select
+                value={watch("editorId") || "none"}
+                onValueChange={(value) => setValue("editorId", value === "none" ? null : value)}
+                disabled={isLoading}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Kein Editor zugeordnet" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Kein Editor</SelectItem>
+                  {editors.map((editor) => (
+                    <SelectItem key={editor.id} value={editor.id}>
+                      {editor.name || editor.email}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="flex items-center space-x-2">
             <Checkbox

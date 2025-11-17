@@ -1,8 +1,8 @@
-import { requireAdmin } from "@/lib/auth-helpers";
+import { requireAdminOrEditor } from "@/lib/auth-helpers";
 import { GlossaryTermForm } from "@/components/lexikon/glossary-term-form";
 
 export default async function NewGlossaryTermPage() {
-  await requireAdmin();
+  await requireAdminOrEditor();
 
   return (
     <div>

@@ -1,4 +1,4 @@
-import { requireAdmin } from "@/lib/auth-helpers";
+import { requireAdminOrEditor } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import { GlossaryTermForm } from "@/components/lexikon/glossary-term-form";
@@ -12,7 +12,7 @@ export default async function EditGlossaryTermPage(props: any) {
       : props?.params;
   const idParam = params?.id;
   const id = Array.isArray(idParam) ? idParam[0] : idParam;
-  await requireAdmin();
+  await requireAdminOrEditor();
 
   const term = await prisma.glossaryTerm.findUnique({
     where: { id },

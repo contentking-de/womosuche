@@ -44,7 +44,7 @@ export default async function UsersPage({
   }
 
   // Rolle-Filter
-  if (role === "ADMIN" || role === "LANDLORD") {
+  if (role === "ADMIN" || role === "LANDLORD" || role === "EDITOR") {
     whereConditions.push({ role });
   }
 

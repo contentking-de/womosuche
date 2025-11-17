@@ -85,8 +85,8 @@ export default async function ListingsPage({
 
   // Für Umkreissuche: Lade alle Listings mit Koordinaten, dann filtere nach Entfernung
   type ListingWithImages = Prisma.ListingGetPayload<{
-    include: { images: true };
-  }>;
+    include: { Image: true };
+  }> & { images: any[] };
   type ListingWithDistance = ListingWithImages & { distance: number };
   let listings: (ListingWithImages & { distance?: number })[] = [];
   let totalCount = 0;
@@ -100,14 +100,20 @@ export default async function ListingsPage({
         lng: { not: null },
       },
       include: {
-        images: {
+        Image: {
           take: 1,
         },
       },
     });
 
+    // Transformiere Image zu images
+    const allListingsWithImages = allListings.map((l: any) => ({
+      ...l,
+      images: l.Image || [],
+    }));
+
     // Berechne Entfernung und filtere nach Radius
-    const listingsWithDistance = allListings
+    const listingsWithDistance = allListingsWithImages
       .map((listing: ListingWithImages): ListingWithDistance => {
         const distance = calculateDistance(
           searchCenter!.lat,
@@ -128,7 +134,7 @@ export default async function ListingsPage({
       prisma.listing.findMany({
         where,
         include: {
-          images: {
+          Image: {
             take: 1,
           },
         },

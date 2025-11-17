@@ -150,12 +150,13 @@ const articleSchema = z.object({
   content: z.string().min(10),
   tags: z.array(z.string()).default([]),
   published: z.boolean().default(false),
+  editorId: z.string().optional().nullable(),
 });
 
 export async function POST(request: Request) {
   try {
     const session = await auth();
-    if (!session?.user || session.user.role !== "ADMIN") {
+    if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "EDITOR")) {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
     }
 
@@ -195,8 +196,14 @@ export async function POST(request: Request) {
       );
     }
 
+    // Stelle sicher, dass editorId explizit gesetzt wird
+    const createData: any = {
+      ...validatedData,
+      editorId: validatedData.editorId || null,
+    };
+
     const article = await prisma.article.create({
-      data: validatedData,
+      data: createData,
     });
 
     return NextResponse.json(article, { status: 201 });

@@ -1,4 +1,4 @@
-import { requireAuth } from "@/lib/auth-helpers";
+import { requireAdmin } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import type { NewsletterSubscriber } from "@prisma/client";
 import Link from "next/link";
@@ -20,18 +20,7 @@ export default async function NewsletterPage({
 }: {
   searchParams: Promise<{ list?: string; status?: string; q?: string; page?: string }>;
 }) {
-  const user = await requireAuth();
-  
-  // Nur ADMINs können Newsletter verwalten
-  if (user.role !== "ADMIN") {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="rounded-lg border p-12 text-center">
-          <p className="text-muted-foreground">Sie haben keine Berechtigung für diese Seite.</p>
-        </div>
-      </div>
-    );
-  }
+  await requireAdmin();
 
   const params = await searchParams;
   const listFilter = params?.list;

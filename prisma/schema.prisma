@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
   output   = "../node_modules/.prisma/client"
@@ -11,50 +8,172 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  LANDLORD
+model Account {
+  id                String  @id
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Article {
+  id               String   @id
+  title            String
+  slug             String   @unique
+  excerpt          String?
+  content          String
+  tags             String[]
+  published        Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime
+  categories       String[]
+  featuredImageUrl String?
+  legacyUrl        String?
+  editorId         String?
+  User             User?    @relation(fields: [editorId], references: [id])
+
+  @@index([editorId])
+  @@index([published])
+  @@index([slug])
+}
+
+model GlossaryTerm {
+  id        String   @id
+  term      String   @unique
+  slug      String   @unique
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+
+  @@index([slug])
+}
+
+model Image {
+  id        String   @id
+  listingId String
+  url       String
+  alt       String?
+  createdAt DateTime @default(now())
+  Listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+}
+
+model Inquiry {
+  id                String    @id
+  listingId         String
+  renterName        String
+  renterEmail       String
+  message           String
+  status            String    @default("OPEN")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime
+  endDate           DateTime?
+  startDate         DateTime?
+  preferredCallTime String?
+  renterPhone       String?
+  Listing           Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+  @@index([status])
+}
+
+model Listing {
+  id          String    @id
+  ownerId     String
+  title       String
+  slug        String    @unique
+  description String
+  pricePerDay Int
+  seats       Int
+  beds        Int
+  location    String
+  features    String[]
+  published   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime
+  lat         Float?
+  lng         Float?
+  Image       Image[]
+  Inquiry     Inquiry[]
+  User        User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([lat, lng])
+  @@index([location])
+  @@index([published])
+  @@index([slug])
+}
+
+model NewsletterSubscriber {
+  id                       String           @id
+  email                    String           @unique
+  name                     String?
+  lists                    NewsletterList[]
+  confirmed                Boolean          @default(false)
+  confirmedAt              DateTime?
+  unsubscribedAt           DateTime?
+  createdAt                DateTime         @default(now())
+  updatedAt                DateTime
+  confirmationToken        String?          @unique
+  confirmationTokenExpires DateTime?
+
+  @@index([confirmationToken])
+  @@index([confirmed])
+  @@index([email])
+}
+
+model PasswordResetToken {
+  id        String   @id
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([expires])
+  @@index([token])
+}
+
+model Redirect {
+  id        String   @id
+  fromPath  String   @unique
+  toPath    String
+  createdAt DateTime @default(now())
+}
+
+model Session {
+  id           String   @id
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String    @id
   email         String    @unique
   emailVerified DateTime?
   name          String?
   password      String
   role          Role      @default(LANDLORD)
-  listings      Listing[]
-  accounts      Account[]
-  sessions      Session[]
   createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-}
-
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token      String? @db.Text
-  access_token       String? @db.Text
-  expires_at        Int?
-  token_type         String?
-  scope              String?
-  id_token           String? @db.Text
-  session_state      String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  updatedAt     DateTime
+  editorProfile Json?
+  profileImage  String?
+  Account       Account[]
+  Article       Article[]
+  Listing       Listing[]
+  Session       Session[]
 }
 
 model VerificationToken {
@@ -65,131 +184,14 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model PasswordResetToken {
-  id        String   @id @default(cuid())
-  email     String
-  token     String   @unique
-  expires   DateTime
-  createdAt DateTime @default(now())
-
-  @@index([email])
-  @@index([token])
-  @@index([expires])
-}
-
-model Listing {
-  id          String   @id @default(cuid())
-  ownerId     String
-  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  title       String
-  slug        String   @unique
-  description String   @db.Text
-  pricePerDay Int
-  seats       Int
-  beds        Int
-  location    String
-  lat         Float?
-  lng         Float?
-  features    String[]
-  images      Image[]
-  inquiries   Inquiry[]
-  published   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([slug])
-  @@index([published])
-  @@index([location])
-  @@index([lat, lng])
-}
-
-model Image {
-  id        String   @id @default(cuid())
-  listingId String
-  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  url       String
-  alt       String?
-  createdAt DateTime @default(now())
-
-  @@index([listingId])
-}
-
-model Inquiry {
-  id                String    @id @default(cuid())
-  listingId        String
-  listing           Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  renterName        String
-  renterEmail       String
-  renterPhone       String?
-  preferredCallTime String?
-  message           String   @db.Text
-  startDate         DateTime?
-  endDate           DateTime?
-  status            String   @default("OPEN") // OPEN|ANSWERED|ARCHIVED
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  @@index([listingId])
-  @@index([status])
-}
-
-model GlossaryTerm {
-  id        String   @id @default(cuid())
-  term      String   @unique
-  slug      String   @unique
-  content   String   @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([slug])
-}
-
-model Article {
-  id        String   @id @default(cuid())
-  title     String
-  slug      String   @unique
-  excerpt   String?  @db.Text
-  content   String   @db.Text
-  tags      String[]
-  categories String[]
-  featuredImageUrl String?
-  legacyUrl String?
-  published Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([slug])
-  @@index([published])
-}
-
-model Redirect {
-  id        String   @id @default(cuid())
-  fromPath  String   @unique
-  toPath    String
-  createdAt DateTime @default(now())
-}
-
 enum NewsletterList {
   NEWS
   REISEBERICHTE
   VERMIETUNGEN
 }
 
-model NewsletterSubscriber {
-  id        String          @id @default(cuid())
-  email     String
-  name      String?
-  lists     NewsletterList[]
-  confirmed Boolean         @default(false)
-  confirmedAt DateTime?
-  unsubscribedAt DateTime?
-  confirmationToken String? @unique
-  confirmationTokenExpires DateTime?
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
-
-  @@unique([email])
-  @@index([email])
-  @@index([confirmed])
-  @@index([confirmationToken])
+enum Role {
+  ADMIN
+  LANDLORD
+  EDITOR
 }

@@ -31,3 +31,15 @@ export async function requireLandlord() {
   return requireRole("LANDLORD");
 }
 
+export async function requireEditor() {
+  return requireRole("EDITOR");
+}
+
+export async function requireAdminOrEditor() {
+  const user = await requireAuth();
+  if (user.role !== "ADMIN" && user.role !== "EDITOR") {
+    redirect("/dashboard");
+  }
+  return user;
+}
+

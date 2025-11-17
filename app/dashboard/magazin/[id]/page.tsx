@@ -1,4 +1,4 @@
-import { requireAdmin } from "@/lib/auth-helpers";
+import { requireAdminOrEditor } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { ArticleForm } from "@/components/magazin/article-form";
@@ -10,11 +10,23 @@ export default async function EditArticlePage(props: any) {
       : props?.params;
   const idParam = params?.id;
   const id = Array.isArray(idParam) ? idParam[0] : idParam;
-  await requireAdmin();
+  await requireAdminOrEditor();
 
-  const article = await prisma.article.findUnique({
-    where: { id },
-  });
+  const [article, editors] = await Promise.all([
+    prisma.article.findUnique({
+      where: { id },
+    }),
+    prisma.user.findMany({
+      where: { role: "EDITOR" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        profileImage: true,
+      },
+      orderBy: { name: "asc" },
+    }),
+  ]);
 
   if (!article) {
     notFound();
@@ -28,7 +40,7 @@ export default async function EditArticlePage(props: any) {
           Bearbeiten Sie den Artikel
         </p>
       </div>
-      <ArticleForm article={article} />
+      <ArticleForm article={article} editors={editors} />
     </div>
   );
 }
