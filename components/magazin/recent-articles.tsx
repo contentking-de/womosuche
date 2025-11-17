@@ -9,6 +9,14 @@ interface RecentArticlesProps {
   currentSlug: string;
 }
 
+type ArticlePreview = {
+  id: string;
+  title: string;
+  slug: string;
+  createdAt: Date;
+  featuredImageUrl: string | null;
+};
+
 export async function RecentArticles({ currentSlug }: RecentArticlesProps) {
   const articles = await prisma.article.findMany({
     where: {
@@ -28,7 +36,7 @@ export async function RecentArticles({ currentSlug }: RecentArticlesProps) {
       createdAt: "desc",
     },
     take: 15,
-  });
+  }) as ArticlePreview[];
 
   if (articles.length === 0) {
     return null;
@@ -38,7 +46,7 @@ export async function RecentArticles({ currentSlug }: RecentArticlesProps) {
     <div className="mt-8">
       <h3 className="text-lg font-bold text-foreground mb-4">Weitere Artikel</h3>
       <nav className="space-y-3">
-        {articles.map((article) => (
+        {articles.map((article: ArticlePreview) => (
           <Link
             key={article.id}
             href={`/magazin/${article.slug}`}
