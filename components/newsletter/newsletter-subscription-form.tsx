@@ -14,8 +14,8 @@ import { Mail, CheckCircle2 } from "lucide-react";
 const newsletterSchema = z.object({
   email: z.string().email("Ungültige E-Mail-Adresse"),
   name: z.string().optional(),
-  news: z.boolean().default(false),
-  reiseberichte: z.boolean().default(false),
+  news: z.boolean(),
+  reiseberichte: z.boolean(),
 }).refine((data) => data.news || data.reiseberichte, {
   message: "Bitte wähle mindestens eine Liste aus",
   path: ["news"],
