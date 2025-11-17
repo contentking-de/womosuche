@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { geocodeLocation } from "@/lib/geocode";
 import { calculateDistance } from "@/lib/distance";
+import type { Prisma } from "@prisma/client";
 
 interface SearchParams {
   location?: string;
@@ -83,7 +84,10 @@ export default async function ListingsPage({
   }
 
   // Für Umkreissuche: Lade alle Listings mit Koordinaten, dann filtere nach Entfernung
-  let listings: any[] = [];
+  type ListingWithImages = Prisma.ListingGetPayload<{
+    include: { images: true };
+  }>;
+  let listings: (ListingWithImages & { distance?: number })[] = [];
   let totalCount = 0;
 
   if (searchCenter && radiusKm) {
@@ -103,7 +107,7 @@ export default async function ListingsPage({
 
     // Berechne Entfernung und filtere nach Radius
     const listingsWithDistance = allListings
-      .map((listing) => {
+      .map((listing: ListingWithImages) => {
         const distance = calculateDistance(
           searchCenter!.lat,
           searchCenter!.lng,
