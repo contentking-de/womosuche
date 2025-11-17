@@ -69,6 +69,17 @@ export async function generateMetadata({
   };
 }
 
+type Article = {
+  id: string;
+  categories: string[] | null;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  featuredImageUrl: string | null;
+  createdAt: Date;
+  tags: string[];
+};
+
 export default async function CategoryPage({
   params,
 }: {
@@ -78,7 +89,7 @@ export default async function CategoryPage({
   const { category } = await params;
 
   // Lade alle Artikel
-  const allArticles = await prisma.article.findMany({
+  const allArticles: Article[] = await prisma.article.findMany({
     where: {
       published: true,
     },
@@ -118,7 +129,7 @@ export default async function CategoryPage({
 
   // Entferne Duplikate
   const uniqueArticles = Array.from(
-    new Map(categoryArticles.map((a) => [a.id, a])).values()
+    new Map(categoryArticles.map((a: Article) => [a.id, a])).values()
   );
 
   return (

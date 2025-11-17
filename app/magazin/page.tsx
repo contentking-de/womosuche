@@ -31,9 +31,20 @@ function shouldHideCategory(category: string): boolean {
   return isPostalCode || isAbstellplaetze;
 }
 
+type Article = {
+  id: string;
+  categories: string[] | null;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  featuredImageUrl: string | null;
+  createdAt: Date;
+  tags: string[];
+};
+
 export default async function MagazinPage() {
   noStore();
-  const articles = await prisma.article.findMany({
+  const articles: Article[] = await prisma.article.findMany({
     where: {
       published: true,
     },
@@ -43,14 +54,14 @@ export default async function MagazinPage() {
   });
 
   // Gruppiere Artikel nach Kategorien (ohne Postleitzahlen)
-  const articlesByCategory = new Map<string, typeof articles>();
-  const uncategorizedArticles: typeof articles = [];
+  const articlesByCategory = new Map<string, Article[]>();
+  const uncategorizedArticles: Article[] = [];
 
   for (const article of articles) {
     if (article.categories && article.categories.length > 0) {
       // Filtere ausgeblendete Kategorien heraus
       const validCategories = article.categories.filter(
-        (cat) => !shouldHideCategory(cat)
+        (cat: string) => !shouldHideCategory(cat)
       );
 
       if (validCategories.length > 0) {
@@ -108,7 +119,7 @@ export default async function MagazinPage() {
             const categoryArticles = articlesByCategory.get(category)!;
             // Entferne Duplikate (falls ein Artikel mehreren Kategorien angehört)
             const uniqueArticles = Array.from(
-              new Map(categoryArticles.map((a) => [a.id, a])).values()
+              new Map(categoryArticles.map((a: Article) => [a.id, a])).values()
             );
 
             // Zeige nur die ersten 4 Artikel
