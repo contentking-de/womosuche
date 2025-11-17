@@ -48,19 +48,22 @@ export function HeroSection({ listings }: HeroSectionProps) {
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 py-24">
-        <div className="mx-auto max-w-5xl text-center">
-          <h1 className="text-5xl font-bold tracking-tight sm:text-6xl text-white drop-shadow-lg">
-            Finde dein perfektes Wohnmobil
+        <div className="mx-auto max-w-5xl text-center flex flex-col">
+          <h1 className="text-5xl font-bold tracking-tight sm:text-6xl text-white drop-shadow-lg order-1">
+            Wohnmobile in Deiner Nähe mieten
           </h1>
-          <p className="mt-6 text-lg leading-8 text-white/90 drop-shadow-md">
+          
+          {/* Suchfunktion - Mobile: direkt unter Headline (order-2), Desktop: nach Subtext (md:order-3) */}
+          <div className="mt-6 order-2 md:order-3">
+            <HeroSearch />
+          </div>
+          
+          <p className="mt-6 text-lg leading-8 text-white/90 drop-shadow-md order-3 md:order-2">
             Entdecke eine große Auswahl an Wohnmobilen für dein nächstes Abenteuer.
             Oder vermiete dein eigenes Wohnmobil und verdiene Geld damit.
           </p>
 
-          {/* Suchfunktion */}
-          <HeroSearch />
-
-          <div className="mt-6 flex items-center justify-center gap-x-6 gap-y-3 flex-wrap">
+          <div className="mt-6 flex items-center justify-center gap-x-6 gap-y-3 flex-wrap order-4">
             <Button
               onClick={() => setShowMap(true)}
               size="lg"
