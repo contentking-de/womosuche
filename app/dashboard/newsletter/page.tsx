@@ -131,8 +131,8 @@ export default async function NewsletterPage({
     }),
   ]);
 
-  const confirmedCount = stats.find((s) => s.confirmed)?._count || 0;
-  const unconfirmedCount = stats.find((s) => !s.confirmed)?._count || 0;
+  const confirmedCount = stats.find((s: { confirmed: boolean; _count: number }) => s.confirmed)?._count || 0;
+  const unconfirmedCount = stats.find((s: { confirmed: boolean; _count: number }) => !s.confirmed)?._count || 0;
 
   const listCounts = {
     NEWS: listStats[0],
