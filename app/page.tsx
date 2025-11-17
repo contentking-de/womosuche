@@ -9,9 +9,13 @@ import { PopularListings } from "@/components/popular-listings";
 import { prisma } from "@/lib/prisma";
 
 export default async function HomePage() {
-  // Lade veröffentlichte Wohnmobile für die Karte
+  // Lade veröffentlichte Wohnmobile für die Karte (nur mit Koordinaten)
   const listings = await prisma.listing.findMany({
-    where: { published: true },
+    where: { 
+      published: true,
+      lat: { not: null },
+      lng: { not: null },
+    },
     select: {
       id: true,
       title: true,

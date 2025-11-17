@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { MapPin, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import type { Icon } from "leaflet";
 
 // Dynamischer Import für Leaflet (nur Client-Side)
 const MapContainer = dynamic(
@@ -41,9 +42,16 @@ interface HeroMapProps {
   onClose: () => void;
 }
 
+interface ListingWithCoords extends Listing {
+  lat: number;
+  lng: number;
+}
+
 export function HeroMap({ listings, onClose }: HeroMapProps) {
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
+  const [markerIcon, setMarkerIcon] = useState<Icon | null>(null);
+  const [listingsWithCoords, setListingsWithCoords] = useState<ListingWithCoords[]>([]);
   
   // Fix für Leaflet Icons - nur im Client ausführen
   useEffect(() => {
@@ -51,19 +59,34 @@ export function HeroMap({ listings, onClose }: HeroMapProps) {
     if (typeof window !== "undefined") {
       import("leaflet").then((L) => {
         delete (L.default.Icon.Default.prototype as any)._getIconUrl;
-        L.default.Icon.Default.mergeOptions({
+        const icon = L.default.icon({
           iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
           iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
           shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          tooltipAnchor: [16, -28],
+          shadowSize: [41, 41],
         });
+        setMarkerIcon(icon);
       });
     }
   }, []);
   
-  // Filtere Listings mit vorhandenen Koordinaten
-  const listingsWithCoords = listings.filter(
-    (listing) => listing.lat !== null && listing.lng !== null
-  );
+  // Verwende nur Listings mit vorhandenen Koordinaten aus der DB
+  useEffect(() => {
+    if (!isClient) return;
+    
+    // Filtere Listings mit vorhandenen Koordinaten
+    const withCoords = listings.filter(
+      (listing): listing is ListingWithCoords => 
+        listing.lat !== null && listing.lng !== null && 
+        listing.lat !== undefined && listing.lng !== undefined
+    );
+    
+    setListingsWithCoords(withCoords);
+  }, [isClient, listings]);
 
   // Berechne Mittelpunkt der Karte basierend auf allen Markern
   const center: [number, number] = listingsWithCoords.length > 0
@@ -78,6 +101,50 @@ export function HeroMap({ listings, onClose }: HeroMapProps) {
       <div className="relative min-h-[600px] flex items-center justify-center bg-muted">
         <div className="text-center">
           <p className="text-lg text-muted-foreground">Karte wird geladen...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Prüfe ob Listings mit Standorten vorhanden sind, aber ohne Koordinaten
+  const listingsWithLocation = listings.filter(l => l.location && l.location.trim() !== "");
+  const hasListingsWithoutCoords = listingsWithLocation.length > listingsWithCoords.length;
+
+  if (listingsWithCoords.length === 0) {
+    return (
+      <div className="relative min-h-[600px] w-full flex items-center justify-center bg-muted">
+        <div className="absolute top-4 right-4 z-[1000]">
+          <Button
+            onClick={onClose}
+            variant="secondary"
+            size="sm"
+            className="bg-white/95 backdrop-blur-sm shadow-lg"
+          >
+            <X className="h-4 w-4 mr-2" />
+            Zur Listenansicht
+          </Button>
+        </div>
+        <div className="text-center max-w-md px-4">
+          <p className="text-lg text-muted-foreground mb-2">
+            {hasListingsWithoutCoords 
+              ? "Keine Wohnmobile mit Koordinaten verfügbar."
+              : "Keine Wohnmobile mit Standortinformationen verfügbar."}
+          </p>
+          {hasListingsWithoutCoords && (
+            <>
+              <p className="text-sm text-muted-foreground mb-4">
+                Es gibt {listingsWithLocation.length} Wohnmobile mit Standorten, aber ohne Koordinaten.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Bitte generieren Sie die Koordinaten im Dashboard unter "Wohnmobile" → "Fehlende Koordinaten generieren".
+              </p>
+            </>
+          )}
+          {!hasListingsWithoutCoords && (
+            <p className="text-sm text-muted-foreground">
+              Bitte stellen Sie sicher, dass die Wohnmobile einen Standort haben.
+            </p>
+          )}
         </div>
       </div>
     );
@@ -98,7 +165,7 @@ export function HeroMap({ listings, onClose }: HeroMapProps) {
       </div>
       <MapContainer
         center={center}
-        zoom={6}
+        zoom={listingsWithCoords.length === 1 ? 10 : 6}
         style={{ height: "100%", width: "100%", minHeight: "600px" }}
         className="z-0"
       >
@@ -110,6 +177,7 @@ export function HeroMap({ listings, onClose }: HeroMapProps) {
           <Marker
             key={listing.id}
             position={[listing.lat!, listing.lng!]}
+            icon={markerIcon || undefined}
           >
             <Popup>
               <Card className="w-64 border-0 shadow-lg">

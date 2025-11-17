@@ -9,9 +9,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { signOut } from "@/auth";
+import { signOutAction } from "@/lib/actions";
 import { Home, User, LogOut, Settings, LogIn, UserPlus, Car, BookOpen, FileText } from "lucide-react";
 import Image from "next/image";
+import { MobileMenu } from "@/components/mobile-menu";
 
 export async function Navbar() {
   const user = await getCurrentUser();
@@ -56,78 +57,76 @@ export async function Navbar() {
                 Magazin
               </Link>
             </div>
-            {user ? (
-              <>
-                <Link href="/dashboard">
-                  <Button variant="outline" size="sm">
-                    Dashboard
-                  </Button>
-                </Link>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback>
-                          <User className="h-4 w-4" />
-                        </AvatarFallback>
-                      </Avatar>
+            <MobileMenu user={user} />
+            <div className="hidden md:flex items-center gap-4">
+              {user ? (
+                <>
+                  <Link href="/dashboard">
+                    <Button variant="outline" size="sm">
+                      Dashboard
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end">
-                    <div className="flex items-center justify-start gap-2 p-2">
-                      <div className="flex flex-col space-y-1 leading-none">
-                        {user.name && <p className="font-medium">{user.name}</p>}
-                        <p className="w-[200px] truncate text-sm text-muted-foreground">
-                          {user.email}
-                        </p>
+                  </Link>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback>
+                            <User className="h-4 w-4" />
+                          </AvatarFallback>
+                        </Avatar>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56" align="end">
+                      <div className="flex items-center justify-start gap-2 p-2">
+                        <div className="flex flex-col space-y-1 leading-none">
+                          {user.name && <p className="font-medium">{user.name}</p>}
+                          <p className="w-[200px] truncate text-sm text-muted-foreground">
+                            {user.email}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href="/dashboard" className="flex items-center">
-                        <User className="mr-2 h-4 w-4" />
-                        Dashboard
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/dashboard/settings" className="flex items-center">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Einstellungen
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <form
-                      action={async () => {
-                        "use server";
-                        await signOut({ redirectTo: "/" });
-                      }}
-                    >
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
-                        <button type="submit" className="flex w-full items-center">
-                          <LogOut className="mr-2 h-4 w-4" />
-                          Abmelden
-                        </button>
+                        <Link href="/dashboard" className="flex items-center">
+                          <User className="mr-2 h-4 w-4" />
+                          Dashboard
+                        </Link>
                       </DropdownMenuItem>
-                    </form>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
-            ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary/10">
-                    <LogIn />
-                    Anmelden
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button size="sm">
-                    <UserPlus />
-                    Registrieren
-                  </Button>
-                </Link>
-              </>
-            )}
+                      <DropdownMenuItem asChild>
+                        <Link href="/dashboard/settings" className="flex items-center">
+                          <Settings className="mr-2 h-4 w-4" />
+                          Einstellungen
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <form action={signOutAction}>
+                        <DropdownMenuItem asChild>
+                          <button type="submit" className="flex w-full items-center">
+                            <LogOut className="mr-2 h-4 w-4" />
+                            Abmelden
+                          </button>
+                        </DropdownMenuItem>
+                      </form>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              ) : (
+                <>
+                  <Link href="/login">
+                    <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary/10">
+                      <LogIn />
+                      Anmelden
+                    </Button>
+                  </Link>
+                  <Link href="/register">
+                    <Button size="sm">
+                      <UserPlus />
+                      Registrieren
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>

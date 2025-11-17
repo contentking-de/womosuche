@@ -19,10 +19,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Pencil, Eye } from "lucide-react";
+import { Plus, Search, Pencil, Eye, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { DeleteListingButton } from "@/components/listings/delete-listing-button";
+import { GeocodeMissingButton } from "@/components/listings/geocode-missing-button";
 import type { Listing } from "@prisma/client";
 
 export default async function ListingsPage({
@@ -93,6 +94,26 @@ export default async function ListingsPage({
     _count: { inquiries: number };
   })[];
 
+  // Zähle Listings ohne Koordinaten (für alle oder nur für den Benutzer)
+  const missingCoordsCount = await prisma.listing.count({
+    where: {
+      ...(user.role !== "ADMIN" ? { ownerId: user.id } : {}),
+      AND: [
+        {
+          OR: [
+            { lat: null },
+            { lng: null },
+          ],
+        },
+        {
+          location: {
+            not: "",
+          },
+        },
+      ],
+    },
+  });
+
   return (
     <div>
       <div className="mb-8">
@@ -145,6 +166,28 @@ export default async function ListingsPage({
           )}
         </form>
       </div>
+
+      {/* Button zum Generieren fehlender Koordinaten */}
+      {missingCoordsCount > 0 && (
+        <div className="mb-4 p-4 bg-muted rounded-lg border">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium">
+                {missingCoordsCount} Wohnmobile ohne Koordinaten gefunden
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Pro Durchlauf können maximal ~25-28 Wohnmobile geocodiert werden (Rate-Limit: 1/Sekunde).
+                {missingCoordsCount > 28 && (
+                  <span className="block mt-1">
+                    Bitte klicken Sie mehrmals auf den Button, bis alle geocodiert sind.
+                  </span>
+                )}
+              </p>
+            </div>
+            <GeocodeMissingButton />
+          </div>
+        </div>
+      )}
 
       <div className="rounded-md border">
         <Table>

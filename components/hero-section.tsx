@@ -64,8 +64,7 @@ export function HeroSection({ listings }: HeroSectionProps) {
             <Button
               onClick={() => setShowMap(true)}
               size="lg"
-              variant="outline"
-              className="px-8 py-6 text-lg font-bold bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20"
+              className="px-8 py-6 text-lg font-bold bg-green-600 hover:bg-green-700 text-white border-0 shadow-lg"
             >
               <Map className="mr-2 h-5 w-5" />
               Auf Karte anzeigen
@@ -73,8 +72,7 @@ export function HeroSection({ listings }: HeroSectionProps) {
             <Link href="/wohnmobile">
               <Button
                 size="lg"
-                variant="outline"
-                className="px-8 py-6 text-lg font-bold bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20"
+                className="px-8 py-6 text-lg font-bold shadow-lg"
               >
                 Alle Wohnmobile anzeigen
               </Button>
@@ -83,7 +81,7 @@ export function HeroSection({ listings }: HeroSectionProps) {
               <Button
                 size="lg"
                 variant="outline"
-                className="px-8 py-6 text-lg font-bold bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20"
+                className="px-8 py-6 text-lg font-bold bg-gray-100/90 hover:bg-gray-200/90 text-gray-700 border-gray-300/50 shadow-lg"
               >
                 Als Vermieter registrieren
               </Button>
