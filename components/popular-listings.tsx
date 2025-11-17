@@ -3,6 +3,7 @@ import { ListingCard } from "@/components/listings/listing-card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { Listing, Image as ImageType } from "@prisma/client";
 
 export async function PopularListings() {
   // Lade alle veröffentlichten Listing-IDs
@@ -71,7 +72,7 @@ export async function PopularListings() {
           </Link>
         </div>
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {listings.map((listing) => (
+          {listings.map((listing: Listing & { images: ImageType[] }) => (
             <ListingCard key={listing.id} listing={listing} />
           ))}
         </div>
