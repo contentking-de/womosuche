@@ -87,6 +87,7 @@ export default async function ListingsPage({
   type ListingWithImages = Prisma.ListingGetPayload<{
     include: { images: true };
   }>;
+  type ListingWithDistance = ListingWithImages & { distance: number };
   let listings: (ListingWithImages & { distance?: number })[] = [];
   let totalCount = 0;
 
@@ -107,7 +108,7 @@ export default async function ListingsPage({
 
     // Berechne Entfernung und filtere nach Radius
     const listingsWithDistance = allListings
-      .map((listing: ListingWithImages) => {
+      .map((listing: ListingWithImages): ListingWithDistance => {
         const distance = calculateDistance(
           searchCenter!.lat,
           searchCenter!.lng,
@@ -116,8 +117,8 @@ export default async function ListingsPage({
         );
         return { ...listing, distance };
       })
-      .filter((listing) => listing.distance <= radiusKm!)
-      .sort((a, b) => a.distance - b.distance); // Sortiere nach Entfernung
+      .filter((listing: ListingWithDistance) => listing.distance <= radiusKm!)
+      .sort((a: ListingWithDistance, b: ListingWithDistance) => a.distance - b.distance); // Sortiere nach Entfernung
 
     totalCount = listingsWithDistance.length;
     listings = listingsWithDistance.slice(skip, skip + ITEMS_PER_PAGE);
