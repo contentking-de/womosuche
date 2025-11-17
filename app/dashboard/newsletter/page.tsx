@@ -1,5 +1,6 @@
 import { requireAuth } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
+import type { NewsletterSubscriber } from "@prisma/client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -339,7 +340,7 @@ export default async function NewsletterPage({
                   </tr>
                 </thead>
                 <tbody>
-                  {subscribers.map((subscriber) => (
+                  {subscribers.map((subscriber: NewsletterSubscriber) => (
                     <tr key={subscriber.id} className="border-b">
                       <td className="p-2">{subscriber.email}</td>
                       <td className="p-2">{subscriber.name || "-"}</td>
