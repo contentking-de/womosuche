@@ -1,13 +1,14 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider";
 
 const availableFeatures = [
   "Klimaanlage",
@@ -29,6 +30,9 @@ export function ListingFilters() {
   const searchParams = useSearchParams();
 
   const [location, setLocation] = useState(searchParams.get("location") || "");
+  const [radius, setRadius] = useState(
+    searchParams.get("radius") || "50"
+  );
   const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
   const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
   const [minSeats, setMinSeats] = useState(searchParams.get("minSeats") || "");
@@ -39,7 +43,11 @@ export function ListingFilters() {
 
   const applyFilters = () => {
     const params = new URLSearchParams();
-    if (location) params.set("location", location);
+    if (location) {
+      params.set("location", location);
+      // Wenn Standort vorhanden, aber kein Radius: Standard 50km verwenden
+      params.set("radius", radius || "50");
+    }
     if (minPrice) params.set("minPrice", minPrice);
     if (maxPrice) params.set("maxPrice", maxPrice);
     if (minSeats) params.set("minSeats", minSeats);
@@ -52,6 +60,7 @@ export function ListingFilters() {
 
   const clearFilters = () => {
     setLocation("");
+    setRadius("");
     setMinPrice("");
     setMaxPrice("");
     setMinSeats("");
@@ -68,6 +77,48 @@ export function ListingFilters() {
     }
   };
 
+  // Automatische Filterung beim Ändern des Radius (mit Debounce)
+  const radiusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitialMount = useRef(true);
+  
+  useEffect(() => {
+    // Überspringe die automatische Filterung beim ersten Laden
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    // Nur automatisch filtern, wenn ein Standort vorhanden ist
+    if (!location) return;
+
+    // Lösche vorherigen Timeout
+    if (radiusTimeoutRef.current) {
+      clearTimeout(radiusTimeoutRef.current);
+    }
+
+    // Setze neuen Timeout für Debounce (500ms Verzögerung)
+    radiusTimeoutRef.current = setTimeout(() => {
+      const params = new URLSearchParams();
+      params.set("location", location);
+      params.set("radius", radius || "50");
+      if (minPrice) params.set("minPrice", minPrice);
+      if (maxPrice) params.set("maxPrice", maxPrice);
+      if (minSeats) params.set("minSeats", minSeats);
+      if (minBeds) params.set("minBeds", minBeds);
+      if (selectedFeatures.length > 0) params.set("features", selectedFeatures.join(","));
+      params.set("page", "1");
+
+      router.push(`/wohnmobile?${params.toString()}`);
+    }, 500);
+
+    // Cleanup
+    return () => {
+      if (radiusTimeoutRef.current) {
+        clearTimeout(radiusTimeoutRef.current);
+      }
+    };
+  }, [radius]); // Nur bei Änderung von radius
+
   return (
     <Card>
       <CardHeader>
@@ -78,11 +129,38 @@ export function ListingFilters() {
           <Label htmlFor="location">Standort</Label>
           <Input
             id="location"
-            placeholder="z.B. München"
+            placeholder="z.B. Ravensburg"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
           />
         </div>
+
+        {location && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="radius">Umkreis</Label>
+              <span className="text-sm font-medium text-primary">
+                {radius} km
+              </span>
+            </div>
+            <Slider
+              id="radius"
+              min={1}
+              max={200}
+              step={1}
+              value={[parseInt(radius) || 50]}
+              onValueChange={(value) => setRadius(value[0].toString())}
+              className="w-full"
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>1 km</span>
+              <span>200 km</span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Zeige Wohnmobile im Umkreis von {radius} km um {location}
+            </p>
+          </div>
+        )}
 
         <Separator />
 

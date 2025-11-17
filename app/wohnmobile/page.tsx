@@ -5,9 +5,12 @@ import { ListingFilters } from "@/components/listings/listing-filters";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import { geocodeLocation } from "@/lib/geocode";
+import { calculateDistance } from "@/lib/distance";
 
 interface SearchParams {
   location?: string;
+  radius?: string;
   minPrice?: string;
   maxPrice?: string;
   minSeats?: string;
@@ -31,7 +34,17 @@ export default async function ListingsPage({
     published: true,
   };
 
+  // Umkreissuche: Wenn Standort angegeben ist, verwende Geocoding
+  let searchCenter: { lat: number; lng: number } | null = null;
+  let radiusKm: number | null = null;
+
   if (params.location) {
+    radiusKm = params.radius ? parseInt(params.radius) : 50; // Standard: 50km wenn kein Radius angegeben
+    searchCenter = await geocodeLocation(params.location);
+  }
+
+  // Wenn keine Umkreissuche, verwende normale Textsuche
+  if (params.location && !searchCenter) {
     where.location = {
       contains: params.location,
       mode: "insensitive",
@@ -69,22 +82,63 @@ export default async function ListingsPage({
     };
   }
 
-  const [listings, totalCount] = await Promise.all([
-    prisma.listing.findMany({
-      where,
+  // Für Umkreissuche: Lade alle Listings mit Koordinaten, dann filtere nach Entfernung
+  let listings: any[] = [];
+  let totalCount = 0;
+
+  if (searchCenter && radiusKm) {
+    // Lade alle Listings mit Koordinaten (andere Filter werden bereits in where angewendet)
+    const allListings = await prisma.listing.findMany({
+      where: {
+        ...where,
+        lat: { not: null },
+        lng: { not: null },
+      },
       include: {
         images: {
           take: 1,
         },
       },
-      orderBy: {
-        createdAt: "desc",
-      },
-      skip,
-      take: ITEMS_PER_PAGE,
-    }),
-    prisma.listing.count({ where }),
-  ]);
+    });
+
+    // Berechne Entfernung und filtere nach Radius
+    const listingsWithDistance = allListings
+      .map((listing) => {
+        const distance = calculateDistance(
+          searchCenter!.lat,
+          searchCenter!.lng,
+          listing.lat!,
+          listing.lng!
+        );
+        return { ...listing, distance };
+      })
+      .filter((listing) => listing.distance <= radiusKm!)
+      .sort((a, b) => a.distance - b.distance); // Sortiere nach Entfernung
+
+    totalCount = listingsWithDistance.length;
+    listings = listingsWithDistance.slice(skip, skip + ITEMS_PER_PAGE);
+  } else {
+    // Normale Suche ohne Umkreis
+    const [listingsResult, countResult] = await Promise.all([
+      prisma.listing.findMany({
+        where,
+        include: {
+          images: {
+            take: 1,
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip,
+        take: ITEMS_PER_PAGE,
+      }),
+      prisma.listing.count({ where }),
+    ]);
+
+    listings = listingsResult;
+    totalCount = countResult;
+  }
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 

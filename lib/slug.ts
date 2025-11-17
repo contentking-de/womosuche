@@ -1,6 +1,8 @@
 export function generateSlug(text: string): string {
   return text
     .toLowerCase()
+    .replace(/\s*&amp;\s*/g, "") // Entferne &amp; und umgebende Leerzeichen
+    .replace(/\s*&\s*/g, "") // Entferne & und umgebende Leerzeichen
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "") // Entferne diakritische Zeichen
     .replace(/[^a-z0-9]+/g, "-") // Ersetze alles außer Buchstaben und Zahlen mit -

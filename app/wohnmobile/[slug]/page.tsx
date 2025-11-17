@@ -1,10 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { InquiryForm } from "@/components/inquiries/inquiry-form";
 import { MobileInquiryButton } from "@/components/listings/mobile-inquiry-button";
+import { ListingImageGallery } from "@/components/listings/listing-image-gallery";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { MapPin, Users, Bed, Euro } from "lucide-react";
@@ -93,57 +93,8 @@ export default async function ListingDetailPage({
       <div className="container mx-auto px-4 py-8 pb-24 md:pb-8">
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Bilder */}
-          <div className="space-y-4">
-            {listing.images.length > 0 ? (
-              <>
-                <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
-                  {listing.images[0].url.includes("vercel-storage.com") ? (
-                    <Image
-                      src={listing.images[0].url}
-                      alt={listing.title}
-                      fill
-                      className="object-cover"
-                      priority
-                    />
-                  ) : (
-                    <img
-                      src={listing.images[0].url}
-                      alt={listing.title}
-                      className="h-full w-full object-cover"
-                    />
-                  )}
-                </div>
-                {listing.images.length > 1 && (
-                  <div className="grid grid-cols-4 gap-2">
-                    {listing.images.slice(1, 5).map((image: typeof listing.images[number], index: number) => (
-                      <div
-                        key={image.id}
-                        className="relative aspect-square overflow-hidden rounded-lg border"
-                      >
-                        {image.url.includes("vercel-storage.com") ? (
-                          <Image
-                            src={image.url}
-                            alt={`${listing.title} - Bild ${index + 2}`}
-                            fill
-                            className="object-cover"
-                          />
-                        ) : (
-                          <img
-                            src={image.url}
-                            alt={`${listing.title} - Bild ${index + 2}`}
-                            className="h-full w-full object-cover"
-                          />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="flex aspect-video items-center justify-center rounded-lg border bg-muted">
-                <p className="text-muted-foreground">Kein Bild verfügbar</p>
-              </div>
-            )}
+          <div>
+            <ListingImageGallery images={listing.images} title={listing.title} />
           </div>
 
           {/* Details */}

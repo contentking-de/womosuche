@@ -9,7 +9,7 @@ import { Listing, Image as ImageType } from "@prisma/client";
 import { MapPin, Users, Bed, Euro } from "lucide-react";
 
 interface ListingCardProps {
-  listing: Listing & { images: ImageType[] };
+  listing: Listing & { images: ImageType[]; distance?: number };
 }
 
 export function ListingCard({ listing }: ListingCardProps) {
@@ -65,6 +65,11 @@ export function ListingCard({ listing }: ListingCardProps) {
           <div className="mb-3 flex items-center gap-1 text-sm text-muted-foreground">
             <MapPin className="h-4 w-4" />
             <span>{listing.location}</span>
+            {listing.distance !== undefined && (
+              <span className="ml-2 text-xs font-medium text-primary">
+                • {listing.distance} km entfernt
+              </span>
+            )}
           </div>
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-4 text-sm">
