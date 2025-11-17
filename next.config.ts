@@ -71,6 +71,15 @@ const nextConfig: NextConfig = {
         'node:url': false,
       };
     }
+
+    // Mapbox GL Worker Support
+    config.module = config.module || {};
+    config.module.rules = config.module.rules || [];
+    config.module.rules.push({
+      test: /\.worker\.(js|ts)$/,
+      use: { loader: 'worker-loader' },
+    });
+
     return config;
   },
 };

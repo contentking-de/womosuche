@@ -60,7 +60,7 @@ export function HeroSection({ listings }: HeroSectionProps) {
           {/* Suchfunktion */}
           <HeroSearch />
 
-          <div className="mt-6 flex items-center justify-center gap-x-6 flex-wrap">
+          <div className="mt-6 flex items-center justify-center gap-x-6 gap-y-3 flex-wrap">
             <Button
               onClick={() => setShowMap(true)}
               size="lg"

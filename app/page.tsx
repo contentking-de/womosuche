@@ -7,8 +7,16 @@ import { HeroSection } from "@/components/hero-section";
 import { MagazinSection } from "@/components/magazin-section";
 import { PopularListings } from "@/components/popular-listings";
 import { prisma } from "@/lib/prisma";
+import { unstable_noStore as noStore } from "next/cache";
+
+// Deaktiviere Caching für diese Seite, damit neue Koordinaten sofort angezeigt werden
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
 export default async function HomePage() {
+  noStore();
+  
   // Lade veröffentlichte Wohnmobile für die Karte (nur mit Koordinaten)
   const listings = await prisma.listing.findMany({
     where: { 
@@ -31,7 +39,7 @@ export default async function HomePage() {
         },
       },
     },
-    take: 100, // Limit für Performance
+    // Entferne das Limit, damit alle Wohnmobile angezeigt werden
   });
 
   // Lade 8 neueste veröffentlichte Magazin-Artikel

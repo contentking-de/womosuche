@@ -213,4 +213,3 @@ export function HeroMap({ listings, onClose }: HeroMapProps) {
     </div>
   );
 }
-
