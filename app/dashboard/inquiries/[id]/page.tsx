@@ -99,6 +99,23 @@ export default async function InquiryDetailPage({
                 {inquiry.renterEmail}
               </a>
             </div>
+            {inquiry.renterPhone && (
+              <div>
+                <p className="text-sm text-muted-foreground">Telefonnummer</p>
+                <a
+                  href={`tel:${inquiry.renterPhone}`}
+                  className="mt-1 text-primary hover:underline"
+                >
+                  {inquiry.renterPhone}
+                </a>
+              </div>
+            )}
+            {inquiry.preferredCallTime && (
+              <div>
+                <p className="text-sm text-muted-foreground">Bevorzugte Rückrufzeit</p>
+                <p className="mt-1">{inquiry.preferredCallTime}</p>
+              </div>
+            )}
             {(inquiry.startDate || inquiry.endDate) && (
               <>
                 <Separator />

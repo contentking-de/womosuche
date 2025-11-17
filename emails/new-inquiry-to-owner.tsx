@@ -16,6 +16,8 @@ interface NewInquiryToOwnerEmailProps {
   listingTitle: string;
   renterName: string;
   renterEmail: string;
+  renterPhone?: string;
+  preferredCallTime?: string;
   startDate?: string;
   endDate?: string;
   message: string;
@@ -27,6 +29,8 @@ export const NewInquiryToOwnerEmail = ({
   listingTitle,
   renterName,
   renterEmail,
+  renterPhone,
+  preferredCallTime,
   startDate,
   endDate,
   message,
@@ -60,6 +64,12 @@ export const NewInquiryToOwnerEmail = ({
             <Text style={label}>Von:</Text>
             <Text style={value}>{renterName}</Text>
             <Text style={value}>{renterEmail}</Text>
+            {renterPhone && (
+              <Text style={value}>Telefon: {renterPhone}</Text>
+            )}
+            {preferredCallTime && (
+              <Text style={value}>Bevorzugte Rückrufzeit: {preferredCallTime}</Text>
+            )}
           </Section>
 
           {(startDate || endDate) && (

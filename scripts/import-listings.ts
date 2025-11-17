@@ -282,11 +282,19 @@ async function importListings(filePath: string) {
       const galleryValue = coerceString(galleryMeta?.["wp:meta_value"]);
       const galleryIds = parsePhpIdArray(galleryValue);
       const imageUrls: string[] = [];
+      
+      // Debug: Log Gallery-IDs
+      if (galleryIds.length > 0) {
+        console.log(`Listing ${title}: ${galleryIds.length} Gallery-IDs gefunden`);
+      }
+      
       for (const id of galleryIds.slice(0, 10)) {
         // Maximal 10 Bilder
         const url = attachmentUrlById.get(id);
         if (url) {
           imageUrls.push(url);
+        } else {
+          console.warn(`Listing ${title}: Bild-ID ${id} nicht in attachmentUrlById gefunden`);
         }
       }
 
@@ -300,6 +308,31 @@ async function importListings(filePath: string) {
         if (thumbUrl && !imageUrls.includes(thumbUrl)) {
           imageUrls.unshift(thumbUrl); // Als erstes Bild
         }
+      } else if (thumbId) {
+        console.warn(`Listing ${title}: Featured Image ID ${thumbId} nicht in attachmentUrlById gefunden`);
+      }
+
+      // Fallback: Versuche Bilder aus dem Content zu extrahieren
+      if (imageUrls.length === 0 && description) {
+        const imageMatches = description.matchAll(/https?:\/\/[^\s"<>]+\.(jpg|jpeg|png|webp|gif)/gi);
+        const contentImageUrls: string[] = [];
+        for (const match of imageMatches) {
+          const url = match[0];
+          if (url && !contentImageUrls.includes(url)) {
+            contentImageUrls.push(url);
+          }
+        }
+        if (contentImageUrls.length > 0) {
+          console.log(`Listing ${title}: ${contentImageUrls.length} Bilder aus Content extrahiert`);
+          imageUrls.push(...contentImageUrls.slice(0, 10));
+        }
+      }
+
+      // Debug: Log finale Bild-URLs
+      if (imageUrls.length > 0) {
+        console.log(`Listing ${title}: ${imageUrls.length} Bilder werden gespeichert`);
+      } else {
+        console.warn(`Listing ${title}: KEINE BILDER gefunden!`);
       }
 
       // Slug generieren

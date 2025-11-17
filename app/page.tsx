@@ -5,6 +5,7 @@ import { Home, Users, Shield, Search } from "lucide-react";
 import { PricingSection } from "@/components/marketing/pricing-section";
 import { HeroSection } from "@/components/hero-section";
 import { MagazinSection } from "@/components/magazin-section";
+import { PopularListings } from "@/components/popular-listings";
 import { prisma } from "@/lib/prisma";
 
 export default async function HomePage() {
@@ -51,6 +52,9 @@ export default async function HomePage() {
     <div className="flex flex-col">
       {/* Hero Section */}
       <HeroSection listings={listings} />
+
+      {/* Beliebte Wohnmobile Section */}
+      <PopularListings />
 
       {/* Features Section */}
       <section className="border-t bg-muted/50 py-24">

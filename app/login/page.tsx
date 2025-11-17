@@ -2,11 +2,22 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth-helpers";
 import { LoginForm } from "@/components/auth/login-form";
 
-export default async function LoginPage({ searchParams }: any) {
+interface SearchParams {
+  callbackUrl?: string;
+  passwordReset?: string;
+}
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const params = await searchParams;
   const callbackUrl =
-    typeof searchParams?.callbackUrl === "string"
-      ? searchParams.callbackUrl
+    typeof params?.callbackUrl === "string"
+      ? params.callbackUrl
       : undefined;
+  const passwordReset = params?.passwordReset === "true";
   const user = await getCurrentUser();
   if (user) {
     redirect(callbackUrl || "/dashboard");
@@ -21,7 +32,7 @@ export default async function LoginPage({ searchParams }: any) {
             Melden Sie sich in Ihrem Konto an
           </p>
         </div>
-        <LoginForm callbackUrl={callbackUrl} />
+        <LoginForm callbackUrl={callbackUrl} passwordReset={passwordReset} />
       </div>
     </div>
   );

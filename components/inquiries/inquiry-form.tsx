@@ -13,6 +13,8 @@ import { Card, CardContent } from "@/components/ui/card";
 const inquirySchema = z.object({
   renterName: z.string().min(2, "Name muss mindestens 2 Zeichen lang sein"),
   renterEmail: z.string().email("Ungültige E-Mail-Adresse"),
+  renterPhone: z.string().optional(),
+  preferredCallTime: z.string().optional(),
   startDate: z.string().min(1, "Reisebeginn ist erforderlich"),
   endDate: z.string().min(1, "Reiseende ist erforderlich"),
   message: z.string().min(10, "Nachricht muss mindestens 10 Zeichen lang sein"),
@@ -131,6 +133,36 @@ export function InquiryForm({ listingId }: InquiryFormProps) {
               />
               {errors.renterEmail && (
                 <p className="text-sm text-destructive">{errors.renterEmail.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="renterPhone">Telefonnummer</Label>
+              <Input
+                id="renterPhone"
+                type="tel"
+                placeholder="+49 123 456789"
+                {...register("renterPhone")}
+                disabled={isLoading}
+              />
+              {errors.renterPhone && (
+                <p className="text-sm text-destructive">{errors.renterPhone.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="preferredCallTime">Bevorzugte Rückrufzeit</Label>
+              <Input
+                id="preferredCallTime"
+                type="text"
+                placeholder="z.B. 10-12 Uhr oder nachmittags"
+                {...register("preferredCallTime")}
+                disabled={isLoading}
+              />
+              {errors.preferredCallTime && (
+                <p className="text-sm text-destructive">{errors.preferredCallTime.message}</p>
               )}
             </div>
           </div>

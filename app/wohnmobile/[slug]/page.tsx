@@ -96,13 +96,21 @@ export default async function ListingDetailPage({
           {listing.images.length > 0 ? (
             <>
               <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
-                <Image
-                  src={listing.images[0].url}
-                  alt={listing.title}
-                  fill
-                  className="object-cover"
-                  priority
-                />
+                {listing.images[0].url.includes("vercel-storage.com") ? (
+                  <Image
+                    src={listing.images[0].url}
+                    alt={listing.title}
+                    fill
+                    className="object-cover"
+                    priority
+                  />
+                ) : (
+                  <img
+                    src={listing.images[0].url}
+                    alt={listing.title}
+                    className="h-full w-full object-cover"
+                  />
+                )}
               </div>
               {listing.images.length > 1 && (
                 <div className="grid grid-cols-4 gap-2">
@@ -111,12 +119,20 @@ export default async function ListingDetailPage({
                       key={image.id}
                       className="relative aspect-square overflow-hidden rounded-lg border"
                     >
-                      <Image
-                        src={image.url}
-                        alt={`${listing.title} - Bild ${index + 2}`}
-                        fill
-                        className="object-cover"
-                      />
+                      {image.url.includes("vercel-storage.com") ? (
+                        <Image
+                          src={image.url}
+                          alt={`${listing.title} - Bild ${index + 2}`}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <img
+                          src={image.url}
+                          alt={`${listing.title} - Bild ${index + 2}`}
+                          className="h-full w-full object-cover"
+                        />
+                      )}
                     </div>
                   ))}
                 </div>

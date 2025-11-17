@@ -19,7 +19,7 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
+export function LoginForm({ callbackUrl, passwordReset }: { callbackUrl?: string; passwordReset?: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
@@ -68,6 +68,11 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {passwordReset && (
+            <div className="rounded-md bg-green-50 dark:bg-green-900/20 p-3 text-sm text-green-800 dark:text-green-200">
+              Ihr Passwort wurde erfolgreich zurückgesetzt. Sie können sich jetzt mit Ihrem neuen Passwort anmelden.
+            </div>
+          )}
           {error && (
             <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
               {error}
@@ -89,7 +94,15 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Passwort</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Passwort</Label>
+              <Link
+                href="/forgot-password"
+                className="text-sm text-primary hover:underline"
+              >
+                Passwort vergessen?
+              </Link>
+            </div>
             <Input
               id="password"
               type="password"

@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 import { NewInquiryToOwnerEmail } from "@/emails/new-inquiry-to-owner";
 import { InquiryConfirmationToRenterEmail } from "@/emails/inquiry-confirmation-to-renter";
+import { PasswordResetEmail } from "@/emails/password-reset";
 import { render } from "@react-email/render";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -11,6 +12,8 @@ export async function sendNewInquiryEmailToOwner({
   listingTitle,
   renterName,
   renterEmail,
+  renterPhone,
+  preferredCallTime,
   startDate,
   endDate,
   message,
@@ -21,6 +24,8 @@ export async function sendNewInquiryEmailToOwner({
   listingTitle: string;
   renterName: string;
   renterEmail: string;
+  renterPhone?: string;
+  preferredCallTime?: string;
   startDate?: string;
   endDate?: string;
   message: string;
@@ -38,6 +43,8 @@ export async function sendNewInquiryEmailToOwner({
         listingTitle,
         renterName,
         renterEmail,
+        renterPhone,
+        preferredCallTime,
         startDate,
         endDate,
         message,
@@ -90,6 +97,41 @@ export async function sendInquiryConfirmationToRenter({
   } catch (error) {
     console.error("Error sending confirmation email:", error);
     // Nicht werfen, da dies nicht kritisch ist
+  }
+}
+
+export async function sendPasswordResetEmail({
+  email,
+  name,
+  resetUrl,
+}: {
+  email: string;
+  name?: string;
+  resetUrl: string;
+}) {
+  try {
+    if (!email || !email.trim()) {
+      throw new Error(`Ungültige E-Mail-Adresse: ${email}`);
+    }
+
+    const emailHtml = await render(
+      PasswordResetEmail({
+        name,
+        resetUrl,
+      })
+    );
+
+    await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev",
+      to: email.trim(),
+      subject: "Passwort zurücksetzen",
+      html: emailHtml,
+    });
+
+    console.log(`Passwort-Reset-E-Mail erfolgreich gesendet an: ${email}`);
+  } catch (error) {
+    console.error(`Fehler beim Senden der Passwort-Reset-E-Mail an ${email}:`, error);
+    throw error;
   }
 }
 

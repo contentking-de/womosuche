@@ -65,6 +65,18 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([token])
+  @@index([expires])
+}
+
 model Listing {
   id          String   @id @default(cuid())
   ownerId     String
@@ -103,17 +115,19 @@ model Image {
 }
 
 model Inquiry {
-  id           String    @id @default(cuid())
-  listingId   String
-  listing      Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  renterName   String
-  renterEmail  String
-  message      String   @db.Text
-  startDate    DateTime?
-  endDate      DateTime?
-  status       String   @default("OPEN") // OPEN|ANSWERED|ARCHIVED
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                String    @id @default(cuid())
+  listingId        String
+  listing           Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  renterName        String
+  renterEmail       String
+  renterPhone       String?
+  preferredCallTime String?
+  message           String   @db.Text
+  startDate         DateTime?
+  endDate           DateTime?
+  status            String   @default("OPEN") // OPEN|ANSWERED|ARCHIVED
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   @@index([listingId])
   @@index([status])

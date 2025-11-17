@@ -14,7 +14,7 @@ import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Eye, Mail } from "lucide-react";
+import { Eye, Mail, Phone, Clock } from "lucide-react";
 import { UpdateInquiryStatusButton } from "@/components/inquiries/update-status-button";
 import type { Inquiry } from "@prisma/client";
 
@@ -87,6 +87,8 @@ export default async function InquiriesPage() {
               <TableHead>Wohnmobil</TableHead>
               <TableHead>Mieter</TableHead>
               <TableHead>E-Mail</TableHead>
+              <TableHead>Telefon</TableHead>
+              <TableHead>Rückrufzeit</TableHead>
               <TableHead>Nachricht</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Datum</TableHead>
@@ -96,7 +98,7 @@ export default async function InquiriesPage() {
           <TableBody>
             {inquiries.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8">
+                <TableCell colSpan={9} className="text-center py-8">
                   <p className="text-muted-foreground">Noch keine Anfragen vorhanden</p>
                 </TableCell>
               </TableRow>
@@ -120,6 +122,29 @@ export default async function InquiriesPage() {
                       <Mail className="h-3 w-3" />
                       {inquiry.renterEmail}
                     </a>
+                  </TableCell>
+                  <TableCell>
+                    {inquiry.renterPhone ? (
+                      <a
+                        href={`tel:${inquiry.renterPhone}`}
+                        className="text-primary hover:underline flex items-center gap-1"
+                      >
+                        <Phone className="h-3 w-3" />
+                        {inquiry.renterPhone}
+                      </a>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {inquiry.preferredCallTime ? (
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-3 w-3 text-muted-foreground" />
+                        <span className="text-sm">{inquiry.preferredCallTime}</span>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">-</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <div className="max-w-xs truncate">{inquiry.message}</div>
