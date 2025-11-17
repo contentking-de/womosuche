@@ -129,18 +129,20 @@ export default async function HomePage() {
       <PricingSection />
 
       {/* CTA Section */}
-      <section className="container mx-auto px-4 py-24">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Bereit für dein nächstes Abenteuer?
-          </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Durchsuche unsere Auswahl an Wohnmobilen oder werde selbst Vermieter
-          </p>
-          <div className="mt-10 flex items-center justify-center gap-x-6">
-            <Link href="/wohnmobile">
-              <Button size="lg">Jetzt suchen</Button>
-            </Link>
+      <section className="bg-gray-800 py-24">
+        <div className="container mx-auto px-4">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-white">
+              Bereit für dein nächstes Abenteuer?
+            </h2>
+            <p className="mt-4 text-lg text-gray-300">
+              Durchsuche unsere Auswahl an Wohnmobilen oder werde selbst Vermieter
+            </p>
+            <div className="mt-10 flex items-center justify-center gap-x-6">
+              <Link href="/wohnmobile">
+                <Button size="lg">Jetzt suchen</Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>

@@ -51,8 +51,8 @@ export async function POST(request: Request) {
     }
 
     console.log(`CSV importiert: ${records.length} Zeilen gefunden`);
-    if (records.length > 0) {
-      console.log("Erste Zeile Beispiel:", Object.keys(records[0]));
+    if (records.length > 0 && typeof records[0] === "object" && records[0] !== null) {
+      console.log("Erste Zeile Beispiel:", Object.keys(records[0] as Record<string, unknown>));
     }
 
     let imported = 0;
