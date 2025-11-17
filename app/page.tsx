@@ -3,52 +3,33 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Home, Users, Shield, Search } from "lucide-react";
 import { PricingSection } from "@/components/marketing/pricing-section";
-import Image from "next/image";
+import { HeroSection } from "@/components/hero-section";
+import { prisma } from "@/lib/prisma";
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Lade veröffentlichte Wohnmobile für die Karte
+  const listings = await prisma.listing.findMany({
+    where: { published: true },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      location: true,
+      pricePerDay: true,
+      images: {
+        take: 1,
+        select: {
+          url: true,
+        },
+      },
+    },
+    take: 100, // Limit für Performance
+  });
+
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
-        {/* Hintergrundbild */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/wohnmobile-mieten-hero.jpg"
-            alt="Wohnmobil Vermietung"
-            fill
-            className="object-cover"
-            priority
-            quality={90}
-          />
-          {/* Overlay für bessere Lesbarkeit */}
-          <div className="absolute inset-0 bg-black/50" />
-        </div>
-        
-        {/* Content */}
-        <div className="relative z-10 container mx-auto px-4 py-24">
-          <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-5xl font-bold tracking-tight sm:text-6xl text-white drop-shadow-lg">
-              Finde dein perfektes Wohnmobil
-            </h1>
-            <p className="mt-6 text-lg leading-8 text-white/90 drop-shadow-md">
-              Entdecke eine große Auswahl an Wohnmobilen für dein nächstes Abenteuer.
-              Oder vermiete dein eigenes Wohnmobil und verdiene Geld damit.
-            </p>
-            <div className="mt-10 flex items-center justify-center gap-x-6">
-              <Link href="/wohnmobile">
-                <Button size="lg" className="px-8 py-6 text-lg font-bold">
-                  Wohnmobile entdecken
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button size="lg" variant="outline" className="px-8 py-6 text-lg font-bold bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20">
-                  Als Vermieter registrieren
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroSection listings={listings} />
 
       {/* Features Section */}
       <section className="border-t bg-muted/50 py-24">
