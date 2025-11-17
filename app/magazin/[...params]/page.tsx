@@ -222,6 +222,17 @@ export default async function ArticlePage({
     return groups;
   })();
 
+  // Hole die erste gültige Kategorie
+  const validCategories = article.categories?.filter(
+    (cat: string) => !shouldHideCategory(cat)
+  ) || [];
+  const firstCategory = validCategories.length > 0 ? validCategories[0] : null;
+  
+  // Dekodiere HTML-Entities in der Kategorie
+  const decodedCategory = firstCategory 
+    ? firstCategory.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+    : null;
+
   return (
     <div className="container mx-auto px-4 py-8">
       <Link href="/magazin">
@@ -235,10 +246,16 @@ export default async function ArticlePage({
         <div className="lg:col-span-8 xl:col-span-9">
           <Card>
             <CardContent className="p-8">
-              <div className="mb-4 flex items-center gap-4 text-sm text-muted-foreground">
+              <div className="mb-4 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                 <span>
                   {format(new Date(article.createdAt), "dd.MM.yyyy", { locale: de })}
                 </span>
+                {article.editor?.name && (
+                  <span>• {article.editor.name}</span>
+                )}
+                {decodedCategory && (
+                  <span>• {decodedCategory}</span>
+                )}
                 {article.tags.length > 0 && (
                   <div className="flex gap-2">
                     {article.tags.map((tag: string) => (

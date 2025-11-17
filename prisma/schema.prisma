@@ -40,7 +40,7 @@ model Article {
   featuredImageUrl String?
   legacyUrl        String?
   editorId         String?
-  User             User?    @relation(fields: [editorId], references: [id])
+  editor           User?    @relation("ArticleEditor", fields: [editorId], references: [id])
 
   @@index([editorId])
   @@index([published])
@@ -171,7 +171,7 @@ model User {
   editorProfile Json?
   profileImage  String?
   Account       Account[]
-  Article       Article[]
+  Article       Article[]  @relation("ArticleEditor")
   Listing       Listing[]
   Session       Session[]
 }

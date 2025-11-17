@@ -59,7 +59,7 @@ const availableFeatures = [
 
 interface ListingFormProps {
   listing?: Listing & { images: Image[] };
-  userRole?: "ADMIN" | "LANDLORD";
+  userRole?: "ADMIN" | "LANDLORD" | "EDITOR";
   ownerId?: string;
   availableUsers?: User[];
 }
