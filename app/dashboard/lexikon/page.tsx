@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { DeleteGlossaryTermButton } from "@/components/lexikon/delete-term-button";
@@ -61,6 +61,12 @@ export default async function LexikonPage({
             />
             <Button type="submit" variant="outline">Suchen</Button>
           </form>
+          <Link href="/dashboard/lexikon/batch">
+            <Button variant="outline">
+              <FileText className="mr-2 h-4 w-4" />
+              Batch-Erstellung
+            </Button>
+          </Link>
           <Link href="/dashboard/lexikon/new">
             <Button>
               <Plus className="mr-2 h-4 w-4" />

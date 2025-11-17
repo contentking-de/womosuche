@@ -8,7 +8,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu, Car, BookOpen, FileText, User, LogOut, LogIn, UserPlus } from "lucide-react";
+import { Menu, Home, Car, BookOpen, FileText, User, LogOut, LogIn, UserPlus } from "lucide-react";
 import type { User as UserType } from "next-auth";
 import { signOutAction } from "@/lib/actions";
 
@@ -32,6 +32,14 @@ export function MobileMenu({ user }: MobileMenuProps) {
         <nav className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <Link
+              href="/"
+              className="flex items-center gap-3 px-3 py-2 text-base font-semibold hover:bg-accent rounded-md transition-colors"
+              onClick={() => setOpen(false)}
+            >
+              <Home className="h-5 w-5" />
+              womosuche Home
+            </Link>
+            <Link
               href="/wohnmobile"
               className="flex items-center gap-3 px-3 py-2 text-base font-semibold hover:bg-accent rounded-md transition-colors"
               onClick={() => setOpen(false)}
@@ -40,20 +48,20 @@ export function MobileMenu({ user }: MobileMenuProps) {
               Wohnmobile mieten
             </Link>
             <Link
-              href="/lexikon"
-              className="flex items-center gap-3 px-3 py-2 text-base font-semibold hover:bg-accent rounded-md transition-colors"
-              onClick={() => setOpen(false)}
-            >
-              <BookOpen className="h-5 w-5" />
-              Lexikon
-            </Link>
-            <Link
               href="/magazin"
               className="flex items-center gap-3 px-3 py-2 text-base font-semibold hover:bg-accent rounded-md transition-colors"
               onClick={() => setOpen(false)}
             >
               <FileText className="h-5 w-5" />
-              Magazin
+              Camping Magazin
+            </Link>
+            <Link
+              href="/lexikon"
+              className="flex items-center gap-3 px-3 py-2 text-base font-semibold hover:bg-accent rounded-md transition-colors"
+              onClick={() => setOpen(false)}
+            >
+              <BookOpen className="h-5 w-5" />
+              Wohnmobil Lexikon
             </Link>
           </div>
 

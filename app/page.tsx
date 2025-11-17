@@ -34,7 +34,7 @@ export default async function HomePage() {
     take: 100, // Limit für Performance
   });
 
-  // Lade 6 neueste veröffentlichte Magazin-Artikel
+  // Lade 8 neueste veröffentlichte Magazin-Artikel
   const articles = await prisma.article.findMany({
     where: { published: true },
     select: {
@@ -49,7 +49,7 @@ export default async function HomePage() {
     orderBy: {
       createdAt: "desc",
     },
-    take: 6,
+    take: 8,
   });
 
   return (

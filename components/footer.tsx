@@ -11,13 +11,13 @@ export function Footer() {
               <Image
                 src="/womosuche-logo.webp"
                 alt="Womosuche"
-                width={160}
-                height={32}
+                width={120}
+                height={24}
                 priority
               />
             </div>
             <p className="text-sm text-muted-foreground">
-              Ihre Plattform für die Vermietung von Wohnmobilen
+              Deine Plattform für die Vermietung von Wohnmobilen
             </p>
           </div>
           <div>

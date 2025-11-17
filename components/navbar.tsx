@@ -36,6 +36,13 @@ export async function Navbar() {
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-4">
               <Link
+                href="/"
+                className="flex items-center gap-2 text-base font-bold hover:text-primary transition-colors"
+              >
+                <Home className="h-4 w-4" />
+                womosuche Home
+              </Link>
+              <Link
                 href="/wohnmobile"
                 className="flex items-center gap-2 text-base font-bold hover:text-primary transition-colors"
               >
@@ -43,18 +50,18 @@ export async function Navbar() {
                 Wohnmobile mieten
               </Link>
               <Link
-                href="/lexikon"
-                className="flex items-center gap-2 text-base font-bold hover:text-primary transition-colors"
-              >
-                <BookOpen className="h-4 w-4" />
-                Lexikon
-              </Link>
-              <Link
                 href="/magazin"
                 className="flex items-center gap-2 text-base font-bold hover:text-primary transition-colors"
               >
                 <FileText className="h-4 w-4" />
-                Magazin
+                Camping Magazin
+              </Link>
+              <Link
+                href="/lexikon"
+                className="flex items-center gap-2 text-base font-bold hover:text-primary transition-colors"
+              >
+                <BookOpen className="h-4 w-4" />
+                Wohnmobil Lexikon
               </Link>
             </div>
             <MobileMenu user={user} />

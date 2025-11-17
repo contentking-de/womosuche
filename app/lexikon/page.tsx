@@ -42,9 +42,9 @@ export default async function LexikonPage({
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold">Lexikon</h1>
-        <p className="mt-2 text-muted-foreground">
-          Fachbegriffe aus der Camping- und Wohnmobilwelt erklärt
+        <h1 className="text-4xl font-bold">Wohnmobil Lexikon</h1>
+        <p className="mt-2 text-lg text-muted-foreground">
+          Finde hier alle wichtigen Fachbegriffe, Techniken und Konzepte rund um Wohnmobile, Camping und Vanlife. Von technischen Details über Ausstattungsmerkmale bis hin zu praktischen Tipps – unser umfassendes Lexikon hilft dir, dich in der Welt der mobilen Reisen zurechtzufinden.
         </p>
       </div>
 
