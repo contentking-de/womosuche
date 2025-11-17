@@ -30,3 +30,44 @@ export async function generateUniqueSlug(
   return `${generateSlug(baseText)}-${Date.now()}`;
 }
 
+// Prüft, ob eine Kategorie ausgeblendet werden soll
+function shouldHideCategory(category: string): boolean {
+  const trimmed = category.trim();
+  // Prüfe auf Postleitzahl-Kategorien
+  const isPostalCode = /^Postleitzahl\s+\d{5}-\d{5}$/i.test(trimmed) || 
+                       /^Postleitzahl/i.test(trimmed);
+  // Prüfe auf "Wohnmobil Abstellplätze"
+  const isAbstellplaetze = /^Wohnmobil\s+Abstellplätze/i.test(trimmed);
+  
+  return isPostalCode || isAbstellplaetze;
+}
+
+// Gibt die erste Kategorie eines Artikels als Slug zurück
+export function getFirstCategorySlug(categories: string[] | null): string | null {
+  if (!categories || categories.length === 0) {
+    return null;
+  }
+  
+  // Filtere ausgeblendete Kategorien heraus
+  const validCategories = categories.filter(
+    (cat: string) => !shouldHideCategory(cat)
+  );
+  
+  if (validCategories.length === 0) {
+    return null;
+  }
+  
+  // Nimm die erste gültige Kategorie
+  return generateSlug(validCategories[0]);
+}
+
+// Erstellt die vollständige Artikel-URL mit Kategorie
+export function getArticleUrl(slug: string, categories: string[] | null): string {
+  const categorySlug = getFirstCategorySlug(categories);
+  if (categorySlug) {
+    return `/magazin/${categorySlug}/${slug}`;
+  }
+  // Fallback: wenn keine Kategorie vorhanden ist, verwende die alte URL-Struktur
+  return `/magazin/${slug}`;
+}
+

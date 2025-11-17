@@ -35,7 +35,7 @@ export function HeroSection({ listings }: HeroSectionProps) {
       {/* Hintergrundbild */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/wohnmobile-mieten-hero.jpg"
+          src="/wohnmobile-mieten-womosuche.jpg"
           alt="Wohnmobil Vermietung"
           fill
           className="object-cover"

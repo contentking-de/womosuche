@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
+import { getArticleUrl } from "@/lib/slug";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -8,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
 
   let listings: Array<{ slug: string; updatedAt: Date }> = [];
-  let articles: Array<{ slug: string; updatedAt: Date }> = [];
+  let articles: Array<{ slug: string; updatedAt: Date; categories: string[] | null }> = [];
   let terms: Array<{ slug: string; updatedAt: Date }> = [];
 
   try {
@@ -19,7 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }),
       prisma.article.findMany({
         where: { published: true },
-        select: { slug: true, updatedAt: true },
+        select: { slug: true, updatedAt: true, categories: true },
       }),
       prisma.glossaryTerm.findMany({
         select: { slug: true, updatedAt: true },
@@ -66,7 +67,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const articleRoutes = articles.map((article: typeof articles[number]) => ({
-    url: `${baseUrl}/magazin/${article.slug}`,
+    url: `${baseUrl}${getArticleUrl(article.slug, article.categories)}`,
     lastModified: article.updatedAt,
     changeFrequency: "monthly" as const,
     priority: 0.6,

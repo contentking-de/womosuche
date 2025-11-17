@@ -9,7 +9,7 @@ import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { FileText, ArrowLeft } from "lucide-react";
 import { unstable_noStore as noStore } from "next/cache";
-import { generateSlug } from "@/lib/slug";
+import { generateSlug, getArticleUrl } from "@/lib/slug";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -155,7 +155,7 @@ export default async function CategoryPage({
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {uniqueArticles.map((article) => (
-            <Link key={article.id} href={`/magazin/${article.slug}`}>
+            <Link key={article.id} href={getArticleUrl(article.slug, article.categories)}>
               <Card className="h-full transition-shadow hover:shadow-lg">
                 <CardContent className="p-0">
                   {article.featuredImageUrl ? (

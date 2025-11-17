@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
@@ -10,6 +10,19 @@ import { de } from "date-fns/locale";
 import { unstable_noStore as noStore } from "next/cache";
 import { TocSearchArticles } from "@/components/magazin/toc-search-articles";
 import { RecentArticles } from "@/components/magazin/recent-articles";
+import { getFirstCategorySlug, generateSlug } from "@/lib/slug";
+
+// Prüft, ob eine Kategorie ausgeblendet werden soll
+function shouldHideCategory(category: string): boolean {
+  const trimmed = category.trim();
+  // Prüfe auf Postleitzahl-Kategorien
+  const isPostalCode = /^Postleitzahl\s+\d{5}-\d{5}$/i.test(trimmed) || 
+                       /^Postleitzahl/i.test(trimmed);
+  // Prüfe auf "Wohnmobil Abstellplätze"
+  const isAbstellplaetze = /^Wohnmobil\s+Abstellplätze/i.test(trimmed);
+  
+  return isPostalCode || isAbstellplaetze;
+}
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -70,16 +83,46 @@ function buildHtmlAndToc(html: string): { htmlWithIds: string; toc: TocItem[] } 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ params: string[] }>;
 }) {
   noStore();
-  const { slug } = await params;
+  const { params: routeParams } = await params;
+  
+  // Erwarte entweder [slug] oder [category, slug]
+  if (routeParams.length === 0 || routeParams.length > 2) {
+    return {};
+  }
+  
+  const slug = routeParams.length === 1 ? routeParams[0] : routeParams[1];
+  const category = routeParams.length === 2 ? routeParams[0] : null;
   const article = await prisma.article.findFirst({
     where: { slug, published: true },
   });
 
   if (!article) {
     return {};
+  }
+
+  // Wenn eine Kategorie angegeben ist, prüfe ob sie übereinstimmt
+  if (category) {
+    if (article.categories && article.categories.length > 0) {
+      // Filtere ausgeblendete Kategorien heraus
+      const validCategories = article.categories.filter(
+        (cat: string) => !shouldHideCategory(cat)
+      );
+      
+      // Prüfe, ob eine der gültigen Kategorien mit der URL-Kategorie übereinstimmt
+      const categoryMatches = validCategories.some((cat: string) => {
+        const catSlug = generateSlug(cat);
+        return catSlug === category;
+      });
+      
+      if (!categoryMatches) {
+        return {};
+      }
+    } else {
+      return {};
+    }
   }
 
   return {
@@ -91,16 +134,66 @@ export async function generateMetadata({
 export default async function ArticlePage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ params: string[] }>;
 }) {
   noStore();
-  const { slug } = await params;
+  const { params: routeParams } = await params;
+  
+  // Erwarte entweder [slug] oder [category, slug]
+  if (routeParams.length === 0 || routeParams.length > 2) {
+    notFound();
+  }
+  
+  const slug = routeParams.length === 1 ? routeParams[0] : routeParams[1];
+  const category = routeParams.length === 2 ? routeParams[0] : null;
+  
+  // Versuche zuerst den Artikel direkt zu finden
   const article = await prisma.article.findFirst({
     where: { slug, published: true },
   });
 
   if (!article) {
     notFound();
+  }
+
+  // Wenn keine Kategorie in der URL angegeben ist, leite zur URL mit Kategorie um
+  if (!category) {
+    if (article.categories && article.categories.length > 0) {
+      const firstCategorySlug = getFirstCategorySlug(article.categories);
+      if (firstCategorySlug) {
+        redirect(`/magazin/${firstCategorySlug}/${slug}`);
+      } else {
+        // Wenn keine gültige Kategorie vorhanden, zeige den Artikel trotzdem an
+        // (Fallback für Artikel ohne Kategorien)
+      }
+    }
+  } else {
+    // Wenn eine Kategorie angegeben ist, prüfe ob sie übereinstimmt
+    if (article.categories && article.categories.length > 0) {
+      // Filtere ausgeblendete Kategorien heraus
+      const validCategories = article.categories.filter(
+        (cat: string) => !shouldHideCategory(cat)
+      );
+      
+      // Wenn nur ausgeblendete Kategorien vorhanden sind, zeige den Artikel trotzdem an
+      if (validCategories.length === 0) {
+        // Artikel ohne gültige Kategorien anzeigen
+      } else {
+        // Prüfe, ob eine der gültigen Kategorien mit der URL-Kategorie übereinstimmt
+        const categoryMatches = validCategories.some((cat: string) => {
+          const catSlug = generateSlug(cat);
+          return catSlug === category;
+        });
+        
+        // Wenn die Kategorie nicht übereinstimmt, leite zur korrekten URL um (erste Kategorie)
+        if (!categoryMatches) {
+          const firstCategorySlug = getFirstCategorySlug(article.categories);
+          if (firstCategorySlug) {
+            redirect(`/magazin/${firstCategorySlug}/${slug}`);
+          }
+        }
+      }
+    }
   }
 
   const { htmlWithIds, toc } = buildHtmlAndToc(article.content ?? "");

@@ -53,6 +53,7 @@ export default async function HomePage() {
       tags: true,
       featuredImageUrl: true,
       createdAt: true,
+      categories: true,
     },
     orderBy: {
       createdAt: "desc",

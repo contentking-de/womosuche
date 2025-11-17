@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { ArrowRight, FileText } from "lucide-react";
+import { getArticleUrl } from "@/lib/slug";
 
 interface Article {
   id: string;
@@ -15,6 +16,7 @@ interface Article {
   tags: string[];
   featuredImageUrl: string | null;
   createdAt: Date;
+  categories: string[] | null;
 }
 
 interface MagazinSectionProps {
@@ -48,7 +50,7 @@ export function MagazinSection({ articles }: MagazinSectionProps) {
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {articles.map((article) => (
-            <Link key={article.id} href={`/magazin/${article.slug}`}>
+            <Link key={article.id} href={getArticleUrl(article.slug, article.categories)}>
               <Card className="h-full transition-shadow hover:shadow-lg">
                 <CardContent className="p-0">
                   {article.featuredImageUrl ? (

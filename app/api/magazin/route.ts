@@ -27,7 +27,7 @@ export async function GET(request: Request) {
       where,
       orderBy: { createdAt: "desc" },
       take,
-      select: { id: true, title: true, slug: true, published: true },
+      select: { id: true, title: true, slug: true, published: true, categories: true },
     });
     return NextResponse.json({ items });
   } catch (error) {

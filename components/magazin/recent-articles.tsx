@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { FileText } from "lucide-react";
+import { getArticleUrl } from "@/lib/slug";
 
 interface RecentArticlesProps {
   currentSlug: string;
@@ -15,6 +16,7 @@ type ArticlePreview = {
   slug: string;
   createdAt: Date;
   featuredImageUrl: string | null;
+  categories: string[] | null;
 };
 
 export async function RecentArticles({ currentSlug }: RecentArticlesProps) {
@@ -31,6 +33,7 @@ export async function RecentArticles({ currentSlug }: RecentArticlesProps) {
       slug: true,
       createdAt: true,
       featuredImageUrl: true,
+      categories: true,
     },
     orderBy: {
       createdAt: "desc",
@@ -49,7 +52,7 @@ export async function RecentArticles({ currentSlug }: RecentArticlesProps) {
         {articles.map((article: ArticlePreview) => (
           <Link
             key={article.id}
-            href={`/magazin/${article.slug}`}
+            href={getArticleUrl(article.slug, article.categories)}
             className="flex gap-3 group"
           >
             <div className="relative flex-shrink-0 w-16 h-16 rounded-md overflow-hidden bg-muted">

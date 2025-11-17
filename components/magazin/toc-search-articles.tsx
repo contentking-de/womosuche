@@ -3,12 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
+import { getArticleUrl } from "@/lib/slug";
 
 type SearchItem = {
   id: string;
   title: string;
   slug: string;
   published?: boolean;
+  categories: string[] | null;
 };
 
 export function TocSearchArticles() {
@@ -71,7 +73,7 @@ export function TocSearchArticles() {
             {items.map((it) => (
               <li key={it.id} className="py-2 first:pt-0 last:pb-0">
                 <Link
-                  href={`/magazin/${it.slug}`}
+                  href={getArticleUrl(it.slug, it.categories)}
                   className="block truncate text-sky-700/80 hover:text-sky-700 dark:text-sky-300/80 dark:hover:text-sky-300"
                 >
                   {it.title}
