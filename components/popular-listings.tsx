@@ -13,7 +13,7 @@ export async function PopularListings() {
 
   // Wähle zufällig 12 IDs aus
   const shuffled = allListingIds.sort(() => 0.5 - Math.random());
-  const selectedIds = shuffled.slice(0, 12).map((l) => l.id);
+  const selectedIds = shuffled.slice(0, 12).map((l: { id: string }) => l.id);
 
   if (selectedIds.length === 0) {
     return null;
