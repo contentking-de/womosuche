@@ -76,6 +76,8 @@ model Listing {
   seats       Int
   beds        Int
   location    String
+  lat         Float?
+  lng         Float?
   features    String[]
   images      Image[]
   inquiries   Inquiry[]
@@ -86,6 +88,7 @@ model Listing {
   @@index([slug])
   @@index([published])
   @@index([location])
+  @@index([lat, lng])
 }
 
 model Image {
@@ -100,12 +103,14 @@ model Image {
 }
 
 model Inquiry {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   listingId   String
   listing      Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
   renterName   String
   renterEmail  String
   message      String   @db.Text
+  startDate    DateTime?
+  endDate      DateTime?
   status       String   @default("OPEN") // OPEN|ANSWERED|ARCHIVED
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

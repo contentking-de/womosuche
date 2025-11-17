@@ -17,7 +17,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Listing, Image } from "@prisma/client";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Listing, Image, User } from "@prisma/client";
 import { ImageUpload } from "./image-upload";
 import { Separator } from "@/components/ui/separator";
 
@@ -30,6 +37,7 @@ const listingSchema = z.object({
   location: z.string().min(2, "Standort ist erforderlich"),
   features: z.array(z.string()),
   published: z.boolean(),
+  ownerId: z.string().optional(),
 });
 
 type ListingFormData = z.infer<typeof listingSchema>;
@@ -51,12 +59,17 @@ const availableFeatures = [
 
 interface ListingFormProps {
   listing?: Listing & { images: Image[] };
+  userRole?: "ADMIN" | "LANDLORD";
+  ownerId?: string;
+  availableUsers?: User[];
 }
 
-export function ListingForm({ listing }: ListingFormProps) {
+export function ListingForm({ listing, userRole, ownerId: initialOwnerId, availableUsers = [] }: ListingFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   const {
     register,
@@ -76,10 +89,12 @@ export function ListingForm({ listing }: ListingFormProps) {
           location: listing.location,
           features: listing.features,
           published: listing.published,
+          ownerId: listing.ownerId,
         }
       : {
           features: [],
           published: false,
+          ownerId: initialOwnerId,
         },
   });
 
@@ -91,6 +106,43 @@ export function ListingForm({ listing }: ListingFormProps) {
       setValue("features", current.filter((f) => f !== feature));
     } else {
       setValue("features", [...current, feature]);
+    }
+  };
+
+  const handleAiGenerate = async () => {
+    setAiError(null);
+    const title = watch("title")?.trim() || "";
+    if (title.length < 3) {
+      setAiError("Bitte geben Sie zuerst einen Titel ein.");
+      return;
+    }
+    setAiLoading(true);
+    try {
+      const res = await fetch("/api/listings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          __action: "generate",
+          title: watch("title"),
+          location: watch("location"),
+          pricePerDay: watch("pricePerDay"),
+          seats: watch("seats"),
+          beds: watch("beds"),
+          features: watch("features") || [],
+          existingDescription: watch("description"),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error ?? "KI-Vorschlag fehlgeschlagen");
+      }
+      if (typeof data?.description === "string") {
+        setValue("description", data.description);
+      }
+    } catch (e) {
+      setAiError((e as Error).message);
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -170,8 +222,44 @@ export function ListingForm({ listing }: ListingFormProps) {
             </div>
           </div>
 
+          {userRole === "ADMIN" && availableUsers.length > 0 && (
+            <div className="space-y-2">
+              <Label htmlFor="ownerId">Vermieter *</Label>
+              <Select
+                defaultValue={watch("ownerId") || ""}
+                onValueChange={(value) => setValue("ownerId", value)}
+                disabled={isLoading}
+              >
+                <SelectTrigger id="ownerId">
+                  <SelectValue placeholder="Vermieter auswählen" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableUsers.map((user) => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.name || user.email} {user.name && `(${user.email})`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.ownerId && (
+                <p className="text-sm text-destructive">{errors.ownerId.message}</p>
+              )}
+            </div>
+          )}
+
           <div className="space-y-2">
-            <Label htmlFor="description">Beschreibung *</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="description">Beschreibung *</Label>
+              <Button 
+                type="button" 
+                variant="secondary" 
+                onClick={handleAiGenerate} 
+                disabled={isLoading || aiLoading}
+                size="sm"
+              >
+                {aiLoading ? "KI arbeitet..." : "Mit KI generieren"}
+              </Button>
+            </div>
             <Textarea
               id="description"
               placeholder="Beschreiben Sie Ihr Wohnmobil..."
@@ -182,6 +270,12 @@ export function ListingForm({ listing }: ListingFormProps) {
             {errors.description && (
               <p className="text-sm text-destructive">{errors.description.message}</p>
             )}
+            {aiError && (
+              <p className="text-sm text-destructive">{aiError}</p>
+            )}
+            <p className="text-sm text-muted-foreground">
+              Die KI kann eine Beschreibung basierend auf den eingegebenen Daten generieren oder die vorhandene Beschreibung überarbeiten.
+            </p>
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">

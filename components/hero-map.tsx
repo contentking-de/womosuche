@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { MapPin, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,28 +25,15 @@ const Popup = dynamic(
   { ssr: false }
 );
 
-import L from "leaflet";
-
-// Fix für Leaflet Icons
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-});
-
 interface Listing {
   id: string;
   title: string;
   slug: string;
   location: string;
   pricePerDay: number;
+  lat: number | null;
+  lng: number | null;
   images: { url: string }[];
-}
-
-interface ListingWithCoords extends Listing {
-  lat?: number;
-  lng?: number;
 }
 
 interface HeroMapProps {
@@ -56,43 +43,27 @@ interface HeroMapProps {
 
 export function HeroMap({ listings, onClose }: HeroMapProps) {
   const router = useRouter();
-  const [listingsWithCoords, setListingsWithCoords] = useState<ListingWithCoords[]>([]);
-  const [loading, setLoading] = useState(true);
-
+  const [isClient, setIsClient] = useState(false);
+  
+  // Fix für Leaflet Icons - nur im Client ausführen
   useEffect(() => {
-    // Geocode Standorte zu Koordinaten
-    const geocodeListings = async () => {
-      const geocoded = await Promise.all(
-        listings.map(async (listing) => {
-          try {
-            const response = await fetch(
-              `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(listing.location)}&limit=1`,
-              {
-                headers: {
-                  "User-Agent": "Womosuche/1.0",
-                },
-              }
-            );
-            const data = await response.json();
-            if (data && data.length > 0) {
-              return {
-                ...listing,
-                lat: parseFloat(data[0].lat),
-                lng: parseFloat(data[0].lon),
-              };
-            }
-          } catch (error) {
-            console.error(`Geocoding failed for ${listing.location}:`, error);
-          }
-          return { ...listing };
-        })
-      );
-      setListingsWithCoords(geocoded.filter((l) => l.lat && l.lng));
-      setLoading(false);
-    };
-
-    geocodeListings();
-  }, [listings]);
+    setIsClient(true);
+    if (typeof window !== "undefined") {
+      import("leaflet").then((L) => {
+        delete (L.default.Icon.Default.prototype as any)._getIconUrl;
+        L.default.Icon.Default.mergeOptions({
+          iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+          iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+          shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+        });
+      });
+    }
+  }, []);
+  
+  // Filtere Listings mit vorhandenen Koordinaten
+  const listingsWithCoords = listings.filter(
+    (listing) => listing.lat !== null && listing.lng !== null
+  );
 
   // Berechne Mittelpunkt der Karte basierend auf allen Markern
   const center: [number, number] = listingsWithCoords.length > 0
@@ -102,7 +73,7 @@ export function HeroMap({ listings, onClose }: HeroMapProps) {
       ]
     : [51.1657, 10.4515]; // Deutschland Mittelpunkt
 
-  if (loading) {
+  if (!isClient) {
     return (
       <div className="relative min-h-[600px] flex items-center justify-center bg-muted">
         <div className="text-center">

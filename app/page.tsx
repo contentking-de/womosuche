@@ -17,6 +17,8 @@ export default async function HomePage() {
       slug: true,
       location: true,
       pricePerDay: true,
+      lat: true,
+      lng: true,
       images: {
         take: 1,
         select: {

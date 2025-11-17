@@ -9,11 +9,10 @@ const updateInquirySchema = z.object({
 
 export async function PATCH(
   request: Request,
-  { params }: any
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const idParam = params?.id;
-    const id = Array.isArray(idParam) ? idParam[0] : idParam;
+    const { id } = await params;
     const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });

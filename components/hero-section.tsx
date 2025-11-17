@@ -14,6 +14,8 @@ interface Listing {
   slug: string;
   location: string;
   pricePerDay: number;
+  lat: number | null;
+  lng: number | null;
   images: { url: string }[];
 }
 

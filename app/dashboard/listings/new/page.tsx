@@ -1,8 +1,23 @@
 import { requireAuth } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
 import { ListingForm } from "@/components/listings/listing-form";
 
 export default async function NewListingPage() {
-  await requireAuth();
+  const user = await requireAuth();
+
+  // Lade User-Liste für Admin
+  const availableUsers =
+    user.role === "ADMIN"
+      ? await prisma.user.findMany({
+          where: { role: "LANDLORD" },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+          orderBy: { name: "asc" },
+        })
+      : [];
 
   return (
     <div>
@@ -12,7 +27,11 @@ export default async function NewListingPage() {
           Fügen Sie ein neues Wohnmobil zu Ihrem Inventar hinzu
         </p>
       </div>
-      <ListingForm />
+      <ListingForm
+        userRole={user.role}
+        ownerId={user.id}
+        availableUsers={availableUsers}
+      />
     </div>
   );
 }

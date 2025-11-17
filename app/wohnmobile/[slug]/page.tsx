@@ -171,9 +171,10 @@ export default async function ListingDetailPage({
 
           <div>
             <h2 className="mb-2 text-xl font-semibold">Beschreibung</h2>
-            <p className="whitespace-pre-wrap text-muted-foreground">
-              {listing.description}
-            </p>
+            <div
+              className="prose prose-sm max-w-none text-muted-foreground"
+              dangerouslySetInnerHTML={{ __html: listing.description }}
+            />
           </div>
 
           {listing.features.length > 0 && (

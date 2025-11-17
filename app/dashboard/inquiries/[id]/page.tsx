@@ -11,9 +11,12 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Mail, MapPin } from "lucide-react";
 import { UpdateInquiryStatusButton } from "@/components/inquiries/update-status-button";
 
-export default async function InquiryDetailPage({ params }: any) {
-  const idParam = params?.id;
-  const id = Array.isArray(idParam) ? idParam[0] : idParam;
+export default async function InquiryDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   const user = await requireAuth();
 
   const inquiry = await prisma.inquiry.findUnique({
@@ -96,6 +99,24 @@ export default async function InquiryDetailPage({ params }: any) {
                 {inquiry.renterEmail}
               </a>
             </div>
+            {(inquiry.startDate || inquiry.endDate) && (
+              <>
+                <Separator />
+                <div>
+                  <p className="text-sm text-muted-foreground">Reisezeitraum</p>
+                  {inquiry.startDate && (
+                    <p className="mt-1">
+                      Reisebeginn: {format(new Date(inquiry.startDate), "dd.MM.yyyy", { locale: de })}
+                    </p>
+                  )}
+                  {inquiry.endDate && (
+                    <p className="mt-1">
+                      Reiseende: {format(new Date(inquiry.endDate), "dd.MM.yyyy", { locale: de })}
+                    </p>
+                  )}
+                </div>
+              </>
+            )}
             <Separator />
             <div>
               <p className="text-sm text-muted-foreground">Nachricht</p>

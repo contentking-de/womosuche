@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { unstable_noStore as noStore } from "next/cache";
 import { TocSearchArticles } from "@/components/magazin/toc-search-articles";
+import { RecentArticles } from "@/components/magazin/recent-articles";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -193,6 +194,7 @@ export default async function ArticlePage({
                     </nav>
                   </>
                 )}
+                <RecentArticles currentSlug={slug} />
               </div>
             </CardContent>
           </Card>

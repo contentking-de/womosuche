@@ -11,6 +11,8 @@ export async function sendNewInquiryEmailToOwner({
   listingTitle,
   renterName,
   renterEmail,
+  startDate,
+  endDate,
   message,
   inquiryUrl,
 }: {
@@ -19,29 +21,42 @@ export async function sendNewInquiryEmailToOwner({
   listingTitle: string;
   renterName: string;
   renterEmail: string;
+  startDate?: string;
+  endDate?: string;
   message: string;
   inquiryUrl: string;
 }) {
   try {
+    // Validierung: Stelle sicher, dass ownerEmail vorhanden ist
+    if (!ownerEmail || !ownerEmail.trim()) {
+      throw new Error(`Ungültige E-Mail-Adresse für Vermieter: ${ownerEmail}`);
+    }
+
     const emailHtml = await render(
       NewInquiryToOwnerEmail({
         ownerName: ownerName || undefined,
         listingTitle,
         renterName,
         renterEmail,
+        startDate,
+        endDate,
         message,
         inquiryUrl,
       })
     );
 
+    // WICHTIG: E-Mail wird immer an die übergebene ownerEmail gesendet
+    // Diese sollte immer die E-Mail des Owners des angefragten Wohnmobils sein
     await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev",
-      to: ownerEmail,
+      to: ownerEmail.trim(), // Verwende trim() um Leerzeichen zu entfernen
       subject: `Neue Buchungsanfrage für ${listingTitle}`,
       html: emailHtml,
     });
+
+    console.log(`E-Mail erfolgreich an Vermieter gesendet: ${ownerEmail} für Listing: ${listingTitle}`);
   } catch (error) {
-    console.error("Error sending email to owner:", error);
+    console.error(`Fehler beim Senden der E-Mail an Vermieter ${ownerEmail}:`, error);
     throw error;
   }
 }

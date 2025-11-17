@@ -16,6 +16,8 @@ interface NewInquiryToOwnerEmailProps {
   listingTitle: string;
   renterName: string;
   renterEmail: string;
+  startDate?: string;
+  endDate?: string;
   message: string;
   inquiryUrl: string;
 }
@@ -25,9 +27,20 @@ export const NewInquiryToOwnerEmail = ({
   listingTitle,
   renterName,
   renterEmail,
+  startDate,
+  endDate,
   message,
   inquiryUrl,
 }: NewInquiryToOwnerEmailProps) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("de-DE", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
   return (
     <Html>
       <Head />
@@ -48,6 +61,22 @@ export const NewInquiryToOwnerEmail = ({
             <Text style={value}>{renterName}</Text>
             <Text style={value}>{renterEmail}</Text>
           </Section>
+
+          {(startDate || endDate) && (
+            <Section style={section}>
+              <Text style={label}>Reisezeitraum:</Text>
+              {startDate && (
+                <Text style={value}>
+                  Reisebeginn: {formatDate(startDate)}
+                </Text>
+              )}
+              {endDate && (
+                <Text style={value}>
+                  Reiseende: {formatDate(endDate)}
+                </Text>
+              )}
+            </Section>
+          )}
 
           <Section style={section}>
             <Text style={label}>Nachricht:</Text>

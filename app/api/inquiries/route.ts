@@ -10,7 +10,17 @@ const inquirySchema = z.object({
   listingId: z.string(),
   renterName: z.string().min(2),
   renterEmail: z.string().email(),
+  startDate: z.string().min(1),
+  endDate: z.string().min(1),
   message: z.string().min(10),
+}).refine((data) => {
+  if (data.startDate && data.endDate) {
+    return new Date(data.startDate) <= new Date(data.endDate);
+  }
+  return true;
+}, {
+  message: "Reiseende muss nach Reisebeginn liegen",
+  path: ["endDate"],
 });
 
 // Einfaches Rate Limiting (in-memory)
@@ -70,26 +80,49 @@ export async function POST(request: Request) {
       );
     }
 
+    // Prüfe ob Owner existiert und E-Mail-Adresse vorhanden ist
+    if (!listing.owner) {
+      return NextResponse.json(
+        { error: "Vermieter nicht gefunden" },
+        { status: 404 }
+      );
+    }
+
+    if (!listing.owner.email) {
+      console.error(`Listing ${listing.id} hat keinen Owner mit E-Mail-Adresse`);
+      return NextResponse.json(
+        { error: "Vermieter-E-Mail nicht verfügbar" },
+        { status: 500 }
+      );
+    }
+
     // Erstelle Anfrage
     const inquiry = await prisma.inquiry.create({
       data: {
         listingId: validatedData.listingId,
         renterName: validatedData.renterName,
         renterEmail: validatedData.renterEmail,
+        startDate: new Date(validatedData.startDate),
+        endDate: new Date(validatedData.endDate),
         message: validatedData.message,
       },
     });
 
     // E-Mails senden (asynchron, nicht blockierend)
+    // WICHTIG: Verwende immer listing.owner.email, um sicherzustellen, dass die E-Mail an den richtigen Vermieter geht
+    const ownerEmail = listing.owner.email;
+    const ownerName = listing.owner.name;
     const inquiryUrl = `${process.env.AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3000"}/dashboard/inquiries`;
     
     Promise.all([
       sendNewInquiryEmailToOwner({
-        ownerEmail: listing.owner.email,
-        ownerName: listing.owner.name,
+        ownerEmail: ownerEmail, // Immer die E-Mail des Owners des angefragten Listings
+        ownerName: ownerName,
         listingTitle: listing.title,
         renterName: validatedData.renterName,
         renterEmail: validatedData.renterEmail,
+        startDate: validatedData.startDate,
+        endDate: validatedData.endDate,
         message: validatedData.message,
         inquiryUrl,
       }),

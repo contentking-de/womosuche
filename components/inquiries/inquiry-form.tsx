@@ -13,7 +13,17 @@ import { Card, CardContent } from "@/components/ui/card";
 const inquirySchema = z.object({
   renterName: z.string().min(2, "Name muss mindestens 2 Zeichen lang sein"),
   renterEmail: z.string().email("Ungültige E-Mail-Adresse"),
+  startDate: z.string().min(1, "Reisebeginn ist erforderlich"),
+  endDate: z.string().min(1, "Reiseende ist erforderlich"),
   message: z.string().min(10, "Nachricht muss mindestens 10 Zeichen lang sein"),
+}).refine((data) => {
+  if (data.startDate && data.endDate) {
+    return new Date(data.startDate) <= new Date(data.endDate);
+  }
+  return true;
+}, {
+  message: "Reiseende muss nach Reisebeginn liegen",
+  path: ["endDate"],
 });
 
 type InquiryFormData = z.infer<typeof inquirySchema>;
@@ -31,10 +41,13 @@ export function InquiryForm({ listingId }: InquiryFormProps) {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm<InquiryFormData>({
     resolver: zodResolver(inquirySchema),
   });
+
+  const startDate = watch("startDate");
 
   const onSubmit = async (data: InquiryFormData) => {
     setIsLoading(true);
@@ -63,7 +76,7 @@ export function InquiryForm({ listingId }: InquiryFormProps) {
       reset();
       setIsLoading(false);
     } catch (err) {
-      setError("Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.");
+      setError("Ein Fehler ist aufgetreten. Bitte versuche es erneut.");
       setIsLoading(false);
     }
   };
@@ -73,9 +86,9 @@ export function InquiryForm({ listingId }: InquiryFormProps) {
       <Card>
         <CardContent className="pt-6">
           <div className="rounded-md bg-green-50 dark:bg-green-900/20 p-4 text-green-800 dark:text-green-200">
-            <p className="font-medium">Anfrage erfolgreich gesendet!</p>
+            <p className="font-medium">Deine Anfrage wurde erfolgreich gesendet!</p>
             <p className="mt-1 text-sm">
-              Der Vermieter wird sich in Kürze bei Ihnen melden.
+              Der Vermieter wird sich in Kürze bei dir melden.
             </p>
           </div>
         </CardContent>
@@ -95,7 +108,7 @@ export function InquiryForm({ listingId }: InquiryFormProps) {
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="renterName">Ihr Name *</Label>
+              <Label htmlFor="renterName">Dein Name *</Label>
               <Input
                 id="renterName"
                 placeholder="Max Mustermann"
@@ -108,11 +121,11 @@ export function InquiryForm({ listingId }: InquiryFormProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="renterEmail">Ihre E-Mail *</Label>
+              <Label htmlFor="renterEmail">Deine E-Mail *</Label>
               <Input
                 id="renterEmail"
                 type="email"
-                placeholder="ihre@email.de"
+                placeholder="deine@email.de"
                 {...register("renterEmail")}
                 disabled={isLoading}
               />
@@ -122,11 +135,41 @@ export function InquiryForm({ listingId }: InquiryFormProps) {
             </div>
           </div>
 
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="startDate">Reisebeginn *</Label>
+              <Input
+                id="startDate"
+                type="date"
+                {...register("startDate")}
+                disabled={isLoading}
+                min={new Date().toISOString().split('T')[0]}
+              />
+              {errors.startDate && (
+                <p className="text-sm text-destructive">{errors.startDate.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="endDate">Reiseende *</Label>
+              <Input
+                id="endDate"
+                type="date"
+                {...register("endDate")}
+                disabled={isLoading}
+                min={startDate || new Date().toISOString().split('T')[0]}
+              />
+              {errors.endDate && (
+                <p className="text-sm text-destructive">{errors.endDate.message}</p>
+              )}
+            </div>
+          </div>
+
           <div className="space-y-2">
-            <Label htmlFor="message">Ihre Nachricht *</Label>
+            <Label htmlFor="message">Deine Nachricht *</Label>
             <Textarea
               id="message"
-              placeholder="Teilen Sie uns Ihre gewünschten Reisedaten und Fragen mit..."
+              placeholder="Teile uns deine gewünschten Reisedaten und Fragen mit..."
               rows={5}
               {...register("message")}
               disabled={isLoading}

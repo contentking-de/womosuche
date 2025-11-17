@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { generateUniqueSlug } from "@/lib/slug";
+import { geocodeLocation } from "@/lib/geocode";
 import { z } from "zod";
 
 const listingSchema = z.object({
@@ -13,15 +14,15 @@ const listingSchema = z.object({
   location: z.string().min(2),
   features: z.array(z.string()).default([]),
   published: z.boolean().default(false),
+  ownerId: z.string().optional(),
 });
 
 export async function PUT(
   request: Request,
-  { params }: any
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const idParam = params?.id;
-    const id = Array.isArray(idParam) ? idParam[0] : idParam;
+    const { id } = await params;
     const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
@@ -57,12 +58,43 @@ export async function PUT(
       );
     }
 
+    // Geocode Location nur wenn sie sich geändert hat
+    let coordinates: { lat: number | null; lng: number | null } | undefined;
+    if (validatedData.location !== listing.location) {
+      const coords = await geocodeLocation(validatedData.location).catch(
+        () => null
+      );
+      coordinates = {
+        lat: coords?.lat ?? null,
+        lng: coords?.lng ?? null,
+      };
+    }
+
+    // Erlaube ownerId-Änderung nur für Admins
+    const updateData: any = {
+      ...validatedData,
+      slug,
+      ...(coordinates && { lat: coordinates.lat, lng: coordinates.lng }),
+    };
+
+    // Nur Admins können ownerId ändern
+    if (session.user.role === "ADMIN" && validatedData.ownerId) {
+      // Prüfe ob User existiert
+      const owner = await prisma.user.findUnique({
+        where: { id: validatedData.ownerId },
+      });
+      if (!owner) {
+        return NextResponse.json(
+          { error: "Vermieter nicht gefunden" },
+          { status: 400 }
+        );
+      }
+      updateData.ownerId = validatedData.ownerId;
+    }
+
     const updatedListing = await prisma.listing.update({
       where: { id },
-      data: {
-        ...validatedData,
-        slug,
-      },
+      data: updateData,
     });
 
     return NextResponse.json(updatedListing);
@@ -84,11 +116,10 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: any
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const idParam = params?.id;
-    const id = Array.isArray(idParam) ? idParam[0] : idParam;
+    const { id } = await params;
     const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
