@@ -11,6 +11,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
+      {
+        protocol: "https",
+        hostname: "womosuche.de",
+      },
+      {
+        protocol: "https",
+        hostname: "*.womosuche.de",
+      },
     ],
   },
   webpack: (config, { isServer }) => {

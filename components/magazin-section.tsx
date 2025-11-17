@@ -1,44 +1,53 @@
-import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
-import { FileText } from "lucide-react";
-import { unstable_noStore as noStore } from "next/cache";
+import { ArrowRight, FileText } from "lucide-react";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-export const fetchCache = "force-no-store";
+interface Article {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  tags: string[];
+  featuredImageUrl: string | null;
+  createdAt: Date;
+}
 
-export default async function MagazinPage() {
-  noStore();
-  const articles = await prisma.article.findMany({
-    where: {
-      published: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+interface MagazinSectionProps {
+  articles: Article[];
+}
+
+export function MagazinSection({ articles }: MagazinSectionProps) {
+  if (articles.length === 0) {
+    return null;
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold">Magazin</h1>
-        <p className="mt-2 text-muted-foreground">
-          Fachartikel rund um Camping und Wohnmobile
-        </p>
-      </div>
-
-      {articles.length === 0 ? (
-        <div className="rounded-lg border p-12 text-center">
-          <p className="text-muted-foreground">Noch keine Artikel vorhanden</p>
+    <section className="border-t bg-muted/50 py-24">
+      <div className="container mx-auto px-4">
+        <div className="mb-12 flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              Aus unserem Magazin
+            </h2>
+            <p className="mt-2 text-lg text-muted-foreground">
+              Fachartikel rund um Camping und Wohnmobile
+            </p>
+          </div>
+          <Link href="/magazin">
+            <Button variant="outline" size="lg">
+              Alle Artikel
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
         </div>
-      ) : (
+
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {articles.map((article: typeof articles[number]) => (
+          {articles.map((article) => (
             <Link key={article.id} href={`/magazin/${article.slug}`}>
               <Card className="h-full transition-shadow hover:shadow-lg">
                 <CardContent className="p-0">
@@ -57,7 +66,9 @@ export default async function MagazinPage() {
                     </div>
                   )}
                   <div className="p-6">
-                    <h2 className="mb-2 text-xl font-semibold line-clamp-2">{article.title}</h2>
+                    <h3 className="mb-2 text-xl font-semibold line-clamp-2">
+                      {article.title}
+                    </h3>
                     {article.excerpt && (
                       <p className="mb-4 line-clamp-3 text-muted-foreground">
                         {article.excerpt}
@@ -71,7 +82,7 @@ export default async function MagazinPage() {
                       </span>
                       {article.tags.length > 0 && (
                         <div className="flex gap-1">
-                          {article.tags.slice(0, 2).map((tag: string) => (
+                          {article.tags.slice(0, 2).map((tag) => (
                             <Badge key={tag} variant="secondary" className="text-xs">
                               {tag}
                             </Badge>
@@ -85,8 +96,8 @@ export default async function MagazinPage() {
             </Link>
           ))}
         </div>
-      )}
-    </div>
+      </div>
+    </section>
   );
 }
 
