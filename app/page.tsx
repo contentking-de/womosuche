@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Home, Users, Shield, Search } from "lucide-react";
+import { Car, Users, Shield, Search } from "lucide-react";
 import { PricingSection } from "@/components/marketing/pricing-section";
 import { HeroSection } from "@/components/hero-section";
 import { MagazinSection } from "@/components/magazin-section";
@@ -73,10 +73,10 @@ export default async function HomePage() {
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Warum unsere Plattform?
+              Warum womosuche.de?
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Alles, was du für eine erfolgreiche Wohnmobil-Vermietung brauchst
+              Finde das perfekte Wohnmobil für dein nächstes Abenteuer
             </p>
           </div>
           <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 sm:grid-cols-2 lg:max-w-none lg:grid-cols-4">
@@ -109,7 +109,7 @@ export default async function HomePage() {
             </Card>
             <Card>
               <CardHeader>
-                <Home className="mb-4 h-8 w-8 text-primary" />
+                <Car className="mb-4 h-8 w-8 text-primary" />
                 <CardTitle>Vermiete einfach</CardTitle>
                 <CardDescription>
                   Verwalte deine Wohnmobile bequem im Dashboard
