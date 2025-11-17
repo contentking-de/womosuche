@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { signOut } from "@/auth";
-import { Home, User, LogOut, Settings, LogIn, UserPlus } from "lucide-react";
+import { Home, User, LogOut, Settings, LogIn, UserPlus, Car, BookOpen, FileText } from "lucide-react";
 import Image from "next/image";
 
 export async function Navbar() {
@@ -36,20 +36,23 @@ export async function Navbar() {
             <div className="hidden md:flex items-center gap-4">
               <Link
                 href="/wohnmobile"
-                className="text-sm font-medium hover:text-primary transition-colors"
+                className="flex items-center gap-2 text-base font-bold hover:text-primary transition-colors"
               >
+                <Car className="h-4 w-4" />
                 Wohnmobile mieten
               </Link>
               <Link
                 href="/lexikon"
-                className="text-sm font-medium hover:text-primary transition-colors"
+                className="flex items-center gap-2 text-base font-bold hover:text-primary transition-colors"
               >
+                <BookOpen className="h-4 w-4" />
                 Lexikon
               </Link>
               <Link
                 href="/magazin"
-                className="text-sm font-medium hover:text-primary transition-colors"
+                className="flex items-center gap-2 text-base font-bold hover:text-primary transition-colors"
               >
+                <FileText className="h-4 w-4" />
                 Magazin
               </Link>
             </div>
