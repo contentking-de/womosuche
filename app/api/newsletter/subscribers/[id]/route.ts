@@ -83,7 +83,7 @@ export async function PUT(
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Ungültige Daten", details: error.errors },
+        { error: "Ungültige Daten", details: error.issues },
         { status: 400 }
       );
     }
