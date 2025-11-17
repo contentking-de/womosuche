@@ -35,11 +35,11 @@ export async function PopularListings() {
   });
 
   // Debug: Prüfe welche Bild-URLs vorhanden sind
-  listings.forEach((listing) => {
+  listings.forEach((listing: { title: string; slug: string; images: { url: string }[] }) => {
     if (listing.images.length === 0) {
       console.log(`Listing ${listing.title} (${listing.slug}) hat keine Bilder`);
     } else {
-      listing.images.forEach((img) => {
+      listing.images.forEach((img: { url: string }) => {
         if (img.url.includes(".jpeg")) {
           console.log(`Listing ${listing.title} hat .jpeg Bild: ${img.url}`);
         }
