@@ -41,7 +41,7 @@ export async function POST(request: Request) {
       skip_empty_lines: true,
       trim: true,
       bom: true, // Unterstütze BOM (Byte Order Mark) für UTF-8
-    });
+    }) as Record<string, unknown>[];
 
     if (!Array.isArray(records) || records.length === 0) {
       return NextResponse.json(
@@ -51,8 +51,8 @@ export async function POST(request: Request) {
     }
 
     console.log(`CSV importiert: ${records.length} Zeilen gefunden`);
-    if (records.length > 0 && typeof records[0] === "object" && records[0] !== null) {
-      console.log("Erste Zeile Beispiel:", Object.keys(records[0] as Record<string, unknown>));
+    if (records.length > 0) {
+      console.log("Erste Zeile Beispiel:", Object.keys(records[0]));
     }
 
     let imported = 0;
