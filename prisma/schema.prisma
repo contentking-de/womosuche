@@ -168,3 +168,28 @@ model Redirect {
   toPath    String
   createdAt DateTime @default(now())
 }
+
+enum NewsletterList {
+  NEWS
+  REISEBERICHTE
+  VERMIETUNGEN
+}
+
+model NewsletterSubscriber {
+  id        String          @id @default(cuid())
+  email     String
+  name      String?
+  lists     NewsletterList[]
+  confirmed Boolean         @default(false)
+  confirmedAt DateTime?
+  unsubscribedAt DateTime?
+  confirmationToken String? @unique
+  confirmationTokenExpires DateTime?
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@unique([email])
+  @@index([email])
+  @@index([confirmed])
+  @@index([confirmationToken])
+}

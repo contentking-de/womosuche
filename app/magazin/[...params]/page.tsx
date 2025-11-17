@@ -10,6 +10,7 @@ import { de } from "date-fns/locale";
 import { unstable_noStore as noStore } from "next/cache";
 import { TocSearchArticles } from "@/components/magazin/toc-search-articles";
 import { RecentArticles } from "@/components/magazin/recent-articles";
+import { NewsletterSubscriptionForm } from "@/components/newsletter/newsletter-subscription-form";
 import { getFirstCategorySlug, generateSlug } from "@/lib/slug";
 
 // Prüft, ob eine Kategorie ausgeblendet werden soll
@@ -248,6 +249,11 @@ export default async function ArticlePage({
               />
             </CardContent>
           </Card>
+
+          {/* Newsletter Subscription Form */}
+          <div className="mt-8">
+            <NewsletterSubscriptionForm />
+          </div>
         </div>
         <aside className="hidden lg:col-span-4 xl:col-span-3 lg:block">
           <Card>

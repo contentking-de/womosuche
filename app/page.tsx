@@ -6,6 +6,7 @@ import { PricingSection } from "@/components/marketing/pricing-section";
 import { HeroSection } from "@/components/hero-section";
 import { MagazinSection } from "@/components/magazin-section";
 import { PopularListings } from "@/components/popular-listings";
+import { NewsletterConfirmationMessage } from "@/components/newsletter/newsletter-confirmation-message";
 import { prisma } from "@/lib/prisma";
 import { unstable_noStore as noStore } from "next/cache";
 
@@ -63,6 +64,9 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col">
+      {/* Newsletter Confirmation Message */}
+      <NewsletterConfirmationMessage />
+      
       {/* Hero Section */}
       <HeroSection listings={listings} />
 

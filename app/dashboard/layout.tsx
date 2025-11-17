@@ -10,6 +10,7 @@ import {
   FileText,
   Settings,
   Users,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +49,11 @@ export default async function DashboardLayout({
       title: "Magazin",
       href: "/dashboard/magazin",
       icon: FileText,
+    },
+    {
+      title: "Newsletter",
+      href: "/dashboard/newsletter",
+      icon: Mail,
     },
     {
       title: "Benutzer",
