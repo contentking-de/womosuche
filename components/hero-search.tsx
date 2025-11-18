@@ -33,7 +33,7 @@ export function HeroSearch() {
       onSubmit={handleSearch}
       className="mt-10 w-full max-w-4xl mx-auto"
     >
-      <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-xl p-4 md:p-6 flex flex-col gap-4">
+      <div className="bg-white rounded-lg shadow-xl p-4 md:p-6 flex flex-col gap-4">
         <div className="flex flex-col md:flex-row gap-4 items-center">
           <div className="relative w-full md:flex-1">
             <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-black" />
