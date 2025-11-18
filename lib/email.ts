@@ -236,7 +236,7 @@ export async function sendNewListingNotificationToAdmins({
     }
 
     // Sende E-Mail an alle Admins
-    const emailPromises = admins.map(async (admin) => {
+    const emailPromises = admins.map(async (admin: { email: string | null; name: string | null }) => {
       if (!admin.email || !admin.email.trim()) {
         console.warn(`Admin ohne E-Mail-Adresse übersprungen: ${admin.name || "Unbekannt"}`);
         return;
