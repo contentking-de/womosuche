@@ -1,6 +1,7 @@
 import { requireAuth } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -201,6 +202,7 @@ export default async function ListingsPage({
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[80px]">Bild</TableHead>
               <TableHead className="w-[200px] max-w-[200px]">Titel</TableHead>
               <TableHead>Standort</TableHead>
               <TableHead>Preis/Tag</TableHead>
@@ -214,7 +216,7 @@ export default async function ListingsPage({
           <TableBody>
             {listings.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={user.role === "ADMIN" ? 8 : 7} className="text-center py-8">
+                <TableCell colSpan={user.role === "ADMIN" ? 9 : 8} className="text-center py-8">
                   <p className="text-muted-foreground">Noch keine Wohnmobile vorhanden</p>
                   <Link href="/dashboard/listings/new">
                     <Button variant="outline" className="mt-4">
@@ -226,6 +228,23 @@ export default async function ListingsPage({
             ) : (
               listings.map((listing: ListingWithRelations) => (
                 <TableRow key={listing.id}>
+                  <TableCell>
+                    {listing.Image && listing.Image.length > 0 ? (
+                      <div className="relative w-16 h-16 rounded-md overflow-hidden border">
+                        <Image
+                          src={listing.Image[0].url}
+                          alt={listing.Image[0].alt || listing.title}
+                          fill
+                          className="object-cover"
+                          sizes="64px"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-16 h-16 rounded-md bg-muted border flex items-center justify-center">
+                        <span className="text-xs text-muted-foreground">Kein Bild</span>
+                      </div>
+                    )}
+                  </TableCell>
                   <TableCell className="font-medium max-w-[200px] truncate" title={listing.title}>
                     {listing.title}
                   </TableCell>
@@ -245,10 +264,12 @@ export default async function ListingsPage({
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                      {user.role === "ADMIN" && (
+                      {/* Admin: Kann freigeben und zurückziehen | LANDLORD: Kann nur zurückziehen (wenn published) */}
+                      {(user.role === "ADMIN" || (user.role === "LANDLORD" && listing.published)) && (
                         <PublishListingButton
                           listingId={listing.id}
                           published={listing.published}
+                          userRole={user.role}
                         />
                       )}
                       {listing.slug && (

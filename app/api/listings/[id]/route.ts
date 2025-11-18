@@ -92,10 +92,20 @@ export async function PUT(
       updateData.ownerId = validatedData.ownerId;
     }
 
-    // LANDLORDS können den published-Status nicht ändern
+    // LANDLORDS können nur auf Entwurf zurücksetzen, aber nicht veröffentlichen
     if (session.user.role !== "ADMIN") {
-      // Behalte den aktuellen published-Status bei
-      updateData.published = listing.published;
+      // LANDLORDS können nur von published: true auf published: false setzen
+      // Sie können nicht von false auf true setzen
+      if (validatedData.published === true) {
+        // LANDLORDS können nicht veröffentlichen - behalte aktuellen Status
+        updateData.published = listing.published;
+      } else if (validatedData.published === false && listing.published === true) {
+        // LANDLORDS können veröffentlichte Wohnmobile auf Entwurf zurücksetzen
+        updateData.published = false;
+      } else {
+        // Behalte den aktuellen Status bei
+        updateData.published = listing.published;
+      }
     }
 
     const updatedListing = await prisma.listing.update({

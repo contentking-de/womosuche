@@ -4,6 +4,7 @@ import { InquiryConfirmationToRenterEmail } from "@/emails/inquiry-confirmation-
 import { PasswordResetEmail } from "@/emails/password-reset";
 import { NewsletterConfirmationEmail } from "@/emails/newsletter-confirmation";
 import { EmailVerificationEmail } from "@/emails/email-verification";
+import { NewListingToAdminEmail } from "@/emails/new-listing-to-admin";
 import { render } from "@react-email/render";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -204,6 +205,72 @@ export async function sendEmailVerificationEmail({
   } catch (error) {
     console.error(`Fehler beim Senden der E-Mail-Verifizierungs-E-Mail an ${email}:`, error);
     throw error;
+  }
+}
+
+export async function sendNewListingNotificationToAdmins({
+  listingTitle,
+  landlordName,
+  landlordEmail,
+  listingUrl,
+}: {
+  listingTitle: string;
+  landlordName?: string | null;
+  landlordEmail: string;
+  listingUrl: string;
+}) {
+  try {
+    // Lade alle Admins aus der Datenbank
+    const { prisma } = await import("@/lib/prisma");
+    const admins = await prisma.user.findMany({
+      where: { role: "ADMIN" },
+      select: {
+        email: true,
+        name: true,
+      },
+    });
+
+    if (admins.length === 0) {
+      console.warn("Keine Administratoren gefunden, um Benachrichtigung zu senden");
+      return;
+    }
+
+    // Sende E-Mail an alle Admins
+    const emailPromises = admins.map(async (admin) => {
+      if (!admin.email || !admin.email.trim()) {
+        console.warn(`Admin ohne E-Mail-Adresse übersprungen: ${admin.name || "Unbekannt"}`);
+        return;
+      }
+
+      try {
+        const emailHtml = await render(
+          NewListingToAdminEmail({
+            adminName: admin.name || undefined,
+            listingTitle,
+            landlordName: landlordName || undefined,
+            landlordEmail,
+            listingUrl,
+          })
+        );
+
+        await resend.emails.send({
+          from: process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev",
+          to: admin.email.trim(),
+          subject: `Neues Wohnmobil wartet auf Freigabe: ${listingTitle}`,
+          html: emailHtml,
+        });
+
+        console.log(`Benachrichtigung erfolgreich an Admin gesendet: ${admin.email}`);
+      } catch (error) {
+        console.error(`Fehler beim Senden der Benachrichtigung an Admin ${admin.email}:`, error);
+        // Nicht werfen, damit andere Admins trotzdem benachrichtigt werden
+      }
+    });
+
+    await Promise.all(emailPromises);
+  } catch (error) {
+    console.error("Fehler beim Senden der Admin-Benachrichtigungen:", error);
+    // Nicht werfen, da dies nicht kritisch für das Erstellen des Listings ist
   }
 }
 

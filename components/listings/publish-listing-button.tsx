@@ -8,11 +8,13 @@ import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 interface PublishListingButtonProps {
   listingId: string;
   published: boolean;
+  userRole?: "ADMIN" | "LANDLORD" | "EDITOR";
 }
 
 export function PublishListingButton({
   listingId,
   published,
+  userRole = "LANDLORD",
 }: PublishListingButtonProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -23,7 +25,14 @@ export function PublishListingButton({
     setError(null);
 
     try {
-      const method = published ? "DELETE" : "POST";
+      // LANDLORDS können nur zurückziehen (DELETE), nicht freigeben (POST)
+      // Admins können beides
+      const method = published ? "DELETE" : userRole === "ADMIN" ? "POST" : null;
+      
+      if (!method) {
+        throw new Error("Nur Administratoren können Wohnmobile freigeben");
+      }
+
       const response = await fetch(`/api/listings/${listingId}/publish`, {
         method,
       });

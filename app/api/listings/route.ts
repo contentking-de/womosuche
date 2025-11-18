@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { generateUniqueSlug } from "@/lib/slug";
 import { geocodeLocation } from "@/lib/geocode";
 import { sanitizeAiHtml } from "@/lib/utils";
+import { sendNewListingNotificationToAdmins } from "@/lib/email";
 import { z } from "zod";
 import { randomUUID } from "crypto";
 
@@ -207,6 +208,32 @@ export async function POST(request: Request) {
         updatedAt: now,
       },
     });
+
+    // Sende Benachrichtigung an alle Admins, wenn ein LANDLORD ein Wohnmobil erstellt hat
+    if (session.user.role === "LANDLORD") {
+      const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+      const listingUrl = `${baseUrl}/dashboard/listings/${listing.id}`;
+      
+      // Lade Landlord-Informationen
+      const landlord = await prisma.user.findUnique({
+        where: { id: finalOwnerId },
+        select: {
+          name: true,
+          email: true,
+        },
+      });
+
+      // Sende E-Mail asynchron (nicht blockierend)
+      sendNewListingNotificationToAdmins({
+        listingTitle: listing.title,
+        landlordName: landlord?.name || null,
+        landlordEmail: landlord?.email || session.user.email || "",
+        listingUrl,
+      }).catch((error) => {
+        console.error("Fehler beim Senden der Admin-Benachrichtigung:", error);
+        // Nicht werfen, da Listing bereits erstellt wurde
+      });
+    }
 
     return NextResponse.json(listing, { status: 201 });
   } catch (error) {

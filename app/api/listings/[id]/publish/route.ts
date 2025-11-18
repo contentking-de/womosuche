@@ -66,14 +66,6 @@ export async function DELETE(
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
     }
 
-    // Nur Admins können Wohnmobile zurückziehen
-    if (session.user.role !== "ADMIN") {
-      return NextResponse.json(
-        { error: "Nur Administratoren können Wohnmobile zurückziehen" },
-        { status: 403 }
-      );
-    }
-
     const listing = await prisma.listing.findUnique({
       where: { id },
     });
@@ -82,6 +74,14 @@ export async function DELETE(
       return NextResponse.json(
         { error: "Wohnmobil nicht gefunden" },
         { status: 404 }
+      );
+    }
+
+    // LANDLORDS können nur ihre eigenen Wohnmobile zurückziehen
+    if (session.user.role !== "ADMIN" && listing.ownerId !== session.user.id) {
+      return NextResponse.json(
+        { error: "Keine Berechtigung" },
+        { status: 403 }
       );
     }
 
