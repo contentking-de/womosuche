@@ -2,6 +2,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { XMLParser } from "fast-xml-parser";
+import { randomUUID } from "crypto";
 import { prisma } from "../lib/prisma";
 import { generateUniqueSlug, generateSlug } from "../lib/slug";
 
@@ -374,6 +375,7 @@ async function importListings(filePath: string) {
           // Erstelle neue Bilder
           await prisma.image.createMany({
             data: imageUrls.map((url) => ({
+              id: randomUUID(),
               listingId: existing.id,
               url,
               alt: title,
@@ -391,6 +393,7 @@ async function importListings(filePath: string) {
         if (imageUrls.length > 0) {
           await prisma.image.createMany({
             data: imageUrls.map((url) => ({
+              id: randomUUID(),
               listingId: newListing.id,
               url,
               alt: title,

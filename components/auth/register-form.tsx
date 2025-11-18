@@ -27,6 +27,8 @@ export function RegisterForm() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   const {
     register,
@@ -59,7 +61,10 @@ export function RegisterForm() {
         return;
       }
 
-      router.push("/login?registered=true");
+      // Zeige Success-Message an
+      setSuccess(true);
+      setUserEmail(data.email);
+      setIsLoading(false);
     } catch (err) {
       setError("Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.");
       setIsLoading(false);
@@ -75,12 +80,37 @@ export function RegisterForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {error && (
-            <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-              {error}
+        {success ? (
+          <div className="space-y-4">
+            <div className="rounded-md bg-green-50 border border-green-200 p-4">
+              <h3 className="text-lg font-semibold text-green-900 mb-2">
+                Registrierung erfolgreich!
+              </h3>
+              <p className="text-sm text-green-800 mb-4">
+                Wir haben dir eine Bestätigungsmail an <strong>{userEmail}</strong> gesendet.
+              </p>
+              <p className="text-sm text-green-800 mb-4">
+                Bitte öffne dein E-Mail-Postfach und klicke auf den Bestätigungslink, um dein Konto zu aktivieren.
+              </p>
+              <p className="text-sm text-green-800">
+                Nach der Bestätigung kannst du dich mit deinen Zugangsdaten anmelden.
+              </p>
             </div>
-          )}
+            <div className="text-center">
+              <Link href="/login">
+                <Button variant="outline" className="w-full">
+                  Zur Anmeldung
+                </Button>
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {error && (
+              <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+                {error}
+              </div>
+            )}
 
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
@@ -142,13 +172,14 @@ export function RegisterForm() {
             {isLoading ? "Wird registriert..." : "Registrieren"}
           </Button>
 
-          <div className="text-center text-sm">
-            <span className="text-muted-foreground">Bereits ein Konto? </span>
-            <Link href="/login" className="text-primary hover:underline">
-              Anmelden
-            </Link>
-          </div>
-        </form>
+            <div className="text-center text-sm">
+              <span className="text-muted-foreground">Bereits ein Konto? </span>
+              <Link href="/login" className="text-primary hover:underline">
+                Anmelden
+              </Link>
+            </div>
+          </form>
+        )}
       </CardContent>
     </Card>
   );

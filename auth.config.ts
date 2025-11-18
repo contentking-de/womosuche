@@ -29,6 +29,14 @@ export const authConfig: NextAuthConfig = {
             return null;
           }
 
+          // Prüfe ob E-Mail verifiziert ist
+          if (!user.emailVerified) {
+            // Verwende einen speziellen Fehlercode, den wir in der Login-Form erkennen können
+            const error = new Error("EMAIL_NOT_VERIFIED");
+            (error as any).cause = "Bitte bestätige zuerst deine E-Mail-Adresse. Wir haben dir eine Bestätigungsmail gesendet.";
+            throw error;
+          }
+
           const isPasswordValid = await bcrypt.default.compare(
             credentials.password as string,
             user.password

@@ -5,6 +5,7 @@ import { generateUniqueSlug } from "@/lib/slug";
 import { geocodeLocation } from "@/lib/geocode";
 import { sanitizeAiHtml } from "@/lib/utils";
 import { z } from "zod";
+import { randomUUID } from "crypto";
 
 const listingSchema = z.object({
   title: z.string().min(3),
@@ -185,13 +186,25 @@ export async function POST(request: Request) {
       finalOwnerId = validatedData.ownerId;
     }
 
+    // LANDLORDS können nur Entwürfe erstellen - published immer false setzen
+    const finalPublished = session.user.role === "ADMIN" 
+      ? validatedData.published 
+      : false;
+
+    // Generiere UUID für das Listing
+    const listingId = randomUUID();
+    const now = new Date();
+
     const listing = await prisma.listing.create({
       data: {
+        id: listingId,
         ...validatedData,
+        published: finalPublished,
         slug,
         ownerId: finalOwnerId,
         lat: coordinates?.lat ?? null,
         lng: coordinates?.lng ?? null,
+        updatedAt: now,
       },
     });
 

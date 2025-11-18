@@ -93,7 +93,7 @@ export function ListingForm({ listing, userRole, ownerId: initialOwnerId, availa
         }
       : {
           features: [],
-          published: false,
+          published: userRole === "ADMIN" ? false : false, // LANDLORDs können nicht veröffentlichen
           ownerId: initialOwnerId,
         },
   });
@@ -359,17 +359,26 @@ export function ListingForm({ listing, userRole, ownerId: initialOwnerId, availa
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="published"
-              checked={watch("published")}
-              onCheckedChange={(checked) => setValue("published", checked === true)}
-              disabled={isLoading}
-            />
-            <Label htmlFor="published" className="cursor-pointer">
-              Sofort veröffentlichen
-            </Label>
-          </div>
+          {userRole === "ADMIN" && (
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="published"
+                checked={watch("published")}
+                onCheckedChange={(checked) => setValue("published", checked === true)}
+                disabled={isLoading}
+              />
+              <Label htmlFor="published" className="cursor-pointer">
+                Sofort veröffentlichen
+              </Label>
+            </div>
+          )}
+          {userRole !== "ADMIN" && (
+            <div className="rounded-md bg-blue-50 border border-blue-200 p-3 text-sm text-blue-800">
+              <p>
+                <strong>Hinweis:</strong> Dein Wohnmobil wird als Entwurf gespeichert und muss von einem Administrator geprüft und freigegeben werden, bevor es veröffentlicht wird.
+              </p>
+            </div>
+          )}
 
           <div className="flex gap-4">
             <Button type="submit" disabled={isLoading}>

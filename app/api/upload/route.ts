@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { put } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
+import { randomUUID } from "crypto";
 
 export async function POST(request: Request) {
   try {
@@ -76,6 +77,7 @@ export async function POST(request: Request) {
     if (listingId) {
       await prisma.image.create({
         data: {
+          id: randomUUID(),
           listingId,
           url: blob.url,
           alt: file.name,

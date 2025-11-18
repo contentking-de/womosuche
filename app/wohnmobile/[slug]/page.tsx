@@ -21,7 +21,7 @@ export async function generateMetadata({
   if (!slug) return {};
   const listing = await prisma.listing.findFirst({
     where: { slug, published: true },
-    include: { images: true },
+    include: { Image: true },
   });
 
   if (!listing) {
@@ -34,7 +34,7 @@ export async function generateMetadata({
     openGraph: {
       title: listing.title,
       description: listing.description.substring(0, 160),
-      images: listing.images.length > 0 ? [listing.images[0].url] : [],
+      images: listing.Image.length > 0 ? [listing.Image[0].url] : [],
     },
   };
 }
@@ -51,8 +51,8 @@ export default async function ListingDetailPage({
   const listing = await prisma.listing.findFirst({
     where: { slug, published: true },
     include: {
-      images: true,
-      owner: {
+      Image: true,
+      User: {
         select: {
           name: true,
         },
@@ -70,7 +70,7 @@ export default async function ListingDetailPage({
     "@type": "Product",
     name: listing.title,
     description: listing.description,
-    image: listing.images.length > 0 ? listing.images.map((img: typeof listing.images[number]) => img.url) : [],
+    image: listing.Image.length > 0 ? listing.Image.map((img: typeof listing.Image[number]) => img.url) : [],
     offers: {
       "@type": "Offer",
       price: listing.pricePerDay,
@@ -94,7 +94,7 @@ export default async function ListingDetailPage({
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Bilder */}
           <div>
-            <ListingImageGallery images={listing.images} title={listing.title} />
+            <ListingImageGallery images={listing.Image} title={listing.title} />
           </div>
 
           {/* Details */}

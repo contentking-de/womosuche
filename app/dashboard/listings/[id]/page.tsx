@@ -14,7 +14,7 @@ export default async function EditListingPage({
   const listing = await prisma.listing.findUnique({
     where: { id },
     include: {
-      images: true,
+      Image: true,
     },
   });
 
@@ -50,7 +50,7 @@ export default async function EditListingPage({
         </p>
       </div>
       <ListingForm
-        listing={listing}
+        listing={listing ? { ...listing, images: listing.Image || [] } : undefined}
         userRole={user.role}
         availableUsers={availableUsers}
       />

@@ -19,12 +19,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Pencil, Eye, MapPin } from "lucide-react";
+import { Plus, Search, Pencil, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { DeleteListingButton } from "@/components/listings/delete-listing-button";
 import { GeocodeMissingButton } from "@/components/listings/geocode-missing-button";
-import type { Listing } from "@prisma/client";
+import { PublishListingButton } from "@/components/listings/publish-listing-button";
 
 export default async function ListingsPage({
   searchParams,
@@ -69,48 +69,49 @@ export default async function ListingsPage({
       ? { ownerId: user.id }
       : {};
 
-  const listings = (await prisma.listing.findMany({
+  const listings = await prisma.listing.findMany({
     where,
     include: {
-      owner: {
+      User: {
         select: {
           name: true,
           email: true,
         },
       },
-      images: true,
+      Image: true,
       _count: {
         select: {
-          inquiries: true,
+          Inquiry: true,
         },
       },
     },
     orderBy: {
       createdAt: "desc",
     },
-  })) as (Listing & {
-    owner: { name: string | null; email: string | null };
-    images: any[];
-    _count: { inquiries: number };
-  })[];
+  });
 
   // Zähle Listings ohne Koordinaten (für alle oder nur für den Benutzer)
+  const missingCoordsConditions: any[] = [
+    {
+      OR: [
+        { lat: null },
+        { lng: null },
+      ],
+    },
+    {
+      location: {
+        not: "",
+      },
+    },
+  ];
+  
+  if (user.role !== "ADMIN") {
+    missingCoordsConditions.push({ ownerId: user.id });
+  }
+  
   const missingCoordsCount = await prisma.listing.count({
     where: {
-      ...(user.role !== "ADMIN" ? { ownerId: user.id } : {}),
-      AND: [
-        {
-          OR: [
-            { lat: null },
-            { lng: null },
-          ],
-        },
-        {
-          location: {
-            not: "",
-          },
-        },
-      ],
+      AND: missingCoordsConditions,
     },
   });
 
@@ -216,11 +217,7 @@ export default async function ListingsPage({
                 </TableCell>
               </TableRow>
             ) : (
-              listings.map((listing: Listing & {
-                owner: { name: string | null; email: string | null };
-                images: any[];
-                _count: { inquiries: number };
-              }) => (
+              listings.map((listing) => (
                 <TableRow key={listing.id}>
                   <TableCell className="font-medium max-w-[200px] truncate" title={listing.title}>
                     {listing.title}
@@ -233,14 +230,20 @@ export default async function ListingsPage({
                     </Badge>
                   </TableCell>
                   {user.role === "ADMIN" && (
-                    <TableCell>{listing.owner.name || listing.owner.email}</TableCell>
+                    <TableCell>{listing.User.name || listing.User.email}</TableCell>
                   )}
-                  <TableCell>{listing._count.inquiries}</TableCell>
+                  <TableCell>{listing._count.Inquiry}</TableCell>
                   <TableCell>
                     {format(new Date(listing.createdAt), "dd.MM.yyyy", { locale: de })}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
+                      {user.role === "ADMIN" && (
+                        <PublishListingButton
+                          listingId={listing.id}
+                          published={listing.published}
+                        />
+                      )}
                       {listing.slug && (
                         <Link href={`/wohnmobile/${listing.slug}`} target="_blank" rel="noopener noreferrer">
                           <Button variant="ghost" size="sm" title="Vorschau anzeigen">

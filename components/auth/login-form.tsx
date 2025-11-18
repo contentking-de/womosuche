@@ -45,7 +45,16 @@ export function LoginForm({ callbackUrl, passwordReset }: { callbackUrl?: string
       });
 
       if (result?.error) {
-        setError("Ungültige Anmeldedaten");
+        // Prüfe ob es eine spezifische Fehlermeldung gibt
+        let errorMessage = "Ungültige Anmeldedaten";
+        
+        if (result.error === "EMAIL_NOT_VERIFIED") {
+          errorMessage = "Bitte bestätige zuerst deine E-Mail-Adresse. Wir haben dir eine Bestätigungsmail gesendet.";
+        } else if (result.error !== "CredentialsSignin") {
+          errorMessage = result.error;
+        }
+        
+        setError(errorMessage);
         setIsLoading(false);
         return;
       }

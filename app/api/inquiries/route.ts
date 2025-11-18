@@ -64,7 +64,7 @@ export async function POST(request: Request) {
     const listing = await prisma.listing.findUnique({
       where: { id: validatedData.listingId },
       include: {
-        owner: true,
+        User: true,
       },
     });
 
@@ -83,14 +83,14 @@ export async function POST(request: Request) {
     }
 
     // Prüfe ob Owner existiert und E-Mail-Adresse vorhanden ist
-    if (!listing.owner) {
+    if (!listing.User) {
       return NextResponse.json(
         { error: "Vermieter nicht gefunden" },
         { status: 404 }
       );
     }
 
-    if (!listing.owner.email) {
+    if (!listing.User.email) {
       console.error(`Listing ${listing.id} hat keinen Owner mit E-Mail-Adresse`);
       return NextResponse.json(
         { error: "Vermieter-E-Mail nicht verfügbar" },
@@ -113,9 +113,9 @@ export async function POST(request: Request) {
     });
 
     // E-Mails senden (asynchron, nicht blockierend)
-    // WICHTIG: Verwende immer listing.owner.email, um sicherzustellen, dass die E-Mail an den richtigen Vermieter geht
-    const ownerEmail = listing.owner.email;
-    const ownerName = listing.owner.name;
+    // WICHTIG: Verwende immer listing.User.email, um sicherzustellen, dass die E-Mail an den richtigen Vermieter geht
+    const ownerEmail = listing.User.email;
+    const ownerName = listing.User.name;
     const inquiryUrl = `${process.env.AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3000"}/dashboard/inquiries`;
     
     Promise.all([
@@ -136,7 +136,7 @@ export async function POST(request: Request) {
         renterEmail: validatedData.renterEmail,
         renterName: validatedData.renterName,
         listingTitle: listing.title,
-        ownerName: listing.owner.name,
+        ownerName: listing.User.name,
       }),
     ]).catch((error) => {
       console.error("Error sending emails:", error);

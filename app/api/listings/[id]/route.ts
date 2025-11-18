@@ -92,6 +92,12 @@ export async function PUT(
       updateData.ownerId = validatedData.ownerId;
     }
 
+    // LANDLORDS können den published-Status nicht ändern
+    if (session.user.role !== "ADMIN") {
+      // Behalte den aktuellen published-Status bei
+      updateData.published = listing.published;
+    }
+
     const updatedListing = await prisma.listing.update({
       where: { id },
       data: updateData,
