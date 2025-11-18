@@ -25,6 +25,13 @@ import { de } from "date-fns/locale";
 import { DeleteListingButton } from "@/components/listings/delete-listing-button";
 import { GeocodeMissingButton } from "@/components/listings/geocode-missing-button";
 import { PublishListingButton } from "@/components/listings/publish-listing-button";
+import type { Listing } from "@prisma/client";
+
+type ListingWithRelations = Listing & {
+  User: { name: string | null; email: string | null };
+  Image: Array<{ id: string; url: string; alt: string | null }>;
+  _count: { Inquiry: number };
+};
 
 export default async function ListingsPage({
   searchParams,
@@ -69,7 +76,7 @@ export default async function ListingsPage({
       ? { ownerId: user.id }
       : {};
 
-  const listings = await prisma.listing.findMany({
+  const listings = (await prisma.listing.findMany({
     where,
     include: {
       User: {
@@ -88,7 +95,7 @@ export default async function ListingsPage({
     orderBy: {
       createdAt: "desc",
     },
-  });
+  })) as ListingWithRelations[];
 
   // Zähle Listings ohne Koordinaten (für alle oder nur für den Benutzer)
   const missingCoordsConditions: any[] = [
@@ -217,7 +224,7 @@ export default async function ListingsPage({
                 </TableCell>
               </TableRow>
             ) : (
-              listings.map((listing) => (
+              listings.map((listing: ListingWithRelations) => (
                 <TableRow key={listing.id}>
                   <TableCell className="font-medium max-w-[200px] truncate" title={listing.title}>
                     {listing.title}
