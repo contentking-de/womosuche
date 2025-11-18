@@ -9,6 +9,7 @@ type Feature = string;
 type Plan = {
   name: string;
   price: string;
+  priceNet: number; // Nettopreis für Berechnung
   cta: string;
   href: string;
   features: Feature[];
@@ -18,14 +19,16 @@ type Plan = {
 const plans: Plan[] = [
   {
     name: "Starter",
-    price: "€0.00",
+    price: "€19,90",
+    priceNet: 19.90,
     cta: "jetzt testen",
     href: "/register",
-    features: ["1 Eintrag", "7 Tage verfügbar", "eMail-Support"],
+    features: ["1 Eintrag", "kostenlose Buchungen", "kein Support"],
   },
   {
     name: "Base",
     price: "€39,90",
+    priceNet: 39.90,
     cta: "jetzt loslegen",
     href: "/register",
     features: ["bis zu 3 Fahrzeuge", "kostenlose Buchungen", "eMail-Support"],
@@ -33,6 +36,7 @@ const plans: Plan[] = [
   {
     name: "Pro",
     price: "€89,90",
+    priceNet: 89.90,
     cta: "jetzt loslegen",
     href: "/register",
     features: ["bis zu 10 Fahrzeuge", "kostenlose Buchungen", "Dedicated Support"],
@@ -41,6 +45,7 @@ const plans: Plan[] = [
   {
     name: "Master",
     price: "€189,90",
+    priceNet: 189.90,
     cta: "jetzt loslegen",
     href: "/register",
     features: ["unbegrenzte Listings", "kostenlose Buchungen", "Premium Support"],
@@ -81,6 +86,12 @@ export function PricingSection() {
                 <CardHeader>
                   <div className={clsx("text-5xl font-extrabold leading-none sm:text-6xl")}>
                     {plan.price}
+                  </div>
+                  <div className={clsx("mt-1 text-xs", isHighlight ? "text-background/70" : "text-muted-foreground")}>
+                    zzgl. 19% MwSt.
+                  </div>
+                  <div className={clsx("mt-1 text-lg font-semibold", isHighlight ? "text-background/90" : "text-foreground")}>
+                    €{(plan.priceNet * 1.19).toFixed(2).replace(".", ",")} inkl. MwSt.
                   </div>
                   <CardTitle className={clsx("mt-6 text-2xl", isHighlight && "text-background")}>
                     {plan.name}

@@ -14,7 +14,7 @@ import {
 interface NewListingToAdminEmailProps {
   adminName?: string;
   listingTitle: string;
-  landlordName: string;
+  landlordName?: string;
   landlordEmail: string;
   listingUrl: string;
 }
@@ -45,7 +45,9 @@ export const NewListingToAdminEmail = ({
             <Text style={infoValue}>{listingTitle}</Text>
             
             <Text style={infoLabel}>Vermieter:</Text>
-            <Text style={infoValue}>{landlordName} ({landlordEmail})</Text>
+            <Text style={infoValue}>
+              {landlordName ? `${landlordName} (${landlordEmail})` : landlordEmail}
+            </Text>
           </Section>
 
           <Text style={text}>
