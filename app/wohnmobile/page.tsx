@@ -147,7 +147,11 @@ export default async function ListingsPage({
       prisma.listing.count({ where }),
     ]);
 
-    listings = listingsResult;
+    // Transformiere Image zu images
+    listings = listingsResult.map((l: any) => ({
+      ...l,
+      images: l.Image || [],
+    }));
     totalCount = countResult;
   }
 

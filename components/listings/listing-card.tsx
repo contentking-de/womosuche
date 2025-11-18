@@ -69,7 +69,7 @@ export function ListingCard({ listing }: ListingCardProps) {
               </div>
             </div>
           </div>
-          {listing.features.length > 0 && (
+          {listing.features && listing.features.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {listing.features.slice(0, 3).map((feature) => (
                 <Badge key={feature} variant="secondary" className="text-xs">
