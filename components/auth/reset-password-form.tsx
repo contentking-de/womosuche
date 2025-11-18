@@ -57,7 +57,8 @@ export function ResetPasswordForm({ token }: { token: string }) {
       }
 
       // Erfolgreich zurückgesetzt, weiterleiten zur Login-Seite
-      router.push("/login?passwordReset=true");
+      // Verwende replace statt push, um die reset-password URL aus der History zu entfernen
+      router.replace("/login?passwordReset=true");
     } catch (err) {
       setError("Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.");
       setIsLoading(false);

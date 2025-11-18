@@ -26,12 +26,12 @@ export default async function InquiriesPage() {
       user.role === "ADMIN"
         ? {}
         : {
-            listing: {
+            Listing: {
               ownerId: user.id,
             },
           },
     include: {
-      listing: {
+      Listing: {
         select: {
           id: true,
           title: true,
@@ -42,7 +42,7 @@ export default async function InquiriesPage() {
     orderBy: {
       createdAt: "desc",
     },
-  })) as (Inquiry & { listing: { id: string; title: string; slug: string } })[];
+  })) as (Inquiry & { Listing: { id: string; title: string; slug: string } })[];
 
   const statusCounts = {
     OPEN: inquiries.filter((i) => i.status === "OPEN").length,
@@ -103,14 +103,14 @@ export default async function InquiriesPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              inquiries.map((inquiry: Inquiry & { listing: { id: string; title: string; slug: string } }) => (
+              inquiries.map((inquiry: Inquiry & { Listing: { id: string; title: string; slug: string } }) => (
                 <TableRow key={inquiry.id}>
                   <TableCell className="font-medium">
                     <Link
-                      href={`/wohnmobile/${inquiry.listing.slug}`}
+                      href={`/wohnmobile/${inquiry.Listing.slug}`}
                       className="hover:underline"
                     >
-                      {inquiry.listing.title}
+                      {inquiry.Listing.title}
                     </Link>
                   </TableCell>
                   <TableCell>{inquiry.renterName}</TableCell>

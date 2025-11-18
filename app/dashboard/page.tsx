@@ -61,7 +61,7 @@ export default async function DashboardPage() {
         user.role === "ADMIN"
           ? {}
           : {
-              listing: {
+              Listing: {
                 ownerId: user.id,
               },
             },

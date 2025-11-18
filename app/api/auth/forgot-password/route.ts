@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import crypto from "crypto";
+import { randomBytes, randomUUID } from "crypto";
 import { sendPasswordResetEmail } from "@/lib/email";
 
 const forgotPasswordSchema = z.object({
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     }
 
     // Generiere Reset-Token
-    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetToken = randomBytes(32).toString("hex");
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 1); // Token ist 1 Stunde gültig
 
@@ -40,6 +40,7 @@ export async function POST(request: Request) {
     // Erstelle neuen Reset-Token
     await prisma.passwordResetToken.create({
       data: {
+        id: randomUUID(),
         email: validatedData.email,
         token: resetToken,
         expires: expiresAt,

@@ -22,9 +22,11 @@ export default async function InquiryDetailPage({
   const inquiry = await prisma.inquiry.findUnique({
     where: { id },
     include: {
-      listing: {
+      Listing: {
         include: {
-          images: true,
+          Image: {
+            take: 1,
+          },
         },
       },
     },
@@ -35,7 +37,7 @@ export default async function InquiryDetailPage({
   }
 
   // Prüfe Berechtigung
-  if (user.role !== "ADMIN" && inquiry.listing.ownerId !== user.id) {
+  if (user.role !== "ADMIN" && inquiry.Listing.ownerId !== user.id) {
     redirect("/dashboard/inquiries");
   }
 
@@ -152,28 +154,28 @@ export default async function InquiryDetailPage({
           <CardContent className="space-y-4">
             <div>
               <Link
-                href={`/wohnmobile/${inquiry.listing.slug}`}
+                href={`/wohnmobile/${inquiry.Listing.slug}`}
                 className="text-lg font-semibold hover:underline"
               >
-                {inquiry.listing.title}
+                {inquiry.Listing.title}
               </Link>
             </div>
             <div className="flex items-center gap-2 text-muted-foreground">
               <MapPin className="h-4 w-4" />
-              <span>{inquiry.listing.location}</span>
+              <span>{inquiry.Listing.location}</span>
             </div>
             <Separator />
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-muted-foreground">Preis/Tag</p>
-                <p className="mt-1 font-semibold">{inquiry.listing.pricePerDay} €</p>
+                <p className="mt-1 font-semibold">{inquiry.Listing.pricePerDay} €</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Sitzplätze</p>
-                <p className="mt-1 font-semibold">{inquiry.listing.seats}</p>
+                <p className="mt-1 font-semibold">{inquiry.Listing.seats}</p>
               </div>
             </div>
-            <Link href={`/dashboard/listings/${inquiry.listing.id}`}>
+            <Link href={`/dashboard/listings/${inquiry.Listing.id}`}>
               <Button variant="outline" className="w-full">
                 Wohnmobil bearbeiten
               </Button>

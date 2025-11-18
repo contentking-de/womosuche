@@ -182,7 +182,7 @@ export function HeroMap({ listings, onClose }: HeroMapProps) {
             <Popup>
               <Card className="w-64 border-0 shadow-lg">
                 <CardContent className="p-4">
-                  {listing.images && listing.images.length > 0 && (
+                  {listing.images.length > 0 && (
                     <img
                       src={listing.images[0].url}
                       alt={listing.title}

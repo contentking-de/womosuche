@@ -50,7 +50,10 @@ export function LoginForm({ callbackUrl, passwordReset }: { callbackUrl?: string
         return;
       }
 
-      router.push(callbackUrl || searchParams.get("callbackUrl") || "/dashboard");
+      // Entferne alle Query-Parameter außer callbackUrl
+      const targetUrl = callbackUrl || searchParams.get("callbackUrl") || "/dashboard";
+      // Verwende replace, um die Login-URL aus der History zu entfernen
+      router.replace(targetUrl);
       router.refresh();
     } catch (err) {
       setError("Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.");

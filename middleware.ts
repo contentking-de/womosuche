@@ -45,6 +45,8 @@ export default auth((req) => {
     "/magazin",
     "/login",
     "/register",
+    "/forgot-password",
+    "/reset-password",
   ];
 
   // Prüfe ob Route öffentlich ist
