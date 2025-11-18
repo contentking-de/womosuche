@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -21,10 +21,34 @@ interface Listing {
 
 interface HeroSectionProps {
   listings: Listing[];
+  totalListings: number;
 }
 
-export function HeroSection({ listings }: HeroSectionProps) {
+export function HeroSection({ listings, totalListings }: HeroSectionProps) {
   const [showMap, setShowMap] = useState(false);
+  const [animatedCount, setAnimatedCount] = useState(0);
+
+  // Animation für die Anzahl der Listings
+  useEffect(() => {
+    const duration = 2000; // 2 Sekunden
+    const steps = 60; // Anzahl der Schritte
+    const stepDuration = duration / steps;
+    const increment = totalListings / steps;
+
+    let currentStep = 0;
+    const timer = setInterval(() => {
+      currentStep++;
+      const nextValue = Math.min(Math.floor(increment * currentStep), totalListings);
+      setAnimatedCount(nextValue);
+
+      if (currentStep >= steps) {
+        setAnimatedCount(totalListings);
+        clearInterval(timer);
+      }
+    }, stepDuration);
+
+    return () => clearInterval(timer);
+  }, [totalListings]);
 
   if (showMap) {
     return <HeroMap listings={listings} onClose={() => setShowMap(false)} />;
@@ -50,7 +74,7 @@ export function HeroSection({ listings }: HeroSectionProps) {
       <div className="relative z-10 container mx-auto px-4 py-24">
         <div className="mx-auto max-w-5xl text-center flex flex-col">
           <h1 className="text-5xl font-bold tracking-tight sm:text-6xl text-white drop-shadow-lg order-1">
-            Wohnmobile in Deiner Nähe mieten
+            Wohnmobile mieten in Deiner Nähe
           </h1>
           
           {/* Suchfunktion - Mobile: direkt unter Headline (order-2), Desktop: nach Subtext (md:order-3) */}
@@ -58,9 +82,8 @@ export function HeroSection({ listings }: HeroSectionProps) {
             <HeroSearch />
           </div>
           
-          <p className="mt-6 text-lg leading-8 text-white/90 drop-shadow-md order-3 md:order-2">
-            Entdecke eine große Auswahl an Wohnmobilen für dein nächstes Abenteuer.
-            Oder vermiete dein eigenes Wohnmobil und verdiene Geld damit.
+          <p className="mt-6 text-xl font-bold leading-8 text-white/90 drop-shadow-md order-3 md:order-2">
+            Entdecke unsere beliebtesten Wohnmobile für dein nächstes Abenteuer und wähle aus <span className="text-3xl">{animatedCount}</span> Fahrzeugen.
           </p>
 
           <div className="mt-6 flex items-center justify-center gap-x-6 gap-y-3 flex-wrap order-4">

@@ -43,6 +43,11 @@ export default async function HomePage() {
     // Entferne das Limit, damit alle Wohnmobile angezeigt werden
   });
 
+  // Lade Gesamtzahl aller veröffentlichten Wohnmobile
+  const totalListings = await prisma.listing.count({
+    where: { published: true },
+  });
+
   // Lade 8 neueste veröffentlichte Magazin-Artikel
   const articles = await prisma.article.findMany({
     where: { published: true },
@@ -68,7 +73,7 @@ export default async function HomePage() {
       <NewsletterConfirmationMessage />
       
       {/* Hero Section */}
-      <HeroSection listings={listings.map((l: any) => ({ ...l, images: l.Image || [] }))} />
+      <HeroSection listings={listings.map((l: any) => ({ ...l, images: l.Image || [] }))} totalListings={totalListings} />
 
       {/* Beliebte Wohnmobile Section */}
       <PopularListings />

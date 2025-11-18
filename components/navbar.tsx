@@ -40,14 +40,14 @@ export async function Navbar() {
                 className="flex items-center gap-2 text-base font-bold hover:text-primary transition-colors"
               >
                 <Home className="h-4 w-4" />
-                womosuche Home
+                Wohnmobile mieten
               </Link>
               <Link
                 href="/wohnmobile"
                 className="flex items-center gap-2 text-base font-bold hover:text-primary transition-colors"
               >
                 <Car className="h-4 w-4" />
-                Wohnmobile mieten
+                Wohnmobile Übersicht
               </Link>
               <Link
                 href="/magazin"

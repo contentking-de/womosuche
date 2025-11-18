@@ -37,7 +37,7 @@ export function MobileMenu({ user }: MobileMenuProps) {
               onClick={() => setOpen(false)}
             >
               <Home className="h-5 w-5" />
-              womosuche Home
+              Wohnmobile mieten
             </Link>
             <Link
               href="/wohnmobile"
@@ -45,7 +45,7 @@ export function MobileMenu({ user }: MobileMenuProps) {
               onClick={() => setOpen(false)}
             >
               <Car className="h-5 w-5" />
-              Wohnmobile mieten
+              Wohnmobile Übersicht
             </Link>
             <Link
               href="/magazin"

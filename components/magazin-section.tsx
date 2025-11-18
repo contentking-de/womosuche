@@ -41,9 +41,9 @@ export function MagazinSection({ articles }: MagazinSectionProps) {
             </p>
           </div>
           <Link href="/magazin">
-            <Button variant="outline" size="lg">
+            <Button size="lg" className="px-8 py-6 text-lg font-bold">
               Alle Artikel
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
         </div>

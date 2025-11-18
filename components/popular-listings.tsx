@@ -58,9 +58,9 @@ export async function PopularListings() {
             </p>
           </div>
           <Link href="/wohnmobile">
-            <Button variant="outline" size="lg">
-              Alle anzeigen
-              <ArrowRight className="ml-2 h-4 w-4" />
+            <Button size="lg" className="px-8 py-6 text-lg font-bold">
+              Alle {allListingIds.length} Wohnmobile anzeigen
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
         </div>
