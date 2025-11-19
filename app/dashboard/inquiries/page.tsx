@@ -113,13 +113,26 @@ export default async function InquiriesPage({
 
   const allInquiries = await prisma.inquiry.findMany({
     where: allInquiriesWhere,
-    select: { status: true },
+    select: { 
+      status: true,
+      replyTemplate: true,
+      replySentAt: true,
+    },
   });
 
   const statusCounts = {
     OPEN: allInquiries.filter((i: { status: string }) => i.status === "OPEN").length,
     ANSWERED: allInquiries.filter((i: { status: string }) => i.status === "ANSWERED").length,
     ARCHIVED: allInquiries.filter((i: { status: string }) => i.status === "ARCHIVED").length,
+  };
+
+  // Antwort-Statistiken
+  const repliedInquiries = allInquiries.filter((i: { replySentAt: Date | null }) => i.replySentAt !== null);
+  const replyStats = {
+    total: repliedInquiries.length,
+    confirmed: repliedInquiries.filter((i: { replyTemplate: string | null }) => i.replyTemplate === "confirmed").length,
+    rejected: repliedInquiries.filter((i: { replyTemplate: string | null }) => i.replyTemplate === "rejected").length,
+    upsell: repliedInquiries.filter((i: { replyTemplate: string | null }) => i.replyTemplate === "upsell").length,
   };
 
   return (
@@ -166,7 +179,7 @@ export default async function InquiriesPage({
         )}
       </form>
 
-      <div className="mb-6 grid gap-4 md:grid-cols-3">
+      <div className="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Offen</CardDescription>
@@ -184,6 +197,28 @@ export default async function InquiriesPage({
             <CardDescription>Archiviert</CardDescription>
             <CardTitle className="text-2xl">{statusCounts.ARCHIVED}</CardTitle>
           </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>Antworten gesendet</CardDescription>
+            <CardTitle className="text-2xl">{replyStats.total}</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-2">
+            <div className="space-y-1 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Bestätigt:</span>
+                <span className="font-medium">{replyStats.confirmed}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Abgelehnt:</span>
+                <span className="font-medium">{replyStats.rejected}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Upsell:</span>
+                <span className="font-medium">{replyStats.upsell}</span>
+              </div>
+            </div>
+          </CardContent>
         </Card>
       </div>
 
