@@ -80,7 +80,6 @@ export default async function HomePage() {
       published: true,
       location: {
         not: null,
-        not: "",
       },
     },
     select: {

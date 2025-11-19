@@ -646,7 +646,7 @@ export default async function ListingDetailPage({
     // Berechne Entfernung und filtere nach Radius
     type ListingWithDistance = typeof allNearbyListingsWithImages[number] & { distance: number };
     const listingsWithDistance = allNearbyListingsWithImages
-      .map((nearbyListing): ListingWithDistance => {
+      .map((nearbyListing: typeof allNearbyListingsWithImages[number]): ListingWithDistance => {
         const distance = calculateDistance(
           listing.lat!,
           listing.lng!,
