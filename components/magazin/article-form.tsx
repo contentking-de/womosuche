@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +21,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Article } from "@prisma/client";
 import { generateSlug } from "@/lib/slug";
+import { Upload, X, Image as ImageIcon } from "lucide-react";
+import Image from "next/image";
 
 function decodeAmp(value: string): string {
   return value.replace(/&amp;/g, "&");
@@ -34,6 +37,7 @@ const articleSchema = z.object({
   categories: z.array(z.string()),
   published: z.boolean(),
   editorId: z.string().optional().nullable(),
+  featuredImageUrl: z.string().optional().nullable(),
 });
 
 type ArticleFormData = z.infer<typeof articleSchema>;
@@ -52,6 +56,8 @@ export function ArticleForm({ article, editors = [], availableCategories = [] }:
   const [categoryInput, setCategoryInput] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [featuredImageUrl, setFeaturedImageUrl] = useState<string | null>(article?.featuredImageUrl || null);
 
   const {
     register,
@@ -61,7 +67,7 @@ export function ArticleForm({ article, editors = [], availableCategories = [] }:
     formState: { errors },
   } = useForm<ArticleFormData>({
     resolver: zodResolver(articleSchema),
-    defaultValues: article
+        defaultValues: article
       ? {
           title: article.title,
           slug: article.slug,
@@ -71,12 +77,14 @@ export function ArticleForm({ article, editors = [], availableCategories = [] }:
           categories: article.categories || [],
           published: article.published,
           editorId: article.editorId || null,
+          featuredImageUrl: article.featuredImageUrl || null,
         }
       : {
           tags: [],
           categories: [],
           published: false,
           editorId: null,
+          featuredImageUrl: null,
         },
   });
 
@@ -124,6 +132,56 @@ export function ArticleForm({ article, editors = [], availableCategories = [] }:
     );
   };
 
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+    if (acceptedFiles.length === 0) return;
+    
+    const file = acceptedFiles[0];
+    setUploadingImage(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: "Unbekannter Fehler" }));
+        throw new Error(errorData.error || `Upload fehlgeschlagen: ${response.status} ${response.statusText}`);
+      }
+      
+      const result = await response.json();
+      if (!result.url) {
+        throw new Error("Keine URL vom Server erhalten");
+      }
+      
+      setFeaturedImageUrl(result.url);
+      setValue("featuredImageUrl", result.url);
+    } catch (err) {
+      console.error("Upload error:", err);
+      const errorMessage = err instanceof Error ? err.message : "Fehler beim Hochladen";
+      alert(errorMessage);
+    } finally {
+      setUploadingImage(false);
+    }
+  }, [setValue]);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      "image/*": [".jpeg", ".jpg", ".png", ".webp"],
+    },
+    maxSize: 10 * 1024 * 1024, // 10MB
+    multiple: false,
+  });
+
+  const removeImage = () => {
+    setFeaturedImageUrl(null);
+    setValue("featuredImageUrl", null);
+  };
+
   const onSubmit = async (data: ArticleFormData) => {
     setIsLoading(true);
     setError(null);
@@ -132,13 +190,14 @@ export function ArticleForm({ article, editors = [], availableCategories = [] }:
       const url = article ? `/api/magazin/${article.id}` : "/api/magazin";
       const method = article ? "PUT" : "POST";
 
-      // Stelle sicher, dass editorId, tags und categories explizit gesetzt werden
+      // Stelle sicher, dass editorId, tags, categories und featuredImageUrl explizit gesetzt werden
       // Verwende immer die aktuellen Werte aus dem State (watch), da diese die Quelle der Wahrheit sind
       const payload = {
         ...data,
         editorId: data.editorId || null,
         tags: tags || [],
         categories: categories || [],
+        featuredImageUrl: featuredImageUrl || null,
       };
 
       const response = await fetch(url, {
@@ -274,6 +333,59 @@ export function ArticleForm({ article, editors = [], availableCategories = [] }:
               {...register("excerpt")}
               disabled={isLoading}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Beitragsbild</Label>
+            {featuredImageUrl ? (
+              <div className="relative w-full max-w-md">
+                <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
+                  <Image
+                    src={featuredImageUrl}
+                    alt="Beitragsbild"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  onClick={removeImage}
+                  className="mt-2"
+                  disabled={isLoading || uploadingImage}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Bild entfernen
+                </Button>
+              </div>
+            ) : (
+              <div
+                {...getRootProps()}
+                className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+                  isDragActive
+                    ? "border-primary bg-primary/5"
+                    : "border-muted-foreground/25 hover:border-primary/50"
+                } ${uploadingImage ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                <input {...getInputProps()} />
+                <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                {uploadingImage ? (
+                  <p className="text-sm text-muted-foreground">Wird hochgeladen...</p>
+                ) : isDragActive ? (
+                  <p className="text-sm text-muted-foreground">Datei hier ablegen...</p>
+                ) : (
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      Ziehen Sie ein Bild hierher oder klicken Sie zum Auswählen
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      PNG, JPG, WEBP bis zu 10MB
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">

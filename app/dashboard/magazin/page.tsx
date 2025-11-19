@@ -1,6 +1,7 @@
 import { requireAdminOrEditor } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -116,6 +117,7 @@ export default async function MagazinPage({
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[80px]">Bild</TableHead>
               <TableHead className="w-[40%]">Titel</TableHead>
               <TableHead className="w-[22%]">Kategorien</TableHead>
               <TableHead className="w-[120px]">Status</TableHead>
@@ -126,7 +128,7 @@ export default async function MagazinPage({
           <TableBody>
             {articles.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8">
+                <TableCell colSpan={6} className="text-center py-8">
                   <p className="text-muted-foreground">Noch keine Artikel vorhanden</p>
                   <Link href="/dashboard/magazin/new">
                     <Button variant="outline" className="mt-4">
@@ -138,6 +140,23 @@ export default async function MagazinPage({
             ) : (
               articles.map((article: Article) => (
                 <TableRow key={article.id}>
+                  <TableCell>
+                    {article.featuredImageUrl ? (
+                      <div className="relative w-16 h-16 rounded-md overflow-hidden border">
+                        <Image
+                          src={article.featuredImageUrl}
+                          alt={article.title}
+                          fill
+                          className="object-cover"
+                          sizes="64px"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-16 h-16 rounded-md bg-muted border flex items-center justify-center">
+                        <span className="text-xs text-muted-foreground">Kein Bild</span>
+                      </div>
+                    )}
+                  </TableCell>
                   <TableCell className="font-medium max-w-[420px] truncate">
                     {article.title}
                   </TableCell>

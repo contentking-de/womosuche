@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { randomUUID } from "crypto";
 import { sanitizeAiHtml } from "@/lib/utils";
 
 export async function GET(request: Request) {
@@ -152,6 +153,7 @@ const articleSchema = z.object({
   categories: z.array(z.string()).default([]),
   published: z.boolean().default(false),
   editorId: z.string().optional().nullable(),
+  featuredImageUrl: z.union([z.string().url(), z.literal(""), z.null()]).optional(),
 });
 
 export async function POST(request: Request) {
@@ -197,11 +199,15 @@ export async function POST(request: Request) {
       );
     }
 
-    // Stelle sicher, dass editorId explizit gesetzt wird
+    // Stelle sicher, dass editorId und featuredImageUrl explizit gesetzt werden und ID generiert wird
+    const now = new Date();
     const createData: any = {
       ...validatedData,
+      id: randomUUID(),
       categories: validatedData.categories || [],
       editorId: validatedData.editorId || null,
+      featuredImageUrl: validatedData.featuredImageUrl || null,
+      updatedAt: now,
     };
 
     const article = await prisma.article.create({

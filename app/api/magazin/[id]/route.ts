@@ -12,6 +12,7 @@ const articleSchema = z.object({
   categories: z.array(z.string()).default([]),
   published: z.boolean().default(false),
   editorId: z.string().optional().nullable(),
+  featuredImageUrl: z.union([z.string().url(), z.literal(""), z.null()]).optional(),
 });
 
 export async function PUT(
@@ -50,7 +51,7 @@ export async function PUT(
       }
     }
 
-    // Stelle sicher, dass editorId explizit gesetzt wird
+    // Stelle sicher, dass editorId und featuredImageUrl explizit gesetzt werden
     // Wenn editorId im Body vorhanden ist (auch wenn null), verwende es, sonst lasse es undefined
     const updateData: any = {
       title: validatedData.title,
@@ -65,6 +66,11 @@ export async function PUT(
     // editorId explizit setzen, auch wenn es null ist
     if ('editorId' in body) {
       updateData.editorId = body.editorId || null;
+    }
+    
+    // featuredImageUrl explizit setzen, auch wenn es null ist
+    if ('featuredImageUrl' in body) {
+      updateData.featuredImageUrl = body.featuredImageUrl || null;
     }
 
     const updatedArticle = await prisma.article.update({
