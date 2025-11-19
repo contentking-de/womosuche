@@ -132,10 +132,13 @@ export function ArticleForm({ article, editors = [], availableCategories = [] }:
       const url = article ? `/api/magazin/${article.id}` : "/api/magazin";
       const method = article ? "PUT" : "POST";
 
-      // Stelle sicher, dass editorId explizit gesetzt wird
+      // Stelle sicher, dass editorId, tags und categories explizit gesetzt werden
+      // Verwende immer die aktuellen Werte aus dem State (watch), da diese die Quelle der Wahrheit sind
       const payload = {
         ...data,
         editorId: data.editorId || null,
+        tags: tags || [],
+        categories: categories || [],
       };
 
       const response = await fetch(url, {

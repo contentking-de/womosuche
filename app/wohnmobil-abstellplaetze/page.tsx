@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { generateSlug, getFirstCategorySlug } from "@/lib/slug";
 import { ParkingCircle } from "lucide-react";
+import { SubmitParkingForm } from "@/components/abstellplaetze/submit-parking-form";
 
 function decodeAmp(value: string): string {
   return value.replace(/&amp;/g, "&");
@@ -104,10 +105,17 @@ export default async function AbstellplaetzePage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-12">
-        <h1 className="text-4xl font-bold">Wohnmobil Abstellplätze</h1>
-        <p className="mt-4 text-lg text-muted-foreground">
-          Finde Abstellplätze für dein Wohnmobil nach Postleitzahl. Übersicht aller verfügbaren Stellplätze in verschiedenen Regionen.
-        </p>
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+          <div className="flex-1">
+            <h1 className="text-4xl font-bold">Wohnmobil Abstellplätze</h1>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Finde Abstellplätze für dein Wohnmobil nach Postleitzahl. Übersicht aller verfügbaren Stellplätze in verschiedenen Regionen.
+            </p>
+          </div>
+          <div className="flex-shrink-0 md:mt-0 mt-2">
+            <SubmitParkingForm />
+          </div>
+        </div>
       </div>
 
       {sortedPostalCodes.length === 0 ? (

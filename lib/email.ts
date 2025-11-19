@@ -5,6 +5,7 @@ import { PasswordResetEmail } from "@/emails/password-reset";
 import { NewsletterConfirmationEmail } from "@/emails/newsletter-confirmation";
 import { EmailVerificationEmail } from "@/emails/email-verification";
 import { NewListingToAdminEmail } from "@/emails/new-listing-to-admin";
+import { NewParkingSubmissionToAdminEmail } from "@/emails/new-parking-submission-to-admin";
 import { render } from "@react-email/render";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -271,6 +272,84 @@ export async function sendNewListingNotificationToAdmins({
   } catch (error) {
     console.error("Fehler beim Senden der Admin-Benachrichtigungen:", error);
     // Nicht werfen, da dies nicht kritisch für das Erstellen des Listings ist
+  }
+}
+
+export async function sendNewParkingSubmissionNotificationToAdmins({
+  parkingTitle,
+  location,
+  postalCode,
+  description,
+  submitterName,
+  submitterEmail,
+  submitterPhone,
+  articleUrl,
+}: {
+  parkingTitle: string;
+  location: string;
+  postalCode: string;
+  description: string;
+  submitterName: string;
+  submitterEmail: string;
+  submitterPhone?: string;
+  articleUrl: string;
+}) {
+  try {
+    // Lade alle Admins aus der Datenbank
+    const { prisma } = await import("@/lib/prisma");
+    const admins = await prisma.user.findMany({
+      where: { role: "ADMIN" },
+      select: {
+        email: true,
+        name: true,
+      },
+    });
+
+    if (admins.length === 0) {
+      console.warn("Keine Administratoren gefunden, um Benachrichtigung zu senden");
+      return;
+    }
+
+    // Sende E-Mail an alle Admins
+    const emailPromises = admins.map(async (admin: { email: string | null; name: string | null }) => {
+      if (!admin.email || !admin.email.trim()) {
+        console.warn(`Admin ohne E-Mail-Adresse übersprungen: ${admin.name || "Unbekannt"}`);
+        return;
+      }
+
+      try {
+        const emailHtml = await render(
+          NewParkingSubmissionToAdminEmail({
+            adminName: admin.name || undefined,
+            parkingTitle,
+            location,
+            postalCode,
+            description,
+            submitterName,
+            submitterEmail,
+            submitterPhone,
+            articleUrl,
+          })
+        );
+
+        await resend.emails.send({
+          from: process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev",
+          to: admin.email.trim(),
+          subject: `Neuer Abstellplatz eingereicht: ${parkingTitle}`,
+          html: emailHtml,
+        });
+
+        console.log(`Benachrichtigung erfolgreich an Admin gesendet: ${admin.email}`);
+      } catch (error) {
+        console.error(`Fehler beim Senden der Benachrichtigung an Admin ${admin.email}:`, error);
+        // Nicht werfen, damit andere Admins trotzdem benachrichtigt werden
+      }
+    });
+
+    await Promise.all(emailPromises);
+  } catch (error) {
+    console.error("Fehler beim Senden der Admin-Benachrichtigungen:", error);
+    // Nicht werfen, da dies nicht kritisch für das Erstellen des Artikels ist
   }
 }
 
