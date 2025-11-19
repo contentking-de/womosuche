@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Car, Users, Shield, Search } from "lucide-react";
+import { Car, Users, Shield, Search, MapPin } from "lucide-react";
 import { PricingSection } from "@/components/marketing/pricing-section";
 import { BeginnerSection } from "@/components/marketing/beginner-section";
 import { FAQSection } from "@/components/marketing/faq-section";
@@ -234,8 +234,9 @@ export default async function HomePage() {
                   <Link
                     key={city}
                     href={`/wohnmobile/${citySlug}`}
-                    className="rounded-lg border bg-card p-4 text-center transition-colors hover:bg-accent hover:text-accent-foreground"
+                    className="rounded-lg border bg-card p-4 text-center transition-colors hover:bg-accent hover:text-accent-foreground flex items-center justify-center gap-2"
                   >
+                    <MapPin className="h-4 w-4" />
                     <span className="font-medium">{city}</span>
                   </Link>
                 );

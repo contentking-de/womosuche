@@ -11,12 +11,18 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function getPrismaClient(): PrismaClientType {
-  // Check if existing client has the new model
+  // Check if existing client has the new model and fields
   if (globalForPrisma.prisma) {
     try {
       // Try to access the outreachPlace model
-      if (typeof (globalForPrisma.prisma as any).outreachPlace === 'undefined') {
-        console.log("Prisma Client missing outreachPlace model, creating new instance...");
+      const hasOutreachPlace = typeof (globalForPrisma.prisma as any).outreachPlace !== 'undefined';
+      // Check if inquiry model has the new replySentAt and replyTemplate fields
+      // We check by trying to access the model's update method signature
+      const inquiryModel = (globalForPrisma.prisma as any).inquiry;
+      const hasNewFields = inquiryModel && typeof inquiryModel.update === 'function';
+      
+      if (!hasOutreachPlace || !hasNewFields) {
+        console.log("Prisma Client missing models or fields, creating new instance...");
         // Disconnect existing client (fire and forget)
         if (typeof (globalForPrisma.prisma as any).$disconnect === 'function') {
           (globalForPrisma.prisma as any).$disconnect().catch(() => {});

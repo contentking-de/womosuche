@@ -10,6 +10,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Mail, MapPin } from "lucide-react";
 import { UpdateInquiryStatusButton } from "@/components/inquiries/update-status-button";
+import { ReplyToInquiryButton } from "@/components/inquiries/reply-to-inquiry-button";
 
 export default async function InquiryDetailPage({
   params,
@@ -26,6 +27,11 @@ export default async function InquiryDetailPage({
         include: {
           Image: {
             take: 1,
+          },
+          User: {
+            select: {
+              name: true,
+            },
           },
         },
       },
@@ -86,6 +92,33 @@ export default async function InquiryDetailPage({
                 })}
               </p>
             </div>
+            {inquiry.replySentAt && (
+              <>
+                <Separator />
+                <div>
+                  <p className="text-sm text-muted-foreground">Antwort gesendet</p>
+                  <p className="mt-1">
+                    {format(new Date(inquiry.replySentAt), "dd.MM.yyyy 'um' HH:mm 'Uhr'", {
+                      locale: de,
+                    })}
+                  </p>
+                  {inquiry.replyTemplate && (
+                    <p className="mt-1 text-sm">
+                      Vorlage:{" "}
+                      <span className="font-medium">
+                        {inquiry.replyTemplate === "confirmed"
+                          ? "Bestätigt"
+                          : inquiry.replyTemplate === "rejected"
+                          ? "Abgelehnt"
+                          : inquiry.replyTemplate === "upsell"
+                          ? "Upsell/Alternative"
+                          : inquiry.replyTemplate}
+                      </span>
+                    </p>
+                  )}
+                </div>
+              </>
+            )}
             <Separator />
             <div>
               <p className="text-sm text-muted-foreground">Mieter</p>
@@ -141,7 +174,15 @@ export default async function InquiryDetailPage({
               <p className="text-sm text-muted-foreground">Nachricht</p>
               <p className="mt-2 whitespace-pre-wrap">{inquiry.message}</p>
             </div>
-            <div className="pt-4">
+            <div className="pt-4 space-y-2">
+              <ReplyToInquiryButton 
+                inquiry={{
+                  ...inquiry,
+                  renterName: inquiry.renterName,
+                  renterEmail: inquiry.renterEmail,
+                }}
+                ownerName={inquiry.Listing.User.name || user.name || "womosuche.de"}
+              />
               <UpdateInquiryStatusButton inquiry={inquiry} />
             </div>
           </CardContent>

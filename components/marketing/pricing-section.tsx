@@ -84,7 +84,7 @@ export function PricingSection() {
                   </div>
                 )}
                 <CardHeader>
-                  <div className={clsx("text-5xl font-extrabold leading-none sm:text-6xl")}>
+                  <div className={clsx("text-4xl font-extrabold leading-none sm:text-5xl")}>
                     {plan.price}
                   </div>
                   <div className={clsx("mt-1 text-xs", isHighlight ? "text-background/70" : "text-muted-foreground")}>

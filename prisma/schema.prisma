@@ -82,6 +82,8 @@ model Inquiry {
   startDate         DateTime?
   preferredCallTime String?
   renterPhone       String?
+  replySentAt       DateTime?
+  replyTemplate      String?   // confirmed, rejected, upsell, oder null für manuelle Antwort
   Listing           Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   @@index([listingId])

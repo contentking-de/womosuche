@@ -21,7 +21,7 @@ export async function PATCH(
     const inquiry = await prisma.inquiry.findUnique({
       where: { id },
       include: {
-        listing: true,
+        Listing: true,
       },
     });
 
@@ -29,10 +29,14 @@ export async function PATCH(
       return NextResponse.json({ error: "Anfrage nicht gefunden" }, { status: 404 });
     }
 
+    if (!inquiry.Listing) {
+      return NextResponse.json({ error: "Wohnmobil nicht gefunden" }, { status: 404 });
+    }
+
     // Prüfe Berechtigung
     if (
       session.user.role !== "ADMIN" &&
-      inquiry.listing.ownerId !== session.user.id
+      inquiry.Listing.ownerId !== session.user.id
     ) {
       return NextResponse.json({ error: "Keine Berechtigung" }, { status: 403 });
     }

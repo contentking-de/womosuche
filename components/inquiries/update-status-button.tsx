@@ -32,13 +32,16 @@ export function UpdateInquiryStatusButton({ inquiry }: UpdateInquiryStatusButton
       });
 
       if (!response.ok) {
-        throw new Error("Fehler beim Aktualisieren");
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || "Fehler beim Aktualisieren";
+        throw new Error(errorMessage);
       }
 
       router.refresh();
     } catch (error) {
       console.error("Update error:", error);
-      alert("Fehler beim Aktualisieren des Status");
+      const errorMessage = error instanceof Error ? error.message : "Fehler beim Aktualisieren des Status";
+      alert(errorMessage);
     } finally {
       setIsLoading(false);
     }
