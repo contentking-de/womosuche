@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { availableBrands } from "@/lib/brands";
 import { convertUmlautsToAscii } from "@/lib/slug";
+import { ChevronDown, ChevronUp, Filter } from "lucide-react";
 
 const availableFeatures = [
   "Klimaanlage",
@@ -56,6 +57,18 @@ export function ListingFilters({ brand, location: initialLocation }: ListingFilt
   );
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>(
     searchParams.get("features")?.split(",").filter(Boolean) || []
+  );
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Prüfe ob Filter aktiv sind
+  const hasActiveFilters = Boolean(
+    location ||
+    minPrice ||
+    maxPrice ||
+    minSeats ||
+    minBeds ||
+    selectedBrand ||
+    selectedFeatures.length > 0
   );
 
   const getBasePath = () => {
@@ -171,9 +184,30 @@ export function ListingFilters({ brand, location: initialLocation }: ListingFilt
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Filter</CardTitle>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex w-full items-center justify-between text-left lg:cursor-default"
+          type="button"
+        >
+          <CardTitle className="flex items-center gap-2">
+            <Filter className="h-4 w-4" />
+            Filter
+            {hasActiveFilters && (
+              <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
+                Aktiv
+              </span>
+            )}
+          </CardTitle>
+          <div className="lg:hidden">
+            {isOpen ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </div>
+        </button>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className={`space-y-4 ${isOpen ? "" : "hidden"} lg:block`}>
         <div className="space-y-2">
           <Label htmlFor="location">Standort</Label>
           <Input

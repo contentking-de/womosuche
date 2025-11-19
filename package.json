@@ -15,6 +15,7 @@
     "assign:brands": "tsx scripts/assign-brands-from-title.ts",
     "remove:postal-codes": "tsx scripts/remove-postal-codes.ts",
     "regenerate:descriptions": "tsx scripts/regenerate-all-descriptions.ts",
+    "remove:parentheses": "tsx scripts/remove-parentheses-from-locations.ts",
     "db:generate": "prisma generate && npm run setup:prisma",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",

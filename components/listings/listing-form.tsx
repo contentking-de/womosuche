@@ -101,7 +101,14 @@ const listingSchema = z.object({
   pricePerDay: z.number().min(1, "Preis muss größer als 0 sein"),
   seats: z.number().min(1, "Mindestens 1 Sitzplatz erforderlich"),
   beds: z.number().min(1, "Mindestens 1 Bett erforderlich"),
-  location: z.string().min(2, "Standort ist erforderlich"),
+  location: z.string()
+    .min(2, "Standort ist erforderlich")
+    .refine(
+      (val) => !val.includes("(") && !val.includes(")") && !val.includes("/"),
+      {
+        message: "Standort darf keine Klammern ( ) oder Schrägstriche (/) enthalten",
+      }
+    ),
   features: z.array(z.string()),
   marke: z.string().optional(),
   equipment: equipmentSchema,
@@ -139,6 +146,7 @@ export function ListingForm({ listing, userRole, ownerId: initialOwnerId, availa
   const [isLoading, setIsLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [showSpecialCharWarning, setShowSpecialCharWarning] = useState(false);
 
   const {
     register,
@@ -287,9 +295,28 @@ export function ListingForm({ listing, userRole, ownerId: initialOwnerId, availa
               <Input
                 id="location"
                 placeholder="z.B. München, Bayern"
-                {...register("location")}
+                {...register("location", {
+                  onChange: (e) => {
+                    // Prüfe ob Sonderzeichen eingegeben wurden
+                    const hasSpecialChars = /[()/]/.test(e.target.value);
+                    if (hasSpecialChars) {
+                      setShowSpecialCharWarning(true);
+                      // Entferne Klammern und Schrägstriche beim Tippen
+                      const value = e.target.value.replace(/[()/]/g, "");
+                      e.target.value = value;
+                      setValue("location", value);
+                    } else {
+                      setShowSpecialCharWarning(false);
+                    }
+                  },
+                })}
                 disabled={isLoading}
               />
+              {showSpecialCharWarning && (
+                <p className="text-sm text-destructive">
+                  Sonderzeichen wie Klammern ( ) und Schrägstriche (/) sind nicht erlaubt
+                </p>
+              )}
               {errors.location && (
                 <p className="text-sm text-destructive">{errors.location.message}</p>
               )}

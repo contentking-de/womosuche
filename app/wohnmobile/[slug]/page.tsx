@@ -694,9 +694,9 @@ export default async function ListingDetailPage({
           <div>
             <ListingImageGallery images={listing.Image} title={listing.title} />
             
-            {/* Ausstattung (Basis) */}
+            {/* Ausstattung (Basis) - nur auf Desktop sichtbar */}
             {listing.features.length > 0 && (
-              <div className="mt-8">
+              <div className="mt-8 hidden lg:block">
                 <h2 className="mb-4 text-xl font-semibold">Ausstattung (Basis)</h2>
                 <div className="flex flex-wrap gap-2">
                   {listing.features.map((feature: string) => (
@@ -708,9 +708,9 @@ export default async function ListingDetailPage({
               </div>
             )}
 
-            {/* Detaillierte Ausstattung */}
+            {/* Detaillierte Ausstattung - nur auf Desktop sichtbar */}
             {(listing as any).equipment && (
-              <div className="mt-8">
+              <div className="mt-8 hidden lg:block">
                 <h2 className="mb-4 text-xl font-semibold">Detaillierte Ausstattung</h2>
                 <EquipmentDisplay equipment={(listing as any).equipment} />
               </div>
@@ -776,6 +776,30 @@ export default async function ListingDetailPage({
                 dangerouslySetInnerHTML={{ __html: listing.description }}
               />
             </div>
+
+            {/* Ausstattung (Basis) - nur auf Mobile sichtbar, nach Beschreibung */}
+            {listing.features.length > 0 && (
+              <div className="lg:hidden">
+                <Separator className="my-6" />
+                <h2 className="mb-4 text-xl font-semibold">Ausstattung (Basis)</h2>
+                <div className="flex flex-wrap gap-2">
+                  {listing.features.map((feature: string) => (
+                    <Badge key={feature} variant="secondary">
+                      {feature}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Detaillierte Ausstattung - nur auf Mobile sichtbar, nach Beschreibung */}
+            {(listing as any).equipment && (
+              <div className="lg:hidden">
+                <Separator className="my-6" />
+                <h2 className="mb-4 text-xl font-semibold">Detaillierte Ausstattung</h2>
+                <EquipmentDisplay equipment={(listing as any).equipment} />
+              </div>
+            )}
 
             <Separator />
 
