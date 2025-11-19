@@ -99,6 +99,8 @@ model Listing {
   beds        Int
   location    String
   features    String[]
+  marke       String?
+  equipment   Json?     // Strukturierte Ausstattungsdaten
   published   Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime
@@ -112,6 +114,7 @@ model Listing {
   @@index([location])
   @@index([published])
   @@index([slug])
+  @@index([marke])
 }
 
 model NewsletterSubscriber {
@@ -171,7 +174,7 @@ model User {
   editorProfile Json?
   profileImage  String?
   Account       Account[]
-  Article       Article[]  @relation("ArticleEditor")
+  Article       Article[] @relation("ArticleEditor")
   Listing       Listing[]
   Session       Session[]
 }

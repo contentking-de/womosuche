@@ -17,6 +17,7 @@ interface SearchParams {
   minSeats?: string;
   minBeds?: string;
   features?: string;
+  marke?: string;
   page?: string;
 }
 
@@ -81,6 +82,10 @@ export default async function ListingsPage({
     where.features = {
       hasSome: features,
     };
+  }
+
+  if (params.marke) {
+    where.marke = params.marke;
   }
 
   // Für Umkreissuche: Lade alle Listings mit Koordinaten, dann filtere nach Entfernung

@@ -9,6 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { availableBrands } from "@/lib/brands";
 
 const availableFeatures = [
   "Klimaanlage",
@@ -25,11 +33,16 @@ const availableFeatures = [
   "Auffahrrampe",
 ];
 
-export function ListingFilters() {
+interface ListingFiltersProps {
+  brand?: string;
+  location?: string;
+}
+
+export function ListingFilters({ brand, location: initialLocation }: ListingFiltersProps = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [location, setLocation] = useState(searchParams.get("location") || "");
+  const [location, setLocation] = useState(initialLocation || searchParams.get("location") || "");
   const [radius, setRadius] = useState(
     searchParams.get("radius") || "50"
   );
@@ -37,9 +50,22 @@ export function ListingFilters() {
   const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
   const [minSeats, setMinSeats] = useState(searchParams.get("minSeats") || "");
   const [minBeds, setMinBeds] = useState(searchParams.get("minBeds") || "");
+  const [selectedBrand, setSelectedBrand] = useState(
+    searchParams.get("marke") || ""
+  );
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>(
     searchParams.get("features")?.split(",").filter(Boolean) || []
   );
+
+  const getBasePath = () => {
+    if (brand) {
+      return `/wohnmobile/${encodeURIComponent(brand.toLowerCase())}`;
+    }
+    if (initialLocation) {
+      return `/wohnmobile/${encodeURIComponent(initialLocation.toLowerCase())}`;
+    }
+    return "/wohnmobile";
+  };
 
   const applyFilters = () => {
     const params = new URLSearchParams();
@@ -52,10 +78,11 @@ export function ListingFilters() {
     if (maxPrice) params.set("maxPrice", maxPrice);
     if (minSeats) params.set("minSeats", minSeats);
     if (minBeds) params.set("minBeds", minBeds);
+    if (selectedBrand) params.set("marke", selectedBrand);
     if (selectedFeatures.length > 0) params.set("features", selectedFeatures.join(","));
     params.set("page", "1");
 
-    router.push(`/wohnmobile?${params.toString()}`);
+    router.push(`${getBasePath()}?${params.toString()}`);
   };
 
   const clearFilters = () => {
@@ -65,8 +92,9 @@ export function ListingFilters() {
     setMaxPrice("");
     setMinSeats("");
     setMinBeds("");
+    setSelectedBrand("");
     setSelectedFeatures([]);
-    router.push("/wohnmobile");
+    router.push(getBasePath());
   };
 
   const toggleFeature = (feature: string) => {
@@ -105,10 +133,11 @@ export function ListingFilters() {
       if (maxPrice) params.set("maxPrice", maxPrice);
       if (minSeats) params.set("minSeats", minSeats);
       if (minBeds) params.set("minBeds", minBeds);
+      if (selectedBrand) params.set("marke", selectedBrand);
       if (selectedFeatures.length > 0) params.set("features", selectedFeatures.join(","));
       params.set("page", "1");
 
-      router.push(`/wohnmobile?${params.toString()}`);
+      router.push(`${getBasePath()}?${params.toString()}`);
     }, 500);
 
     // Cleanup
@@ -165,6 +194,29 @@ export function ListingFilters() {
               Bitte geben Sie zuerst einen Standort ein
             </p>
           )}
+        </div>
+
+        <Separator />
+
+        <div className="space-y-2">
+          <Label htmlFor="marke">Marke</Label>
+          <Select
+            value={selectedBrand}
+            onValueChange={(value) => setSelectedBrand(value === "__none__" ? "" : value)}
+            disabled={!!brand} // Deaktiviere wenn bereits auf Marken-Seite
+          >
+            <SelectTrigger id="marke">
+              <SelectValue placeholder="Alle Marken" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__none__">Alle Marken</SelectItem>
+              {[...availableBrands].sort((a, b) => a.localeCompare(b, "de")).map((brandOption) => (
+                <SelectItem key={brandOption} value={brandOption}>
+                  {brandOption}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <Separator />

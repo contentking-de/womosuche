@@ -16,6 +16,8 @@ const listingSchema = z.object({
   beds: z.number().min(1),
   location: z.string().min(2),
   features: z.array(z.string()).default([]),
+  marke: z.string().optional(),
+  equipment: z.any().optional(), // JSON-Feld für strukturierte Ausstattungsdaten
   published: z.boolean().default(false),
   ownerId: z.string().optional(),
 });

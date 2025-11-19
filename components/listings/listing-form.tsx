@@ -27,6 +27,73 @@ import {
 import { Listing, Image, User } from "@prisma/client";
 import { ImageUpload } from "./image-upload";
 import { Separator } from "@/components/ui/separator";
+import { availableBrands } from "@/lib/brands";
+import { EquipmentForm } from "./equipment-form";
+import type { EquipmentData } from "@/lib/equipment-schema";
+
+const equipmentSchema = z.object({
+  // Allgemeine Fahrzeugdaten
+  vehicleType: z.string().optional(),
+  year: z.number().optional(),
+  length: z.number().optional(),
+  width: z.number().optional(),
+  height: z.number().optional(),
+  totalWeight: z.string().optional(),
+  seats: z.number().optional(),
+  sleepPlaces: z.number().optional(),
+  enginePower: z.string().optional(),
+  transmission: z.string().optional(),
+  fuelType: z.string().optional(),
+  fuelConsumption: z.string().optional(),
+  reversingCamera: z.boolean().optional(),
+  // Schlafen
+  bedTypes: z.array(z.string()).optional(),
+  bedSizes: z.array(z.string()).optional(),
+  bedComfort: z.array(z.string()).optional(),
+  bedConversion: z.boolean().optional(),
+  // Küche
+  stove: z.string().optional(),
+  refrigerator: z.string().optional(),
+  sink: z.boolean().optional(),
+  oven: z.boolean().optional(),
+  microwave: z.boolean().optional(),
+  gasSupply: z.string().optional(),
+  kitchenware: z.boolean().optional(),
+  // Bad
+  shower: z.boolean().optional(),
+  toilet: z.string().optional(),
+  washbasin: z.boolean().optional(),
+  hotWater: z.boolean().optional(),
+  separateShower: z.boolean().optional(),
+  // Technik & Energie
+  freshWaterTank: z.number().optional(),
+  wasteWaterTank: z.number().optional(),
+  heating: z.string().optional(),
+  airConditioning: z.string().optional(),
+  solarPower: z.number().optional(),
+  inverter: z.boolean().optional(),
+  shorePower: z.boolean().optional(),
+  shorePowerCable: z.boolean().optional(),
+  additionalBatteries: z.boolean().optional(),
+  // Innenraum & Komfort
+  seating: z.string().optional(),
+  swivelSeats: z.boolean().optional(),
+  tv: z.boolean().optional(),
+  satellite: z.boolean().optional(),
+  usbPorts: z.boolean().optional(),
+  blinds: z.boolean().optional(),
+  flyScreen: z.boolean().optional(),
+  floorHeating: z.boolean().optional(),
+  storage: z.array(z.string()).optional(),
+  // Außen & Campingzubehör
+  awning: z.boolean().optional(),
+  bikeRack: z.string().optional(),
+  towbar: z.boolean().optional(),
+  campingFurniture: z.boolean().optional(),
+  levelingBlocks: z.boolean().optional(),
+  outdoorSocket: z.boolean().optional(),
+  outdoorShower: z.boolean().optional(),
+}).optional();
 
 const listingSchema = z.object({
   title: z.string().min(3, "Titel muss mindestens 3 Zeichen lang sein"),
@@ -36,6 +103,8 @@ const listingSchema = z.object({
   beds: z.number().min(1, "Mindestens 1 Bett erforderlich"),
   location: z.string().min(2, "Standort ist erforderlich"),
   features: z.array(z.string()),
+  marke: z.string().optional(),
+  equipment: equipmentSchema,
   published: z.boolean(),
   ownerId: z.string().optional(),
 });
@@ -88,11 +157,14 @@ export function ListingForm({ listing, userRole, ownerId: initialOwnerId, availa
           beds: listing.beds,
           location: listing.location,
           features: listing.features,
+          marke: (listing as any).marke || "",
+          equipment: (listing as any).equipment || undefined,
           published: listing.published,
           ownerId: listing.ownerId,
         }
       : {
           features: [],
+          equipment: undefined,
           published: userRole === "ADMIN" ? false : false, // LANDLORDs können nicht veröffentlichen
           ownerId: initialOwnerId,
         },
@@ -278,6 +350,29 @@ export function ListingForm({ listing, userRole, ownerId: initialOwnerId, availa
             </p>
           </div>
 
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="marke">Marke</Label>
+              <Select
+                value={watch("marke") || "__none__"}
+                onValueChange={(value) => setValue("marke", value === "__none__" ? undefined : value)}
+                disabled={isLoading}
+              >
+                <SelectTrigger id="marke">
+                  <SelectValue placeholder="Marke auswählen (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">Keine Marke</SelectItem>
+                  {availableBrands.map((brand) => (
+                    <SelectItem key={brand} value={brand}>
+                      {brand}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
               <Label htmlFor="pricePerDay">Preis pro Tag (€) *</Label>
@@ -338,7 +433,10 @@ export function ListingForm({ listing, userRole, ownerId: initialOwnerId, availa
           <Separator />
 
           <div className="space-y-2">
-            <Label>Ausstattung</Label>
+            <Label>Ausstattung (Basis)</Label>
+            <p className="text-sm text-muted-foreground mb-3">
+              Wichtige Ausstattungsmerkmale für die Schnellsuche
+            </p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {availableFeatures.map((feature) => (
                 <div key={feature} className="flex items-center space-x-2">
@@ -357,6 +455,18 @@ export function ListingForm({ listing, userRole, ownerId: initialOwnerId, availa
                 </div>
               ))}
             </div>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-4">
+            <div>
+              <Label className="text-lg font-semibold">Detaillierte Ausstattung</Label>
+              <p className="text-sm text-muted-foreground mt-1">
+                Erfasse alle technischen Details und Ausstattungsmerkmale deines Wohnmobils
+              </p>
+            </div>
+            <EquipmentForm form={{ watch, setValue, formState: { errors } } as any} disabled={isLoading} />
           </div>
 
           {userRole === "ADMIN" && (
