@@ -9,6 +9,7 @@ const articleSchema = z.object({
   excerpt: z.string().optional(),
   content: z.string().min(10),
   tags: z.array(z.string()).default([]),
+  categories: z.array(z.string()).default([]),
   published: z.boolean().default(false),
   editorId: z.string().optional().nullable(),
 });
@@ -57,6 +58,7 @@ export async function PUT(
       excerpt: validatedData.excerpt,
       content: validatedData.content,
       tags: validatedData.tags,
+      categories: validatedData.categories,
       published: validatedData.published,
     };
     

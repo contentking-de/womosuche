@@ -21,12 +21,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Article } from "@prisma/client";
 import { generateSlug } from "@/lib/slug";
 
+function decodeAmp(value: string): string {
+  return value.replace(/&amp;/g, "&");
+}
+
 const articleSchema = z.object({
   title: z.string().min(3, "Titel muss mindestens 3 Zeichen lang sein"),
   slug: z.string().min(2, "Slug muss mindestens 2 Zeichen lang sein"),
   excerpt: z.string().optional(),
   content: z.string().min(10, "Inhalt muss mindestens 10 Zeichen lang sein"),
   tags: z.array(z.string()),
+  categories: z.array(z.string()),
   published: z.boolean(),
   editorId: z.string().optional().nullable(),
 });
@@ -36,13 +41,15 @@ type ArticleFormData = z.infer<typeof articleSchema>;
 interface ArticleFormProps {
   article?: Article & { editorId?: string | null };
   editors?: Array<{ id: string; name: string | null; email: string; profileImage: string | null }>;
+  availableCategories?: string[];
 }
 
-export function ArticleForm({ article, editors = [] }: ArticleFormProps) {
+export function ArticleForm({ article, editors = [], availableCategories = [] }: ArticleFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [tagInput, setTagInput] = useState("");
+  const [categoryInput, setCategoryInput] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
 
@@ -61,17 +68,20 @@ export function ArticleForm({ article, editors = [] }: ArticleFormProps) {
           excerpt: article.excerpt || "",
           content: article.content,
           tags: article.tags,
+          categories: article.categories || [],
           published: article.published,
           editorId: article.editorId || null,
         }
       : {
           tags: [],
+          categories: [],
           published: false,
           editorId: null,
         },
   });
 
   const tags = watch("tags") || [];
+  const categories = watch("categories") || [];
   const titleValue = watch("title");
 
   // Auto-generate slug when title changes
@@ -96,6 +106,21 @@ export function ArticleForm({ article, editors = [] }: ArticleFormProps) {
     setValue(
       "tags",
       tags.filter((tag) => tag !== tagToRemove)
+    );
+  };
+
+  const addCategory = (category: string) => {
+    const trimmed = category.trim();
+    if (trimmed && !categories.includes(trimmed)) {
+      setValue("categories", [...categories, trimmed]);
+      setCategoryInput("");
+    }
+  };
+
+  const removeCategory = (categoryToRemove: string) => {
+    setValue(
+      "categories",
+      categories.filter((category) => category !== categoryToRemove)
     );
   };
 
@@ -304,6 +329,83 @@ export function ArticleForm({ article, editors = [] }: ArticleFormProps) {
                     <button
                       type="button"
                       onClick={() => removeTag(tag)}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label>Kategorien</Label>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Kategorie hinzufügen oder aus Liste wählen..."
+                value={categoryInput}
+                onChange={(e) => setCategoryInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    if (categoryInput.trim()) {
+                      addCategory(categoryInput);
+                    }
+                  }
+                }}
+                disabled={isLoading}
+                list="category-list"
+              />
+              <datalist id="category-list">
+                {availableCategories
+                  .filter((cat) => !categories.includes(cat))
+                  .map((cat) => (
+                    <option key={cat} value={cat} label={decodeAmp(cat)} />
+                  ))}
+              </datalist>
+              <Button
+                type="button"
+                onClick={() => {
+                  if (categoryInput.trim()) {
+                    addCategory(categoryInput);
+                  }
+                }}
+                variant="outline"
+                disabled={isLoading || !categoryInput.trim()}
+              >
+                Hinzufügen
+              </Button>
+            </div>
+            {availableCategories.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {availableCategories
+                  .filter((cat) => !categories.includes(cat))
+                  .map((cat) => (
+                    <Button
+                      key={cat}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => addCategory(cat)}
+                      disabled={isLoading}
+                    >
+                      + {decodeAmp(cat)}
+                    </Button>
+                  ))}
+              </div>
+            )}
+            {categories.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {categories.map((category) => (
+                  <div
+                    key={category}
+                    className="flex items-center gap-1 rounded-md bg-primary/10 px-2 py-1 text-sm"
+                  >
+                    <span>{decodeAmp(category)}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeCategory(category)}
                       className="text-muted-foreground hover:text-foreground"
                     >
                       ×

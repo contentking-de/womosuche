@@ -17,6 +17,24 @@ export default async function NewArticlePage() {
     orderBy: { name: "asc" },
   });
 
+  // Lade alle verfügbaren Kategorien aus bestehenden Artikeln
+  const allArticles = await prisma.article.findMany({
+    select: { categories: true },
+  });
+  const categorySet = new Set<string>();
+  for (const article of allArticles) {
+    if (article.categories) {
+      for (const cat of article.categories) {
+        if (cat && cat.trim()) {
+          categorySet.add(cat.trim());
+        }
+      }
+    }
+  }
+  const availableCategories = Array.from(categorySet).sort((a, b) =>
+    a.localeCompare(b, "de", { sensitivity: "base" })
+  );
+
   return (
     <div>
       <div className="mb-8">
@@ -25,7 +43,7 @@ export default async function NewArticlePage() {
           Erstellen Sie einen neuen Artikel für das Magazin
         </p>
       </div>
-      <ArticleForm editors={editors} />
+      <ArticleForm editors={editors} availableCategories={availableCategories} />
     </div>
   );
 }

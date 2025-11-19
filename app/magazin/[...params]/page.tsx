@@ -257,9 +257,9 @@ export default async function ArticlePage({
                   <span>• {decodedCategory}</span>
                 )}
                 {article.tags.length > 0 && (
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {article.tags.map((tag: string) => (
-                      <Badge key={tag} variant="secondary">
+                      <Badge key={tag} variant="secondary" className="max-w-full truncate">
                         {tag}
                       </Badge>
                     ))}

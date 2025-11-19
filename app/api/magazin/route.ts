@@ -149,6 +149,7 @@ const articleSchema = z.object({
   excerpt: z.string().optional(),
   content: z.string().min(10),
   tags: z.array(z.string()).default([]),
+  categories: z.array(z.string()).default([]),
   published: z.boolean().default(false),
   editorId: z.string().optional().nullable(),
 });
@@ -199,6 +200,7 @@ export async function POST(request: Request) {
     // Stelle sicher, dass editorId explizit gesetzt wird
     const createData: any = {
       ...validatedData,
+      categories: validatedData.categories || [],
       editorId: validatedData.editorId || null,
     };
 

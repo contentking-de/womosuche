@@ -12,7 +12,7 @@ export default async function EditArticlePage(props: any) {
   const id = Array.isArray(idParam) ? idParam[0] : idParam;
   await requireAdminOrEditor();
 
-  const [article, editors] = await Promise.all([
+  const [article, editors, allArticles] = await Promise.all([
     prisma.article.findUnique({
       where: { id },
     }),
@@ -26,11 +26,29 @@ export default async function EditArticlePage(props: any) {
       },
       orderBy: { name: "asc" },
     }),
+    prisma.article.findMany({
+      select: { categories: true },
+    }),
   ]);
 
   if (!article) {
     notFound();
   }
+
+  // Lade alle verfügbaren Kategorien aus bestehenden Artikeln
+  const categorySet = new Set<string>();
+  for (const art of allArticles) {
+    if (art.categories) {
+      for (const cat of art.categories) {
+        if (cat && cat.trim()) {
+          categorySet.add(cat.trim());
+        }
+      }
+    }
+  }
+  const availableCategories = Array.from(categorySet).sort((a, b) =>
+    a.localeCompare(b, "de", { sensitivity: "base" })
+  );
 
   return (
     <div>
@@ -40,7 +58,7 @@ export default async function EditArticlePage(props: any) {
           Bearbeiten Sie den Artikel
         </p>
       </div>
-      <ArticleForm article={article} editors={editors} />
+      <ArticleForm article={article} editors={editors} availableCategories={availableCategories} />
     </div>
   );
 }

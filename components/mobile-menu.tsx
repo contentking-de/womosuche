@@ -7,8 +7,9 @@ import {
   Sheet,
   SheetContent,
   SheetTrigger,
+  SheetTitle,
 } from "@/components/ui/sheet";
-import { Menu, Home, Car, BookOpen, FileText, User, LogOut, LogIn, UserPlus, Euro, HelpCircle, Info, MessageSquare } from "lucide-react";
+import { Menu, Home, Car, BookOpen, FileText, User, LogOut, LogIn, UserPlus, Euro, HelpCircle, Info, MessageSquare, MapPin } from "lucide-react";
 import type { User as UserType } from "next-auth";
 import { signOutAction } from "@/lib/actions";
 
@@ -29,6 +30,7 @@ export function MobileMenu({ user }: MobileMenuProps) {
           </Button>
         </SheetTrigger>
       <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+        <SheetTitle className="sr-only">Navigation</SheetTitle>
         <nav className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <div className="px-3 py-2 text-sm font-semibold text-muted-foreground">
@@ -73,6 +75,14 @@ export function MobileMenu({ user }: MobileMenuProps) {
             >
               <MessageSquare className="h-4 w-4" />
               Nutzer Feedback
+            </Link>
+            <Link
+              href="/wohnmobil-abstellplaetze"
+              className="flex items-center gap-3 px-6 py-2 text-sm hover:bg-accent rounded-md transition-colors"
+              onClick={() => setOpen(false)}
+            >
+              <MapPin className="h-4 w-4" />
+              Wohnmobil Abstellplätze
             </Link>
             <Link
               href="/wohnmobile"
