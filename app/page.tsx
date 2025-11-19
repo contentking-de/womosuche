@@ -3,6 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Car, Users, Shield, Search } from "lucide-react";
 import { PricingSection } from "@/components/marketing/pricing-section";
+import { BeginnerSection } from "@/components/marketing/beginner-section";
+import { FAQSection } from "@/components/marketing/faq-section";
+import { AboutSection } from "@/components/marketing/about-section";
+import { BrandLogosSection } from "@/components/marketing/brand-logos-section";
+import { RentalInfoSection } from "@/components/marketing/rental-info-section";
+import { TestimonialsSection } from "@/components/marketing/testimonials-section";
 import { HeroSection } from "@/components/hero-section";
 import { MagazinSection } from "@/components/magazin-section";
 import { PopularListings } from "@/components/popular-listings";
@@ -75,11 +81,20 @@ export default async function HomePage() {
       {/* Hero Section */}
       <HeroSection listings={listings.map((l: any) => ({ ...l, images: l.Image || [] }))} totalListings={totalListings} />
 
+      {/* Brand Logos Section */}
+      <BrandLogosSection />
+
       {/* Beliebte Wohnmobile Section */}
       <PopularListings />
 
+      {/* Testimonials Section */}
+      <TestimonialsSection />
+
+      {/* Rental Info Section */}
+      <RentalInfoSection />
+
       {/* Features Section */}
-      <section className="border-t bg-muted/50 py-24">
+      <section className="bg-muted/50 py-24">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
@@ -133,6 +148,9 @@ export default async function HomePage() {
       {/* Pricing Section */}
       <PricingSection />
 
+      {/* Beginner Section */}
+      <BeginnerSection />
+
       {/* CTA Section */}
       <section className="bg-gray-800 py-24">
         <div className="container mx-auto px-4">
@@ -154,6 +172,12 @@ export default async function HomePage() {
 
       {/* Magazin Section */}
       <MagazinSection articles={articles} />
+
+      {/* FAQ Section */}
+      <FAQSection />
+
+      {/* About Section */}
+      <AboutSection />
     </div>
   );
 }

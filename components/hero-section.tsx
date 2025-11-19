@@ -90,7 +90,8 @@ export function HeroSection({ listings, totalListings }: HeroSectionProps) {
             <Button
               onClick={() => setShowMap(true)}
               size="lg"
-              className="px-8 py-6 text-lg font-bold bg-green-600 hover:bg-green-700 text-white border-0 shadow-lg"
+              className="px-8 py-6 text-lg font-bold text-white border-0 shadow-lg hover:opacity-90 transition-opacity"
+              style={{ backgroundColor: 'rgb(27, 204, 148)' }}
             >
               <Map className="mr-2 h-5 w-5" />
               Auf Karte anzeigen
@@ -106,8 +107,7 @@ export function HeroSection({ listings, totalListings }: HeroSectionProps) {
             <Link href="/register">
               <Button
                 size="lg"
-                variant="outline"
-                className="px-8 py-6 text-lg font-bold bg-gray-100/90 hover:bg-gray-200/90 text-gray-700 border-gray-300/50 shadow-lg"
+                className="px-8 py-6 text-lg font-bold bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-lg"
               >
                 Als Vermieter registrieren
               </Button>

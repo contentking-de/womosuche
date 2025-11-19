@@ -51,7 +51,7 @@ export async function PopularListings() {
         <div className="mb-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Beliebte Wohnmobile
+              Beliebte Wohnmobile, Camper, Reisemobile und Vans
             </h2>
             <p className="mt-2 text-lg text-muted-foreground">
               Entdecke unsere beliebtesten Wohnmobile für dein nächstes Abenteuer

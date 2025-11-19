@@ -29,7 +29,7 @@ export function MagazinSection({ articles }: MagazinSectionProps) {
   }
 
   return (
-    <section className="border-t bg-muted/50 py-24">
+    <section id="magazin" className="border-t bg-muted/50 py-24">
       <div className="container mx-auto px-4">
         <div className="mb-12 flex items-center justify-between">
           <div>

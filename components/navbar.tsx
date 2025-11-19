@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { signOutAction } from "@/lib/actions";
-import { Home, User, LogOut, Settings, LogIn, UserPlus, Car, BookOpen, FileText } from "lucide-react";
+import { Home, User, LogOut, Settings, LogIn, UserPlus, Car, BookOpen, FileText, ChevronDown, Euro, HelpCircle, Info, MessageSquare } from "lucide-react";
 import Image from "next/image";
 import { MobileMenu } from "@/components/mobile-menu";
 
@@ -35,13 +35,47 @@ export async function Navbar() {
 
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-4">
-              <Link
-                href="/"
-                className="flex items-center gap-2 text-base font-bold hover:text-primary transition-colors"
-              >
-                <Home className="h-4 w-4" />
-                Wohnmobile mieten
-              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 text-base font-bold hover:text-primary transition-colors">
+                    <Home className="h-4 w-4" />
+                    Wohnmobile mieten
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-56">
+                  <DropdownMenuItem asChild>
+                    <Link href="/#pricing" className="flex items-center">
+                      <Euro className="mr-2 h-4 w-4" />
+                      Preise für Vermieter
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/#magazin" className="flex items-center">
+                      <FileText className="mr-2 h-4 w-4" />
+                      Aktuelle Artikel
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/#faq" className="flex items-center">
+                      <HelpCircle className="mr-2 h-4 w-4" />
+                      FAQ
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/#about" className="flex items-center">
+                      <Info className="mr-2 h-4 w-4" />
+                      Über uns
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/#testimonials" className="flex items-center">
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      Nutzer Feedback
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Link
                 href="/wohnmobile"
                 className="flex items-center gap-2 text-base font-bold hover:text-primary transition-colors"
