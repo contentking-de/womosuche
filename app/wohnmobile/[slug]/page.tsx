@@ -8,6 +8,7 @@ import { ListingImageGallery } from "@/components/listings/listing-image-gallery
 import { ListingCard } from "@/components/listings/listing-card";
 import { ListingFilters } from "@/components/listings/listing-filters";
 import { EquipmentDisplay } from "@/components/listings/equipment-display";
+import { VehicleDataDisplay } from "@/components/listings/vehicle-data-display";
 import { ScrollToInquiryButton } from "@/components/listings/scroll-to-inquiry-button";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -584,6 +585,83 @@ export default async function ListingDetailPage({
     notFound();
   }
 
+  // Lade weitere Wohnmobile des gleichen Vermieters
+  // Nur wenn ownerId vorhanden ist
+  const otherListingsFromOwner = listing.ownerId
+    ? await prisma.listing.findMany({
+        where: {
+          ownerId: listing.ownerId,
+          published: true,
+          id: {
+            not: listing.id, // Ausschließen des aktuellen Listings
+          },
+        },
+        include: {
+          Image: {
+            take: 1,
+          },
+        },
+        take: 4, // Maximal 4 weitere Wohnmobile anzeigen
+        orderBy: {
+          createdAt: "desc",
+        },
+      })
+    : [];
+
+  // Transformiere Image zu images für ListingCard
+  const otherListingsWithImages = otherListingsFromOwner.map((l: any) => ({
+    ...l,
+    images: l.Image || [],
+  }));
+
+  // Lade weitere Wohnmobile in der Nähe (50km Umkreis)
+  let nearbyListings: (typeof otherListingsWithImages[number] & { distance?: number })[] = [];
+  
+  if (listing.lat && listing.lng) {
+    const radiusKm = 50; // Standard 50km Umkreis
+    
+    // Lade alle veröffentlichten Listings mit Koordinaten (außer dem aktuellen)
+    const allNearbyListings = await prisma.listing.findMany({
+      where: {
+        published: true,
+        lat: { not: null },
+        lng: { not: null },
+        id: {
+          not: listing.id, // Ausschließen des aktuellen Listings
+        },
+      },
+      include: {
+        Image: {
+          take: 1,
+        },
+      },
+    });
+
+    // Transformiere Image zu images
+    const allNearbyListingsWithImages = allNearbyListings.map((l: any) => ({
+      ...l,
+      images: l.Image || [],
+    }));
+
+    // Berechne Entfernung und filtere nach Radius
+    type ListingWithDistance = typeof allNearbyListingsWithImages[number] & { distance: number };
+    const listingsWithDistance = allNearbyListingsWithImages
+      .map((nearbyListing): ListingWithDistance => {
+        const distance = calculateDistance(
+          listing.lat!,
+          listing.lng!,
+          nearbyListing.lat!,
+          nearbyListing.lng!
+        );
+        return { ...nearbyListing, distance };
+      })
+      .filter((nearbyListing: ListingWithDistance) => nearbyListing.distance <= radiusKm)
+      .sort((a: ListingWithDistance, b: ListingWithDistance) => a.distance - b.distance)
+      .slice(0, 4); // Maximal 4 Wohnmobile anzeigen
+
+    nearbyListings = listingsWithDistance;
+  }
+
   const baseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
   const jsonLd = {
     "@context": "https://schema.org",
@@ -615,6 +693,28 @@ export default async function ListingDetailPage({
           {/* Bilder */}
           <div>
             <ListingImageGallery images={listing.Image} title={listing.title} />
+            
+            {/* Ausstattung (Basis) */}
+            {listing.features.length > 0 && (
+              <div className="mt-8">
+                <h2 className="mb-4 text-xl font-semibold">Ausstattung (Basis)</h2>
+                <div className="flex flex-wrap gap-2">
+                  {listing.features.map((feature: string) => (
+                    <Badge key={feature} variant="secondary">
+                      {feature}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Detaillierte Ausstattung */}
+            {(listing as any).equipment && (
+              <div className="mt-8">
+                <h2 className="mb-4 text-xl font-semibold">Detaillierte Ausstattung</h2>
+                <EquipmentDisplay equipment={(listing as any).equipment} />
+              </div>
+            )}
           </div>
 
           {/* Details */}
@@ -660,6 +760,11 @@ export default async function ListingDetailPage({
               </div>
             </div>
 
+            {/* Allgemeine Fahrzeugdaten */}
+            {(listing as any).equipment && (
+              <VehicleDataDisplay equipment={(listing as any).equipment} />
+            )}
+
             <ScrollToInquiryButton />
 
             <Separator />
@@ -672,28 +777,6 @@ export default async function ListingDetailPage({
               />
             </div>
 
-            {listing.features.length > 0 && (
-              <div>
-                <h2 className="mb-2 text-xl font-semibold">Ausstattung (Basis)</h2>
-                <div className="flex flex-wrap gap-2">
-                  {listing.features.map((feature: string) => (
-                    <Badge key={feature} variant="secondary">
-                      {feature}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {(listing.features.length > 0 || (listing as any).equipment) && <Separator />}
-
-            {(listing as any).equipment && (
-              <div>
-                <h2 className="mb-4 text-xl font-semibold">Detaillierte Ausstattung</h2>
-                <EquipmentDisplay equipment={(listing as any).equipment} />
-              </div>
-            )}
-
             <Separator />
 
             <div id="inquiry-form">
@@ -703,6 +786,33 @@ export default async function ListingDetailPage({
             </div>
           </div>
         </div>
+
+        {/* Weitere Wohnmobile des Vermieters */}
+        {otherListingsWithImages.length > 0 && (
+          <div className="mt-12">
+            <h2 className="mb-6 text-2xl font-bold">
+              Weitere Wohnmobile von {listing.User?.name || "diesem Vermieter"}
+            </h2>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+              {otherListingsWithImages.map((otherListing: typeof otherListingsWithImages[number]) => (
+                <ListingCard key={otherListing.id} listing={otherListing} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Weitere Wohnmobile in der Nähe */}
+        {nearbyListings.length > 0 && (
+          <div className="mt-12">
+            <h2 className="mb-2 text-2xl font-bold">Weitere Wohnmobile in der Nähe</h2>
+            <p className="mb-6 text-muted-foreground">im Umkreis von 50km zu Deinem Standort</p>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+              {nearbyListings.map((nearbyListing) => (
+                <ListingCard key={nearbyListing.id} listing={nearbyListing} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       
       {/* Fixierter Button für Mobile-Geräte */}
