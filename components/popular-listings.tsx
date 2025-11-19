@@ -48,7 +48,7 @@ export async function PopularListings() {
   return (
     <section className="border-t bg-background py-24">
       <div className="container mx-auto px-4">
-        <div className="mb-12 flex items-center justify-between">
+        <div className="mb-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
               Beliebte Wohnmobile
@@ -57,8 +57,8 @@ export async function PopularListings() {
               Entdecke unsere beliebtesten Wohnmobile für dein nächstes Abenteuer
             </p>
           </div>
-          <Link href="/wohnmobile">
-            <Button size="lg" className="px-8 py-6 text-lg font-bold">
+          <Link href="/wohnmobile" className="w-full md:w-auto">
+            <Button size="lg" className="w-full md:w-auto px-8 py-6 text-lg font-bold">
               Alle {allListingIds.length} Wohnmobile anzeigen
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
