@@ -39,7 +39,7 @@ export function EquipmentDisplay({ equipment }: EquipmentDisplayProps) {
         <>
           <Separator />
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold">🛏️ Schlafen</h3>
+            <h3 className="text-lg font-semibold">Schlafen</h3>
             <div className="grid gap-2 md:grid-cols-2">
               {equipment.bedTypes && equipment.bedTypes.length > 0 && (
                 <div>
@@ -81,7 +81,7 @@ export function EquipmentDisplay({ equipment }: EquipmentDisplayProps) {
         <>
           <Separator />
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold">🍽️ Küche</h3>
+            <h3 className="text-lg font-semibold">Küche</h3>
             <div className="grid gap-2 md:grid-cols-2">
               {equipment.stove && (
                 <div>
@@ -121,7 +121,7 @@ export function EquipmentDisplay({ equipment }: EquipmentDisplayProps) {
         <>
           <Separator />
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold">🚿 Bad</h3>
+            <h3 className="text-lg font-semibold">Bad</h3>
             <div className="grid gap-2 md:grid-cols-2">
               {equipment.toilet && (
                 <div>
@@ -153,7 +153,7 @@ export function EquipmentDisplay({ equipment }: EquipmentDisplayProps) {
         <>
           <Separator />
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold">🔋 Technik & Energie</h3>
+            <h3 className="text-lg font-semibold">Technik & Energie</h3>
             <div className="grid gap-2 md:grid-cols-2">
               {equipment.freshWaterTank && (
                 <div>
@@ -209,7 +209,7 @@ export function EquipmentDisplay({ equipment }: EquipmentDisplayProps) {
         <>
           <Separator />
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold">🧭 Innenraum & Komfort</h3>
+            <h3 className="text-lg font-semibold">Innenraum & Komfort</h3>
             <div className="grid gap-2 md:grid-cols-2">
               {equipment.seating && (
                 <div>
@@ -248,7 +248,7 @@ export function EquipmentDisplay({ equipment }: EquipmentDisplayProps) {
         <>
           <Separator />
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold">🚴‍♂️ Außen & Campingzubehör</h3>
+            <h3 className="text-lg font-semibold">Außen & Campingzubehör</h3>
             <div className="grid gap-2 md:grid-cols-2">
               {equipment.bikeRack && (
                 <div>

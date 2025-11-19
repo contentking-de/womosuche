@@ -80,10 +80,10 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${listing.title} - womosuche.de`,
+    title: `${listing.title} mieten - womosuche.de`,
     description: listing.description.substring(0, 160),
     openGraph: {
-      title: listing.title,
+      title: `${listing.title} mieten`,
       description: listing.description.substring(0, 160),
       images: listing.Image.length > 0 ? [listing.Image[0].url] : [],
     },
@@ -779,7 +779,7 @@ export default async function ListingDetailPage({
 
             <Separator />
 
-            <div id="inquiry-form">
+            <div id="inquiry-form" className="rounded-lg bg-gray-200 dark:bg-gray-800 p-6">
               <h2 className="mb-2 text-xl font-semibold">Buchungsanfrage stellen</h2>
               <p className="mb-4 text-muted-foreground">für {listing.title}</p>
               <InquiryForm listingId={listing.id} />
