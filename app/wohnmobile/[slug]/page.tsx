@@ -119,7 +119,7 @@ export default async function ListingDetailPage({
     }
     
     // Zeige Marken-Seite
-    const params_search = await (searchParams || Promise.resolve({}));
+    const params_search = await (searchParams || Promise.resolve({} as SearchParams));
     const page = parseInt(params_search.page || "1");
     const skip = (page - 1) * ITEMS_PER_PAGE;
 
@@ -348,7 +348,7 @@ export default async function ListingDetailPage({
     }
     
     // Zeige Stadt-Seite
-    const params_search = await (searchParams || Promise.resolve({}));
+    const params_search = await (searchParams || Promise.resolve({} as SearchParams));
     const page = parseInt(params_search.page || "1");
     const skip = (page - 1) * ITEMS_PER_PAGE;
 

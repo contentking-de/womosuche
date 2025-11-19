@@ -109,7 +109,7 @@ const listingSchema = z.object({
   ownerId: z.string().optional(),
 });
 
-type ListingFormData = z.infer<typeof listingSchema>;
+export type ListingFormData = z.infer<typeof listingSchema>;
 
 const availableFeatures = [
   "Klimaanlage",
