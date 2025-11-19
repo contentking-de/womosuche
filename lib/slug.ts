@@ -71,3 +71,57 @@ export function getArticleUrl(slug: string, categories: string[] | null): string
   return `/magazin/${slug}`;
 }
 
+// Konvertiert Umlaute zu ASCII-Äquivalenten für Stadt-URLs
+export function convertUmlautsToAscii(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/ä/g, "ae")
+    .replace(/ö/g, "oe")
+    .replace(/ü/g, "ue")
+    .replace(/ß/g, "ss")
+    .replace(/[()]/g, "") // Entferne Klammern
+    .replace(/\s+/g, "-") // Ersetze Leerzeichen durch Bindestriche
+    .replace(/-+/g, "-") // Mehrere Bindestriche zu einem
+    .replace(/^-+|-+$/g, ""); // Entferne führende und abschließende Bindestriche
+}
+
+// Konvertiert ASCII-Äquivalente zurück zu möglichen Umlaut-Varianten
+// Gibt ein Array mit möglichen Varianten zurück (z.B. ["muenchen", "münchen"])
+export function convertAsciiToUmlautVariants(text: string): string[] {
+  const variants = new Set<string>();
+  const lowerText = text.toLowerCase();
+  
+  // Füge die ursprüngliche Variante hinzu
+  variants.add(lowerText);
+  
+  // Ersetze Bindestriche zurück zu Leerzeichen für die Suche
+  const withSpaces = lowerText.replace(/-/g, " ");
+  variants.add(withSpaces);
+  
+  // Ersetze alle ae, oe, ue, ss Kombinationen zurück zu Umlauten
+  let withUmlauts = lowerText;
+  withUmlauts = withUmlauts.replace(/ae/g, "ä");
+  withUmlauts = withUmlauts.replace(/oe/g, "ö");
+  withUmlauts = withUmlauts.replace(/ue/g, "ü");
+  // Nur ss zu ß ersetzen, wenn es nicht Teil eines größeren Wortes ist
+  // z.B. "strasse" -> "straße", aber nicht "wasser" -> "waßer"
+  withUmlauts = withUmlauts.replace(/([a-z])ss([^a-z]|$)/g, "$1ß$2");
+  
+  if (withUmlauts !== lowerText) {
+    variants.add(withUmlauts);
+  }
+  
+  // Kombiniere Bindestriche mit Umlauten
+  const withSpacesAndUmlauts = withSpaces
+    .replace(/ae/g, "ä")
+    .replace(/oe/g, "ö")
+    .replace(/ue/g, "ü")
+    .replace(/([a-z])ss([^a-z]|$)/g, "$1ß$2");
+  if (withSpacesAndUmlauts !== lowerText && withSpacesAndUmlauts !== withSpaces) {
+    variants.add(withSpacesAndUmlauts);
+  }
+  
+  // Entferne Duplikate und gib als Array zurück
+  return Array.from(variants);
+}
+

@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { brandToUrl } from "@/lib/brands";
 
 const brandLogos = [
   { name: "Bürstner", src: "/buerstern-wohnmobile-logo.jpg" },
@@ -27,9 +29,10 @@ export function BrandLogosSection() {
         <div className="overflow-hidden">
           <div className="flex gap-8 items-center animate-scroll-logos w-fit">
             {duplicatedLogos.map((brand, index) => (
-              <div
+              <Link
                 key={`${brand.name}-${index}`}
-                className="flex items-center justify-center h-24 flex-shrink-0 transition-all duration-300 opacity-80 hover:opacity-100"
+                href={`/wohnmobile/${brandToUrl(brand.name)}`}
+                className="flex items-center justify-center h-24 flex-shrink-0 transition-all duration-300 opacity-80 hover:opacity-100 cursor-pointer"
                 style={{ width: "200px" }}
               >
                 <Image
@@ -39,7 +42,7 @@ export function BrandLogosSection() {
                   height={90}
                   className="object-contain max-h-24 w-auto"
                 />
-              </div>
+              </Link>
             ))}
           </div>
         </div>

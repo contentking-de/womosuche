@@ -14,6 +14,7 @@ import { MagazinSection } from "@/components/magazin-section";
 import { PopularListings } from "@/components/popular-listings";
 import { NewsletterConfirmationMessage } from "@/components/newsletter/newsletter-confirmation-message";
 import { prisma } from "@/lib/prisma";
+import { convertUmlautsToAscii } from "@/lib/slug";
 import { unstable_noStore as noStore } from "next/cache";
 
 // Deaktiviere Caching für diese Seite, damit neue Koordinaten sofort angezeigt werden
@@ -72,6 +73,41 @@ export default async function HomePage() {
     },
     take: 8,
   });
+
+  // Lade alle veröffentlichten Listings mit Location
+  const allListingsWithLocation = await prisma.listing.findMany({
+    where: {
+      published: true,
+      location: {
+        not: null,
+        not: "",
+      },
+    },
+    select: {
+      location: true,
+    },
+  });
+
+  // Gruppiere nach Location und zähle
+  const cityCounts = new Map<string, number>();
+  for (const listing of allListingsWithLocation) {
+    if (listing.location) {
+      cityCounts.set(
+        listing.location,
+        (cityCounts.get(listing.location) || 0) + 1
+      );
+    }
+  }
+
+  // Filtere Städte mit mindestens 4 Wohnmobilen
+  const citiesWithEnoughListings = Array.from(cityCounts.entries())
+    .filter(([_, count]) => count >= 4)
+    .map(([city, _]) => city);
+
+  // Wähle 12 zufällige Städte aus
+  const shuffledCities = citiesWithEnoughListings
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 12);
 
   return (
     <div className="flex flex-col">
@@ -178,6 +214,37 @@ export default async function HomePage() {
 
       {/* About Section */}
       <AboutSection />
+
+      {/* Cities Section */}
+      {shuffledCities.length > 0 && (
+        <section className="bg-muted/30 py-16">
+          <div className="container mx-auto px-4">
+            <div className="mx-auto max-w-2xl text-center mb-8">
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                Wohnmobile mieten in beliebten Städten
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground">
+                Entdecke unsere Auswahl an Wohnmobilen in verschiedenen Städten
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+              {shuffledCities.map((city) => {
+                // Konvertiere Stadtname zu URL-Slug mit Umlaut-Umschreibung
+                const citySlug = convertUmlautsToAscii(city);
+                return (
+                  <Link
+                    key={city}
+                    href={`/wohnmobile/${citySlug}`}
+                    className="rounded-lg border bg-card p-4 text-center transition-colors hover:bg-accent hover:text-accent-foreground"
+                  >
+                    <span className="font-medium">{city}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

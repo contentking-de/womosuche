@@ -17,6 +17,7 @@ import { MapPin, Users, Bed, Euro } from "lucide-react";
 import { normalizeBrandFromUrl, brandToUrl } from "@/lib/brands";
 import { geocodeLocation } from "@/lib/geocode";
 import { calculateDistance } from "@/lib/distance";
+import { convertAsciiToUmlautVariants, convertUmlautsToAscii } from "@/lib/slug";
 import { Suspense } from "react";
 import type { Prisma } from "@prisma/client";
 
@@ -35,20 +36,25 @@ export async function generateMetadata({
   const normalizedBrand = normalizeBrandFromUrl(slug);
   if (normalizedBrand) {
     return {
-      title: `${normalizedBrand} Wohnmobile mieten - Wohnmobil Vermietung`,
+      title: `${normalizedBrand} Wohnmobile mieten - womosuche.de`,
       description: `Finde und miete ${normalizedBrand} Wohnmobile für deinen nächsten Trip. Filtere nach Preis, Sitzplätzen, Betten, Ausstattung und Standort.`,
     };
   }
   
   // Prüfe, ob es eine Stadt ist
+  // Konvertiere ASCII-Variante zurück zu möglichen Umlaut-Varianten für die Suche
   const normalizedLocation = decodeURIComponent(slug).trim();
+  const locationVariants = convertAsciiToUmlautVariants(normalizedLocation);
+  
   const firstListingForMeta = await prisma.listing.findFirst({
     where: {
       published: true,
-      location: {
-        equals: normalizedLocation,
-        mode: "insensitive",
-      },
+      OR: locationVariants.map((variant) => ({
+        location: {
+          equals: variant,
+          mode: "insensitive" as const,
+        },
+      })),
     },
     select: {
       location: true,
@@ -58,7 +64,7 @@ export async function generateMetadata({
   if (firstListingForMeta) {
     const correctLocationMeta = firstListingForMeta.location;
     return {
-      title: `Wohnmobile mieten in ${correctLocationMeta} - Wohnmobil Vermietung`,
+      title: `Wohnmobile mieten in ${correctLocationMeta} - womosuche.de`,
       description: `Finde und miete Wohnmobile in ${correctLocationMeta} für deinen nächsten Trip. Filtere nach Preis, Sitzplätzen, Betten, Ausstattung und Standort.`,
     };
   }
@@ -73,7 +79,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${listing.title} - Wohnmobil Vermietung`,
+    title: `${listing.title} - womosuche.de`,
     description: listing.description.substring(0, 160),
     openGraph: {
       title: listing.title,
@@ -320,17 +326,21 @@ export default async function ListingDetailPage({
   }
   
   // Prüfe, ob es eine Stadt ist (nur wenn es keine Marke war)
-  // Normalisiere den Slug für die Suche
+  // Normalisiere den Slug für die Suche und konvertiere ASCII zurück zu möglichen Umlaut-Varianten
   const normalizedLocation = decodeURIComponent(slug).trim();
+  const locationVariants = convertAsciiToUmlautVariants(normalizedLocation);
   
   // Prüfe, ob es Listings mit dieser Stadt gibt und hole die korrekte Schreibweise
+  // Suche nach allen möglichen Varianten (mit und ohne Umlaute) - case-insensitive
   const firstListing = await prisma.listing.findFirst({
     where: {
       published: true,
-      location: {
-        equals: normalizedLocation,
-        mode: "insensitive",
-      },
+      OR: locationVariants.map((variant) => ({
+        location: {
+          equals: variant,
+          mode: "insensitive" as const,
+        },
+      })),
     },
     select: {
       location: true,
@@ -341,11 +351,13 @@ export default async function ListingDetailPage({
     // Verwende die korrekte Schreibweise aus der DB
     const correctLocation = firstListing.location;
     
-    // Redirect zu kleingeschriebener URL, falls nötig
-    const lowerSlug = slug.toLowerCase();
-    if (slug !== lowerSlug) {
-      redirect(`/wohnmobile/${encodeURIComponent(lowerSlug)}`);
-    }
+    // Erstelle die ASCII-Variante für die URL
+    const asciiSlug = convertUmlautsToAscii(correctLocation);
+    const currentSlugLower = slug.toLowerCase();
+    
+    // Keine Redirects - verwende den aktuellen Slug, wenn er funktioniert
+    // Verwende den aktuellen Slug für URLs (er funktioniert bereits, da wir hier sind)
+    const urlSlug = currentSlugLower;
     
     // Zeige Stadt-Seite
     const params_search = await (searchParams || Promise.resolve({} as SearchParams));
@@ -354,10 +366,12 @@ export default async function ListingDetailPage({
 
     const where: any = {
       published: true,
-      location: {
-        equals: correctLocation,
-        mode: "insensitive",
-      },
+      OR: locationVariants.map((variant) => ({
+        location: {
+          equals: variant,
+          mode: "insensitive" as const,
+        },
+      })),
     };
 
     // Umkreissuche: Wenn Standort angegeben ist, verwende Geocoding
@@ -523,7 +537,7 @@ export default async function ListingDetailPage({
                     {page > 1 && (
                       <Link
                         href={{
-                          pathname: `/wohnmobile/${encodeURIComponent(correctLocation.toLowerCase())}`,
+                          pathname: `/wohnmobile/${urlSlug}`,
                           query: { ...params_search, page: page - 1 },
                         }}
                       >
@@ -536,7 +550,7 @@ export default async function ListingDetailPage({
                     {page < totalPages && (
                       <Link
                         href={{
-                          pathname: `/wohnmobile/${encodeURIComponent(correctLocation.toLowerCase())}`,
+                          pathname: `/wohnmobile/${urlSlug}`,
                           query: { ...params_search, page: page + 1 },
                         }}
                       >

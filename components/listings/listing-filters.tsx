@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { availableBrands } from "@/lib/brands";
+import { convertUmlautsToAscii } from "@/lib/slug";
 
 const availableFeatures = [
   "Klimaanlage",
@@ -59,17 +60,20 @@ export function ListingFilters({ brand, location: initialLocation }: ListingFilt
 
   const getBasePath = () => {
     if (brand) {
-      return `/wohnmobile/${encodeURIComponent(brand.toLowerCase())}`;
+      return `/wohnmobile/${brand.toLowerCase()}`;
     }
     if (initialLocation) {
-      return `/wohnmobile/${encodeURIComponent(initialLocation.toLowerCase())}`;
+      // Verwende ASCII-Variante für URLs (konsistent mit Startseite)
+      return `/wohnmobile/${convertUmlautsToAscii(initialLocation)}`;
     }
     return "/wohnmobile";
   };
 
   const applyFilters = () => {
     const params = new URLSearchParams();
-    if (location) {
+    // Wenn wir bereits auf einer Stadt-Seite sind (initialLocation vorhanden), 
+    // füge keine Location-Parameter hinzu, da die Location bereits im URL-Pfad ist
+    if (location && !initialLocation) {
       params.set("location", location);
       // Wenn Standort vorhanden, aber kein Radius: Standard 50km verwenden
       params.set("radius", radius || "50");
@@ -80,9 +84,15 @@ export function ListingFilters({ brand, location: initialLocation }: ListingFilt
     if (minBeds) params.set("minBeds", minBeds);
     if (selectedBrand) params.set("marke", selectedBrand);
     if (selectedFeatures.length > 0) params.set("features", selectedFeatures.join(","));
-    params.set("page", "1");
+    
+    // Nur page=1 hinzufügen, wenn es auch andere Parameter gibt
+    const hasOtherParams = params.toString().length > 0;
+    if (hasOtherParams) {
+      params.set("page", "1");
+    }
 
-    router.push(`${getBasePath()}?${params.toString()}`);
+    const queryString = params.toString();
+    router.push(queryString ? `${getBasePath()}?${queryString}` : getBasePath());
   };
 
   const clearFilters = () => {
@@ -127,17 +137,27 @@ export function ListingFilters({ brand, location: initialLocation }: ListingFilt
     // Setze neuen Timeout für Debounce (500ms Verzögerung)
     radiusTimeoutRef.current = setTimeout(() => {
       const params = new URLSearchParams();
-      params.set("location", location);
-      params.set("radius", radius || "50");
+      // Wenn wir bereits auf einer Stadt-Seite sind (initialLocation vorhanden), 
+      // füge keine Location-Parameter hinzu
+      if (location && !initialLocation) {
+        params.set("location", location);
+        params.set("radius", radius || "50");
+      }
       if (minPrice) params.set("minPrice", minPrice);
       if (maxPrice) params.set("maxPrice", maxPrice);
       if (minSeats) params.set("minSeats", minSeats);
       if (minBeds) params.set("minBeds", minBeds);
       if (selectedBrand) params.set("marke", selectedBrand);
       if (selectedFeatures.length > 0) params.set("features", selectedFeatures.join(","));
-      params.set("page", "1");
+      
+      // Nur page=1 hinzufügen, wenn es auch andere Parameter gibt
+      const hasOtherParams = params.toString().length > 0;
+      if (hasOtherParams) {
+        params.set("page", "1");
+      }
 
-      router.push(`${getBasePath()}?${params.toString()}`);
+      const queryString = params.toString();
+      router.push(queryString ? `${getBasePath()}?${queryString}` : getBasePath());
     }, 500);
 
     // Cleanup
