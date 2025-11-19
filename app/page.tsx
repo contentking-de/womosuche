@@ -79,7 +79,7 @@ export default async function HomePage() {
     where: {
       published: true,
       location: {
-        not: null,
+        not: "",
       },
     },
     select: {
@@ -90,7 +90,7 @@ export default async function HomePage() {
   // Gruppiere nach Location und zähle
   const cityCounts = new Map<string, number>();
   for (const listing of allListingsWithLocation) {
-    if (listing.location) {
+    if (listing.location && listing.location.trim() !== "") {
       cityCounts.set(
         listing.location,
         (cityCounts.get(listing.location) || 0) + 1
