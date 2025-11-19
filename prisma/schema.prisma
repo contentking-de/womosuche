@@ -193,6 +193,39 @@ enum NewsletterList {
   VERMIETUNGEN
 }
 
+model OutreachPlace {
+  id              String    @id @default(uuid())
+  name            String
+  address         String?
+  phone           String?
+  website         String?
+  email           String?
+  latitude        String?
+  longitude       String?
+  googlePlaceId   String?   @unique
+  googleCID       String?
+  googleFID       String?
+  rating          String?
+  reviews         String?
+  status          String?
+  category        String?
+  keyword         String?
+  priceRange      String?
+  timing          Json?     // Array von Timing-Objekten
+  url             String?
+  listingUrl      String?
+  reviewsLink     String?
+  contacted       Boolean   @default(false)
+  contactedAt     DateTime?
+  contactNotes    String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([name])
+  @@index([contacted])
+  @@index([googlePlaceId])
+}
+
 enum Role {
   ADMIN
   LANDLORD

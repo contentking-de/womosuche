@@ -14,6 +14,7 @@
     "map:listings:manual": "tsx scripts/map-listings-manual.ts",
     "assign:brands": "tsx scripts/assign-brands-from-title.ts",
     "remove:postal-codes": "tsx scripts/remove-postal-codes.ts",
+    "regenerate:descriptions": "tsx scripts/regenerate-all-descriptions.ts",
     "db:generate": "prisma generate && npm run setup:prisma",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",

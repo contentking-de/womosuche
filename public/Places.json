@@ -1,0 +1,760 @@
+[
+{
+    "Address": "3500 N Hawthorne St, Chattanooga, TN 37406",
+    "Category": "Recreational vehicle rental agency",
+    "GoogleCID": "15112362253706797813",
+    "GoogleFID": "0x886061c4c5fc0095:0xd1b9e566a93722f5",
+    "Keyword": "Wohnmobilvermietung",
+    "Latitude": "35.0806963",
+    "Listing_Url": "https://www.google.com/maps/search/Wohnmobilvermietung/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI0MTAyMy4wIKXMDSoASAFQAw%3D%3D",
+    "Longitude": "-85.2497222",
+    "Name": "Cruise America RV Rental",
+    "Phone": "(423) 622-2266",
+    "Placeid": "ChIJlQD8xcRhYIgR9SI3qWbludE",
+    "PriceRange": null,
+    "Rating": "3.0",
+    "Result_Type": null,
+    "Reviews": "2",
+    "Reviews_Link": "https://search.google.com/local/reviews?placeid=ChIJlQD8xcRhYIgR9SI3qWbludE&q=Wohnmobilvermietung&authuser=0&hl=en&gl=US",
+    "Status": "Open · Closes 5 PM",
+    "Timing": [
+        {
+            "day": "Wednesday",
+            "open_interval": "8 AM - 5 PM"
+        },
+        {
+            "day": "Thursday",
+            "open_interval": "8 AM - 5 PM"
+        },
+        {
+            "day": "Friday",
+            "open_interval": "8 AM - 5 PM"
+        },
+        {
+            "day": "Saturday",
+            "open_interval": "8 AM - 12 PM"
+        },
+        {
+            "day": "Sunday",
+            "open_interval": "Closed"
+        },
+        {
+            "day": "Monday",
+            "open_interval": "8 AM - 5 PM"
+        },
+        {
+            "day": "Tuesday",
+            "open_interval": "8 AM - 5 PM"
+        }
+    ],
+    "Url": "https://www.google.com/maps/search/?api=1&query=Cruise America RV Rental&query_place_id=ChIJlQD8xcRhYIgR9SI3qWbludE",
+    "Website": "https://www.cruiseamerica.com/rv-rental-locations/tennessee/chattanooga"
+},
+{
+    "Address": "Gewerbestraße 26, 79618 Rheinfelden (Baden), Germany",
+    "Category": "Recreational vehicle rental agency",
+    "GoogleCID": "1784934498519427427",
+    "GoogleFID": "0x4791b5819131abc3:0x18c55c782b972963",
+    "Keyword": "Wohnmobilvermietung",
+    "Latitude": "47.546557899999996",
+    "Listing_Url": "https://www.google.com/maps/search/Wohnmobilvermietung/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI0MTAyMy4wIKXMDSoASAFQAw%3D%3D",
+    "Longitude": "7.7323002999999995",
+    "Name": "ADAC Wohnmobilvermietung - Christians Caravan Center",
+    "Phone": "+49 7623 7482989",
+    "Placeid": "ChIJw6sxkYG1kUcRYymXK3hcxRg",
+    "PriceRange": null,
+    "Rating": "4.9",
+    "Result_Type": null,
+    "Reviews": "69",
+    "Reviews_Link": "https://search.google.com/local/reviews?placeid=ChIJw6sxkYG1kUcRYymXK3hcxRg&q=Wohnmobilvermietung&authuser=0&hl=en&gl=US",
+    "Status": "Closed · Opens 9 AM Thu",
+    "Timing": [
+        {
+            "day": "Wednesday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Thursday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Friday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Saturday",
+            "open_interval": "9 AM - 1 PM"
+        },
+        {
+            "day": "Sunday",
+            "open_interval": "Closed"
+        },
+        {
+            "day": "Monday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Tuesday",
+            "open_interval": "9 AM - 5 PM"
+        }
+    ],
+    "Url": "https://www.google.com/maps/search/?api=1&query=ADAC Wohnmobilvermietung - Christians Caravan Center&query_place_id=ChIJw6sxkYG1kUcRYymXK3hcxRg",
+    "Website": "https://autovermietung.adac.de/wohnmobile/loerrach/"
+},
+{
+    "Address": "Wrangelstraße 100, 10997 Berlin, Germany",
+    "Category": "Recreational vehicle rental agency",
+    "GoogleCID": "4852140365467417459",
+    "GoogleFID": "0x47a85180ace9d9cf:0x435643f46404fb73",
+    "Keyword": "Wohnmobilvermietung",
+    "Latitude": "52.5016952",
+    "Listing_Url": "https://www.google.com/maps/search/Wohnmobilvermietung/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI0MTAyMy4wIKXMDSoASAFQAw%3D%3D",
+    "Longitude": "13.4349151",
+    "Name": "Campanda",
+    "Phone": null,
+    "Placeid": "ChIJz9nprIBRqEcRc_sEZPRDVkM",
+    "PriceRange": null,
+    "Rating": "3.9",
+    "Result_Type": null,
+    "Reviews": "118",
+    "Reviews_Link": "https://search.google.com/local/reviews?placeid=ChIJz9nprIBRqEcRc_sEZPRDVkM&q=Wohnmobilvermietung&authuser=0&hl=en&gl=US",
+    "Status": "Open 24 hours",
+    "Timing": [
+        {
+            "day": "Wednesday",
+            "open_interval": "Open 24 hours"
+        },
+        {
+            "day": "Thursday",
+            "open_interval": "Open 24 hours"
+        },
+        {
+            "day": "Friday",
+            "open_interval": "Open 24 hours"
+        },
+        {
+            "day": "Saturday",
+            "open_interval": "Open 24 hours"
+        },
+        {
+            "day": "Sunday",
+            "open_interval": "Open 24 hours"
+        },
+        {
+            "day": "Monday",
+            "open_interval": "Open 24 hours"
+        },
+        {
+            "day": "Tuesday",
+            "open_interval": "Open 24 hours"
+        }
+    ],
+    "Url": "https://www.google.com/maps/search/?api=1&query=Campanda&query_place_id=ChIJz9nprIBRqEcRc_sEZPRDVkM",
+    "Website": "https://www.campanda.de/"
+},
+{
+    "Address": "Holzmarkt 2a, 50676 Köln, Germany",
+    "Category": "Recreational vehicle rental agency",
+    "GoogleCID": "12717831042530442344",
+    "GoogleFID": "0x47bf244b3ecfffff:0xb07ecff383767c68",
+    "Keyword": "Wohnmobilvermietung",
+    "Latitude": "50.9292065",
+    "Listing_Url": "https://www.google.com/maps/search/Wohnmobilvermietung/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI0MTAyMy4wIKXMDSoASAFQAw%3D%3D",
+    "Longitude": "6.9633129",
+    "Name": "CamperDays GmbH",
+    "Phone": "+49 221 56797706",
+    "Placeid": "ChIJ___PPkskv0cRaHx2g_PPfrA",
+    "PriceRange": null,
+    "Rating": "4.2",
+    "Result_Type": null,
+    "Reviews": "129",
+    "Reviews_Link": "https://search.google.com/local/reviews?placeid=ChIJ___PPkskv0cRaHx2g_PPfrA&q=Wohnmobilvermietung&authuser=0&hl=en&gl=US",
+    "Status": "Closed · Opens 9 AM Thu",
+    "Timing": [
+        {
+            "day": "Wednesday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Thursday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Friday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Saturday",
+            "open_interval": "Closed"
+        },
+        {
+            "day": "Sunday",
+            "open_interval": "Closed"
+        },
+        {
+            "day": "Monday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Tuesday",
+            "open_interval": "9 AM - 5 PM"
+        }
+    ],
+    "Url": "https://www.google.com/maps/search/?api=1&query=CamperDays GmbH&query_place_id=ChIJ___PPkskv0cRaHx2g_PPfrA",
+    "Website": "https://www.camperdays.de/"
+},
+{
+    "Address": "Winzererstraße 47d, 80797 München, Germany",
+    "Category": "Recreational vehicle rental agency",
+    "GoogleCID": "16777044766967046283",
+    "GoogleFID": "0x479e6f94828ed0f7:0xe8d40953b3e5a08b",
+    "Keyword": "Wohnmobilvermietung",
+    "Latitude": "48.1639931",
+    "Listing_Url": "https://www.google.com/maps/search/Wohnmobilvermietung/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI0MTAyMy4wIKXMDSoASAFQAw%3D%3D",
+    "Longitude": "11.5606973",
+    "Name": "roadsurfer GmbH Zentrale",
+    "Phone": null,
+    "Placeid": "ChIJ99COgpRvnkcRi6Dls1MJ1Og",
+    "PriceRange": null,
+    "Rating": "4.1",
+    "Result_Type": null,
+    "Reviews": "293",
+    "Reviews_Link": "https://search.google.com/local/reviews?placeid=ChIJ99COgpRvnkcRi6Dls1MJ1Og&q=Wohnmobilvermietung&authuser=0&hl=en&gl=US",
+    "Status": null,
+    "Timing": [],
+    "Url": "https://www.google.com/maps/search/?api=1&query=roadsurfer GmbH Zentrale&query_place_id=ChIJ99COgpRvnkcRi6Dls1MJ1Og",
+    "Website": "https://roadsurfer.com/"
+},
+{
+    "Address": "Ingolstädter Str. 172, 80939 München, Germany",
+    "Category": "Recreational vehicle rental agency",
+    "GoogleCID": "8806286812142749413",
+    "GoogleFID": "0x479e76940d393227:0x7a363732abf9c6e5",
+    "Keyword": "Wohnmobilvermietung",
+    "Latitude": "48.2054289",
+    "Listing_Url": "https://www.google.com/maps/search/Wohnmobilvermietung/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI0MTAyMy4wIKXMDSoASAFQAw%3D%3D",
+    "Longitude": "11.586928",
+    "Name": "roadsurfer - Wohnmobil und Camper mieten München",
+    "Phone": null,
+    "Placeid": "ChIJJzI5DZR2nkcR5cb5qzI3Nno",
+    "PriceRange": null,
+    "Rating": "4.5",
+    "Result_Type": null,
+    "Reviews": "474",
+    "Reviews_Link": "https://search.google.com/local/reviews?placeid=ChIJJzI5DZR2nkcR5cb5qzI3Nno&q=Wohnmobilvermietung&authuser=0&hl=en&gl=US",
+    "Status": null,
+    "Timing": [],
+    "Url": "https://www.google.com/maps/search/?api=1&query=roadsurfer - Wohnmobil und Camper mieten München&query_place_id=ChIJJzI5DZR2nkcR5cb5qzI3Nno",
+    "Website": "https://roadsurfer.com/de/camper-mieten/deutschland/bayern/muenchen/"
+},
+{
+    "Address": null,
+    "Category": "Recreational vehicle rental agency",
+    "GoogleCID": "10270353777876545261",
+    "GoogleFID": "0x479dd9bfa5f5bb9f:0x8e87a058a7ec2eed",
+    "Keyword": "Wohnmobilvermietung",
+    "Latitude": "51.175807",
+    "Listing_Url": "https://www.google.com/maps/search/Wohnmobilvermietung/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI0MTAyMy4wIKXMDSoASAFQAw%3D%3D",
+    "Longitude": "10.4541194",
+    "Name": "bestCAMPER.net GmbH",
+    "Phone": "+49 89 800746990",
+    "Placeid": "ChIJn7v1pb_ZnUcR7S7sp1igh44",
+    "PriceRange": null,
+    "Rating": "4.7",
+    "Result_Type": null,
+    "Reviews": "135",
+    "Reviews_Link": "https://search.google.com/local/reviews?placeid=ChIJn7v1pb_ZnUcR7S7sp1igh44&q=Wohnmobilvermietung&authuser=0&hl=en&gl=US",
+    "Status": "Closed · Opens 9 AM Thu",
+    "Timing": [
+        {
+            "day": "Wednesday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Thursday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Friday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Saturday",
+            "open_interval": "Closed"
+        },
+        {
+            "day": "Sunday",
+            "open_interval": "Closed"
+        },
+        {
+            "day": "Monday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Tuesday",
+            "open_interval": "9 AM - 5 PM"
+        }
+    ],
+    "Url": "https://www.google.com/maps/search/?api=1&query=bestCAMPER.net GmbH&query_place_id=ChIJn7v1pb_ZnUcR7S7sp1igh44",
+    "Website": "http://www.bestcamper.de/"
+},
+{
+    "Address": "78 Beaver Rd, Fort Oglethorpe, GA 30742",
+    "Category": "Recreational vehicle rental agency",
+    "GoogleCID": "9562312017771637171",
+    "GoogleFID": "0x88606745aa1a59ed:0x84b4281deaba29b3",
+    "Keyword": "Wohnmobilvermietung",
+    "Latitude": "34.9559553",
+    "Listing_Url": "https://www.google.com/maps/search/Wohnmobilvermietung/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI0MTAyMy4wIKXMDSoASAFQAw%3D%3D",
+    "Longitude": "-85.2291551",
+    "Name": "Camper rental",
+    "Phone": "(423) 593-5879",
+    "Placeid": "ChIJ7VkaqkVnYIgRsym66h0otIQ",
+    "PriceRange": null,
+    "Rating": null,
+    "Result_Type": null,
+    "Reviews": null,
+    "Reviews_Link": null,
+    "Status": "Open · Closes 5 PM",
+    "Timing": [
+        {
+            "day": "Wednesday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Thursday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Friday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Saturday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Sunday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Monday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Tuesday",
+            "open_interval": "9 AM - 5 PM"
+        }
+    ],
+    "Url": "https://www.google.com/maps/search/?api=1&query=Camper rental&query_place_id=ChIJ7VkaqkVnYIgRsym66h0otIQ",
+    "Website": "http://getlostcamperrentals.com/"
+},
+{
+    "Address": "Truderinger Str. 227, 81825 München, Germany",
+    "Category": "Recreational vehicle rental agency",
+    "GoogleCID": "9150946276565806953",
+    "GoogleFID": "0x479e0bdca62fd62d:0x7efeb1279d636f69",
+    "Keyword": "Wohnmobilvermietung",
+    "Latitude": "48.1269128",
+    "Listing_Url": "https://www.google.com/maps/search/Wohnmobilvermietung/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI0MTAyMy4wIKXMDSoASAFQAw%3D%3D",
+    "Longitude": "11.6586228",
+    "Name": "Vanever - Camper & Wohnmobil mieten in München",
+    "Phone": "+49 89 62828834",
+    "Placeid": "ChIJLdYvptwLnkcRaW9jnSex_n4",
+    "PriceRange": null,
+    "Rating": "4.8",
+    "Result_Type": null,
+    "Reviews": "1143",
+    "Reviews_Link": "https://search.google.com/local/reviews?placeid=ChIJLdYvptwLnkcRaW9jnSex_n4&q=Wohnmobilvermietung&authuser=0&hl=en&gl=US",
+    "Status": "Closed · Opens 10 AM Thu",
+    "Timing": [
+        {
+            "day": "Wednesday",
+            "open_interval": "10 AM - 5 PM"
+        },
+        {
+            "day": "Thursday",
+            "open_interval": "10 AM - 5 PM"
+        },
+        {
+            "day": "Friday",
+            "open_interval": "10 AM - 5 PM"
+        },
+        {
+            "day": "Saturday",
+            "open_interval": "Closed"
+        },
+        {
+            "day": "Sunday",
+            "open_interval": "Closed"
+        },
+        {
+            "day": "Monday",
+            "open_interval": "10 AM - 5 PM"
+        },
+        {
+            "day": "Tuesday",
+            "open_interval": "10 AM - 5 PM"
+        }
+    ],
+    "Url": "https://www.google.com/maps/search/?api=1&query=Vanever - Camper & Wohnmobil mieten in München&query_place_id=ChIJLdYvptwLnkcRaW9jnSex_n4",
+    "Website": "https://vanever.com/de/camper-mieten-muenchen"
+},
+{
+    "Address": "Zechenwihlstraße 44, 79730 Murg, Germany",
+    "Category": "Recreational vehicle rental agency",
+    "GoogleCID": "12859689840727306470",
+    "GoogleFID": "0x47904566eef0ceed:0xb276cbc6ce4030e6",
+    "Keyword": "Wohnmobilvermietung",
+    "Latitude": "47.573530899999994",
+    "Listing_Url": "https://www.google.com/maps/search/Wohnmobilvermietung/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI0MTAyMy4wIKXMDSoASAFQAw%3D%3D",
+    "Longitude": "8.0271715",
+    "Name": "miete ein Wohnmobil",
+    "Phone": "+49 174 2394355",
+    "Placeid": "ChIJ7c7w7mZFkEcR5jBAzsbLdrI",
+    "PriceRange": null,
+    "Rating": "5.0",
+    "Result_Type": null,
+    "Reviews": "19",
+    "Reviews_Link": "https://search.google.com/local/reviews?placeid=ChIJ7c7w7mZFkEcR5jBAzsbLdrI&q=Wohnmobilvermietung&authuser=0&hl=en&gl=US",
+    "Status": "Open 24 hours",
+    "Timing": [
+        {
+            "day": "Wednesday",
+            "open_interval": "Open 24 hours"
+        },
+        {
+            "day": "Thursday",
+            "open_interval": "Open 24 hours"
+        },
+        {
+            "day": "Friday",
+            "open_interval": "Open 24 hours"
+        },
+        {
+            "day": "Saturday",
+            "open_interval": "Open 24 hours"
+        },
+        {
+            "day": "Sunday",
+            "open_interval": "Open 24 hours"
+        },
+        {
+            "day": "Monday",
+            "open_interval": "Open 24 hours"
+        },
+        {
+            "day": "Tuesday",
+            "open_interval": "Open 24 hours"
+        }
+    ],
+    "Url": "https://www.google.com/maps/search/?api=1&query=miete ein Wohnmobil&query_place_id=ChIJ7c7w7mZFkEcR5jBAzsbLdrI",
+    "Website": "https://miete-ein-wohnmobil.de/"
+},
+{
+    "Address": "Kamp 15, 33154 Salzkotten, Germany",
+    "Category": "Recreational vehicle rental agency",
+    "GoogleCID": "4119798237473387864",
+    "GoogleFID": "0x47bbb5fc21cbdf77:0x392c76ab5ae1b558",
+    "Keyword": "Wohnmobilvermietung",
+    "Latitude": "51.6307718",
+    "Listing_Url": "https://www.google.com/maps/search/Wohnmobilvermietung/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI0MTAyMy4wIKXMDSoASAFQAw%3D%3D",
+    "Longitude": "8.6834317",
+    "Name": "Traum-Camper GmbH Wohnmobilvermietung und Verkauf",
+    "Phone": "+49 171 2721801",
+    "Placeid": "ChIJd9_LIfy1u0cRWLXhWqt2LDk",
+    "PriceRange": null,
+    "Rating": "4.9",
+    "Result_Type": null,
+    "Reviews": "78",
+    "Reviews_Link": "https://search.google.com/local/reviews?placeid=ChIJd9_LIfy1u0cRWLXhWqt2LDk&q=Wohnmobilvermietung&authuser=0&hl=en&gl=US",
+    "Status": "Closed · Opens 2 PM Thu",
+    "Timing": [
+        {
+            "day": "Wednesday",
+            "open_interval": "Closed"
+        },
+        {
+            "day": "Thursday",
+            "open_interval": "2 - 5 PM"
+        },
+        {
+            "day": "Friday",
+            "open_interval": "2 - 5 PM"
+        },
+        {
+            "day": "Saturday",
+            "open_interval": "10 AM - 2 PM"
+        },
+        {
+            "day": "Sunday",
+            "open_interval": "Closed"
+        },
+        {
+            "day": "Monday",
+            "open_interval": "2 - 5 PM"
+        },
+        {
+            "day": "Tuesday",
+            "open_interval": "2 - 5 PM"
+        }
+    ],
+    "Url": "https://www.google.com/maps/search/?api=1&query=Traum-Camper GmbH Wohnmobilvermietung und Verkauf&query_place_id=ChIJd9_LIfy1u0cRWLXhWqt2LDk",
+    "Website": "https://www.traum-camper.com/"
+},
+{
+    "Address": "Von-Wrangell-Straße 6, 53359 Rheinbach, Germany",
+    "Category": "Recreational vehicle rental agency",
+    "GoogleCID": "6753056018212110204",
+    "GoogleFID": "0x47bee1c23134c1bd:0x5db7acab59d8bf7c",
+    "Keyword": "Wohnmobilvermietung",
+    "Latitude": "50.6316924",
+    "Listing_Url": "https://www.google.com/maps/search/Wohnmobilvermietung/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI0MTAyMy4wIKXMDSoASAFQAw%3D%3D",
+    "Longitude": "6.954310899999999",
+    "Name": "Rent a camper",
+    "Phone": "+49 2233 9281581",
+    "Placeid": "ChIJvcE0McLhvkcRfL_YWaust10",
+    "PriceRange": null,
+    "Rating": "4.6",
+    "Result_Type": null,
+    "Reviews": "169",
+    "Reviews_Link": "https://search.google.com/local/reviews?placeid=ChIJvcE0McLhvkcRfL_YWaust10&q=Wohnmobilvermietung&authuser=0&hl=en&gl=US",
+    "Status": "Closed · Opens 10 AM Thu",
+    "Timing": [
+        {
+            "day": "Wednesday",
+            "open_interval": "10 AM - 5 PM"
+        },
+        {
+            "day": "Thursday",
+            "open_interval": "10 AM - 5 PM"
+        },
+        {
+            "day": "Friday",
+            "open_interval": "10 AM - 5 PM"
+        },
+        {
+            "day": "Saturday",
+            "open_interval": "Closed"
+        },
+        {
+            "day": "Sunday",
+            "open_interval": "Closed"
+        },
+        {
+            "day": "Monday",
+            "open_interval": "10 AM - 5 PM"
+        },
+        {
+            "day": "Tuesday",
+            "open_interval": "10 AM - 5 PM"
+        }
+    ],
+    "Url": "https://www.google.com/maps/search/?api=1&query=Rent a camper&query_place_id=ChIJvcE0McLhvkcRfL_YWaust10",
+    "Website": "http://www.rentacamper.de/"
+},
+{
+    "Address": "Lobeckstraße 36-40, 10969 Berlin, Germany",
+    "Category": "Recreational vehicle rental agency",
+    "GoogleCID": "14569408058272465509",
+    "GoogleFID": "0x47a84ef5e59a9835:0xca30ef6fdd0b4265",
+    "Keyword": "Wohnmobilvermietung",
+    "Latitude": "52.5039927",
+    "Listing_Url": "https://www.google.com/maps/search/Wohnmobilvermietung/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI0MTAyMy4wIKXMDSoASAFQAw%3D%3D",
+    "Longitude": "13.407862999999999",
+    "Name": "PaulCamper GmbH",
+    "Phone": "+49 30 609849722",
+    "Placeid": "ChIJNZia5fVOqEcRZUIL3W_vMMo",
+    "PriceRange": null,
+    "Rating": "3.0",
+    "Result_Type": null,
+    "Reviews": "662",
+    "Reviews_Link": "https://search.google.com/local/reviews?placeid=ChIJNZia5fVOqEcRZUIL3W_vMMo&q=Wohnmobilvermietung&authuser=0&hl=en&gl=US",
+    "Status": "Closed · Opens 9 AM Thu",
+    "Timing": [
+        {
+            "day": "Wednesday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Thursday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Friday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Saturday",
+            "open_interval": "Closed"
+        },
+        {
+            "day": "Sunday",
+            "open_interval": "Closed"
+        },
+        {
+            "day": "Monday",
+            "open_interval": "9 AM - 5 PM"
+        },
+        {
+            "day": "Tuesday",
+            "open_interval": "9 AM - 5 PM"
+        }
+    ],
+    "Url": "https://www.google.com/maps/search/?api=1&query=PaulCamper GmbH&query_place_id=ChIJNZia5fVOqEcRZUIL3W_vMMo",
+    "Website": "https://www.paulcamper.de/"
+},
+{
+    "Address": "Emil-von-Behring-Straße 6, 60439 Frankfurt am Main, Germany",
+    "Category": "Recreational vehicle rental agency",
+    "GoogleCID": "16075901715150845148",
+    "GoogleFID": "0x479e75fd323655b3:0xdf19136fa7a8b4dc",
+    "Keyword": "Wohnmobilvermietung",
+    "Latitude": "50.1685923",
+    "Listing_Url": "https://www.google.com/maps/search/Wohnmobilvermietung/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI0MTAyMy4wIKXMDSoASAFQAw%3D%3D",
+    "Longitude": "8.6348653",
+    "Name": "camperboerse",
+    "Phone": "+49 69 273158461",
+    "Placeid": "ChIJs1U2Mv11nkcR3LSop28TGd8",
+    "PriceRange": null,
+    "Rating": "3.0",
+    "Result_Type": null,
+    "Reviews": "13",
+    "Reviews_Link": "https://search.google.com/local/reviews?placeid=ChIJs1U2Mv11nkcR3LSop28TGd8&q=Wohnmobilvermietung&authuser=0&hl=en&gl=US",
+    "Status": "Open · Closes 8 PM",
+    "Timing": [
+        {
+            "day": "Wednesday",
+            "open_interval": "9 AM - 8 PM"
+        },
+        {
+            "day": "Thursday",
+            "open_interval": "9 AM - 8 PM"
+        },
+        {
+            "day": "Friday",
+            "open_interval": "9 AM - 8 PM"
+        },
+        {
+            "day": "Saturday",
+            "open_interval": "10 AM - 6:30 PM"
+        },
+        {
+            "day": "Sunday",
+            "open_interval": "10 AM - 6:30 PM"
+        },
+        {
+            "day": "Monday",
+            "open_interval": "9 AM - 8 PM"
+        },
+        {
+            "day": "Tuesday",
+            "open_interval": "9 AM - 8 PM"
+        }
+    ],
+    "Url": "https://www.google.com/maps/search/?api=1&query=camperboerse&query_place_id=ChIJs1U2Mv11nkcR3LSop28TGd8",
+    "Website": "http://www.camperboerse.com/"
+},
+{
+    "Address": "Helmut-Knaus-Straße 1, 94118 Jandelsbrunn, Germany",
+    "Category": "Recreational vehicle rental agency",
+    "GoogleCID": "413529437317916716",
+    "GoogleFID": "0x477492eb1c37836f:0x5bd26d50f80682c",
+    "Keyword": "Wohnmobilvermietung",
+    "Latitude": "48.7332069",
+    "Listing_Url": "https://www.google.com/maps/search/Wohnmobilvermietung/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI0MTAyMy4wIKXMDSoASAFQAw%3D%3D",
+    "Longitude": "13.6901669",
+    "Name": "RENT AND TRAVEL",
+    "Phone": "+49 8583 21266",
+    "Placeid": "ChIJb4M3HOuSdEcRLGiAD9UmvQU",
+    "PriceRange": null,
+    "Rating": "3.5",
+    "Result_Type": null,
+    "Reviews": "24",
+    "Reviews_Link": "https://search.google.com/local/reviews?placeid=ChIJb4M3HOuSdEcRLGiAD9UmvQU&q=Wohnmobilvermietung&authuser=0&hl=en&gl=US",
+    "Status": "Closed · Opens 9:30 AM Thu",
+    "Timing": [
+        {
+            "day": "Wednesday",
+            "open_interval": "9:30 AM - 12:30 PM"
+        },
+        {
+            "day": "Thursday",
+            "open_interval": "9:30 AM - 4:30 PM"
+        },
+        {
+            "day": "Friday",
+            "open_interval": "9:30 AM - 12:30 PM"
+        },
+        {
+            "day": "Saturday",
+            "open_interval": "Closed"
+        },
+        {
+            "day": "Sunday",
+            "open_interval": "Closed"
+        },
+        {
+            "day": "Monday",
+            "open_interval": "9:30 AM - 4:30 PM"
+        },
+        {
+            "day": "Tuesday",
+            "open_interval": "9:30 AM - 12:30 PM"
+        }
+    ],
+    "Url": "https://www.google.com/maps/search/?api=1&query=RENT AND TRAVEL&query_place_id=ChIJb4M3HOuSdEcRLGiAD9UmvQU",
+    "Website": "https://www.rentandtravel.de/"
+},
+{
+    "Address": "Griffith Hwy, Jasper, TN 37347",
+    "Category": "Recreational vehicle rental agency",
+    "GoogleCID": "3272582853494662035",
+    "GoogleFID": "0x886055e3592773d7:0x2d6a8cc430956393",
+    "Keyword": "Wohnmobilvermietung",
+    "Latitude": "35.054805",
+    "Listing_Url": "https://www.google.com/maps/search/Wohnmobilvermietung/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI0MTAyMy4wIKXMDSoASAFQAw%3D%3D",
+    "Longitude": "-85.566385",
+    "Name": "Cedar Mountain RV rental",
+    "Phone": null,
+    "Placeid": "ChIJ13MnWeNVYIgRk2OVMMSMai0",
+    "PriceRange": null,
+    "Rating": null,
+    "Result_Type": null,
+    "Reviews": null,
+    "Reviews_Link": null,
+    "Status": "Open 24 hours",
+    "Timing": [
+        {
+            "day": "Wednesday",
+            "open_interval": "Open 24 hours"
+        },
+        {
+            "day": "Thursday",
+            "open_interval": "Open 24 hours"
+        },
+        {
+            "day": "Friday",
+            "open_interval": "Open 24 hours"
+        },
+        {
+            "day": "Saturday",
+            "open_interval": "Open 24 hours"
+        },
+        {
+            "day": "Sunday",
+            "open_interval": "Open 24 hours"
+        },
+        {
+            "day": "Monday",
+            "open_interval": "Open 24 hours"
+        },
+        {
+            "day": "Tuesday",
+            "open_interval": "Open 24 hours"
+        }
+    ],
+    "Url": "https://www.google.com/maps/search/?api=1&query=Cedar Mountain RV rental&query_place_id=ChIJ13MnWeNVYIgRk2OVMMSMai0",
+    "Website": "https://cedarmtnrvrental.wordpress.com/"
+}
+]

@@ -43,8 +43,13 @@ export async function PUT(
   try {
     const { id } = await params;
     const session = await auth();
-    if (!session?.user || session.user.role !== "ADMIN") {
+    if (!session?.user) {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
+    }
+    
+    // Benutzer können nur ihr eigenes Profil bearbeiten, außer sie sind ADMIN
+    if (session.user.id !== id && session.user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Nicht autorisiert" }, { status: 403 });
     }
     const body = await request.json();
     const data = updateUserSchema.parse(body);
@@ -64,11 +69,20 @@ export async function PUT(
       select: { role: true },
     });
 
-    const updateData: any = {
-      name: data.name,
-      email: data.email,
-      role: data.role,
-    };
+    const updateData: any = {};
+    
+    // Nur ADMINs können die Rolle ändern
+    if (data.role && session.user.role === "ADMIN") {
+      updateData.role = data.role;
+    }
+    
+    // Name und E-Mail können von allen geändert werden
+    if (data.name !== undefined) {
+      updateData.name = data.name;
+    }
+    if (data.email !== undefined) {
+      updateData.email = data.email;
+    }
     
     if (data.password) {
       updateData.password = await bcrypt.hash(data.password, 10);
@@ -84,8 +98,8 @@ export async function PUT(
       updateData.profileImage = data.profileImage;
     }
     
-    // Wenn Rolle von EDITOR zu etwas anderem geändert wird, Editor-Profil und Profilbild löschen
-    if (currentUser?.role === "EDITOR" && data.role && data.role !== "EDITOR") {
+    // Wenn Rolle von EDITOR zu etwas anderem geändert wird, Editor-Profil und Profilbild löschen (nur für ADMINs)
+    if (currentUser?.role === "EDITOR" && data.role && data.role !== "EDITOR" && session.user.role === "ADMIN") {
       updateData.editorProfile = null;
       updateData.profileImage = null;
     }

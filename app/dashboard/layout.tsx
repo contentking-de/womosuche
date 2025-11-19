@@ -11,6 +11,7 @@ import {
   Settings,
   Users,
   Mail,
+  Send,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -57,6 +58,11 @@ export default async function DashboardLayout({
       title: "Newsletter",
       href: "/dashboard/newsletter",
       icon: Mail,
+    },
+    {
+      title: "Outreach",
+      href: "/dashboard/outreach",
+      icon: Send,
     },
     {
       title: "Benutzer",
