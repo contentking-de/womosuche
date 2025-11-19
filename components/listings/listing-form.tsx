@@ -201,6 +201,8 @@ export function ListingForm({ listing, userRole, ownerId: initialOwnerId, availa
           seats: watch("seats"),
           beds: watch("beds"),
           features: watch("features") || [],
+          marke: watch("marke"),
+          equipment: watch("equipment"),
           existingDescription: watch("description"),
         }),
       });

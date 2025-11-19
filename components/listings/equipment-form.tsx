@@ -241,7 +241,7 @@ export function EquipmentForm({ form, disabled }: EquipmentFormProps) {
 
       {/* Schlafen */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">🛏️ Schlafen</h3>
+        <h3 className="text-lg font-semibold">Schlafen</h3>
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Betttypen</Label>
@@ -326,7 +326,7 @@ export function EquipmentForm({ form, disabled }: EquipmentFormProps) {
 
       {/* Küche */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">🍽️ Küche</h3>
+        <h3 className="text-lg font-semibold">Küche</h3>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="stove">Gaskocher</Label>
@@ -417,7 +417,7 @@ export function EquipmentForm({ form, disabled }: EquipmentFormProps) {
 
       {/* Bad */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">🚿 Bad</h3>
+        <h3 className="text-lg font-semibold">Bad</h3>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="toilet">Toilette</Label>
@@ -493,7 +493,7 @@ export function EquipmentForm({ form, disabled }: EquipmentFormProps) {
 
       {/* Technik & Energie */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">🔋 Technik & Energie</h3>
+        <h3 className="text-lg font-semibold">Technik & Energie</h3>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="freshWaterTank">Frischwassertank (Liter)</Label>
@@ -626,7 +626,7 @@ export function EquipmentForm({ form, disabled }: EquipmentFormProps) {
 
       {/* Innenraum & Komfort */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">🧭 Innenraum & Komfort</h3>
+        <h3 className="text-lg font-semibold">Innenraum & Komfort</h3>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="seating">Sitzgruppe</Label>
@@ -754,7 +754,7 @@ export function EquipmentForm({ form, disabled }: EquipmentFormProps) {
 
       {/* Außen & Campingzubehör */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">🚴‍♂️ Außen & Campingzubehör</h3>
+        <h3 className="text-lg font-semibold">Außen & Campingzubehör</h3>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="bikeRack">Fahrradträger</Label>

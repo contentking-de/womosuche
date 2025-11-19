@@ -29,6 +29,8 @@ async function generateListingDescription(data: {
   seats?: number;
   beds?: number;
   features?: string[];
+  marke?: string;
+  equipment?: any;
   existingDescription?: string;
 }) {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -43,14 +45,84 @@ async function generateListingDescription(data: {
     ? data.features.join(", ")
     : "Keine speziellen Ausstattungsmerkmale angegeben";
 
+  // Formatiere Equipment-Daten für den Prompt
+  const equipmentDetails: string[] = [];
+  if (data.equipment) {
+    const eq = data.equipment;
+    
+    // Allgemeine Fahrzeugdaten
+    if (eq.vehicleType) equipmentDetails.push(`Fahrzeugtyp: ${eq.vehicleType}`);
+    if (eq.year) equipmentDetails.push(`Baujahr: ${eq.year}`);
+    if (eq.length) equipmentDetails.push(`Länge: ${eq.length} cm`);
+    if (eq.transmission) equipmentDetails.push(`Getriebe: ${eq.transmission}`);
+    if (eq.fuelType) equipmentDetails.push(`Kraftstoff: ${eq.fuelType}`);
+    if (eq.fuelConsumption) equipmentDetails.push(`Verbrauch: ${eq.fuelConsumption}`);
+    
+    // Schlafen
+    if (eq.bedTypes && eq.bedTypes.length > 0) equipmentDetails.push(`Betttypen: ${eq.bedTypes.join(", ")}`);
+    if (eq.bedSizes && eq.bedSizes.length > 0) equipmentDetails.push(`Bettgrößen: ${eq.bedSizes.join(", ")}`);
+    if (eq.sleepPlaces) equipmentDetails.push(`Schlafplätze: ${eq.sleepPlaces}`);
+    
+    // Küche
+    if (eq.stove) equipmentDetails.push(`Herd: ${eq.stove}`);
+    if (eq.refrigerator) equipmentDetails.push(`Kühlschrank: ${eq.refrigerator}`);
+    if (eq.oven) equipmentDetails.push("Backofen: vorhanden");
+    if (eq.microwave) equipmentDetails.push("Mikrowelle: vorhanden");
+    if (eq.gasSupply) equipmentDetails.push(`Gasversorgung: ${eq.gasSupply}`);
+    
+    // Bad
+    if (eq.shower) equipmentDetails.push("Dusche: vorhanden");
+    if (eq.toilet) equipmentDetails.push(`Toilette: ${eq.toilet}`);
+    if (eq.hotWater) equipmentDetails.push("Warmwasser: vorhanden");
+    
+    // Technik & Energie
+    if (eq.freshWaterTank) equipmentDetails.push(`Frischwassertank: ${eq.freshWaterTank} Liter`);
+    if (eq.wasteWaterTank) equipmentDetails.push(`Abwassertank: ${eq.wasteWaterTank} Liter`);
+    if (eq.heating) equipmentDetails.push(`Heizung: ${eq.heating}`);
+    if (eq.airConditioning) equipmentDetails.push(`Klimaanlage: ${eq.airConditioning}`);
+    if (eq.solarPower) equipmentDetails.push(`Solaranlage: ${eq.solarPower} Watt`);
+    if (eq.inverter) equipmentDetails.push("Wechselrichter: vorhanden");
+    if (eq.shorePower) equipmentDetails.push("Landstromanschluss: vorhanden");
+    
+    // Innenraum & Komfort
+    if (eq.seating) equipmentDetails.push(`Sitzgruppe: ${eq.seating}`);
+    if (eq.swivelSeats) equipmentDetails.push("Drehsitze: vorhanden");
+    if (eq.tv) equipmentDetails.push("TV: vorhanden");
+    if (eq.satellite) equipmentDetails.push("Satellitenanlage: vorhanden");
+    if (eq.usbPorts) equipmentDetails.push("USB-Anschlüsse: vorhanden");
+    if (eq.blinds) equipmentDetails.push("Verdunkelung: vorhanden");
+    if (eq.storage && eq.storage.length > 0) equipmentDetails.push(`Stauraum: ${eq.storage.join(", ")}`);
+    
+    // Außen & Campingzubehör
+    if (eq.awning) equipmentDetails.push("Markise: vorhanden");
+    if (eq.bikeRack) equipmentDetails.push(`Fahrradträger: ${eq.bikeRack}`);
+    if (eq.towbar) equipmentDetails.push("Anhängerkupplung: vorhanden");
+    if (eq.campingFurniture) equipmentDetails.push("Campingmöbel: vorhanden");
+    if (eq.outdoorShower) equipmentDetails.push("Außendusche: vorhanden");
+  }
+  
+  const equipmentList = equipmentDetails.length > 0 
+    ? equipmentDetails.join("\n")
+    : "Keine detaillierten Ausstattungsdaten angegeben";
+
   const prompt = [
     "Erstelle eine ansprechende, verkaufsfördernde und emotionale Beschreibung für ein Wohnmobil auf Deutsch.",
+    "",
+    "=== GRUNDDATEN ===",
     data.title ? `Titel: "${data.title}"` : undefined,
+    data.marke ? `Marke: ${data.marke}` : undefined,
     data.location ? `Standort: ${data.location}` : undefined,
     data.pricePerDay ? `Preis pro Tag: ${data.pricePerDay}€` : undefined,
     data.seats ? `Sitzplätze: ${data.seats}` : undefined,
     data.beds ? `Betten: ${data.beds}` : undefined,
-    `Ausstattung: ${featuresList}`,
+    "",
+    "=== AUSSTATTUNGSMERKMALE ===",
+    `Besondere Features: ${featuresList}`,
+    "",
+    "=== DETAILLIERTE AUSSTATTUNG ===",
+    equipmentList,
+    "",
+    "WICHTIG: Nutze die oben genannten Informationen (Titel, Marke, Ausstattungsmerkmale und detaillierte Ausstattung) aktiv in der Beschreibung. Erwähne konkrete Details wie Marke, Fahrzeugtyp, besondere Ausstattungsmerkmale und technische Details, um die Beschreibung authentisch und informativ zu gestalten.",
     "",
     "WICHTIG: Verwende IMMER informale Sprache (Du-Form, nicht Sie-Form).",
     "",
@@ -150,6 +222,8 @@ export async function POST(request: Request) {
         seats: typeof body?.seats === "number" ? body.seats : undefined,
         beds: typeof body?.beds === "number" ? body.beds : undefined,
         features: Array.isArray(body?.features) ? body.features : undefined,
+        marke: typeof body?.marke === "string" ? body.marke : undefined,
+        equipment: body?.equipment && typeof body.equipment === "object" ? body.equipment : undefined,
         existingDescription: typeof body?.existingDescription === "string" ? body.existingDescription : undefined,
       };
       return await generateListingDescription(generateData);
