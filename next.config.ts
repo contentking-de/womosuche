@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Moderne Browser unterstützen - reduziert Polyfills
+  compiler: {
+    // Entferne Console-Logs in Production (optional)
+    removeConsole: process.env.NODE_ENV === "production" ? {
+      exclude: ["error", "warn"],
+    } : false,
+  },
   images: {
     remotePatterns: [
       {
@@ -26,6 +33,16 @@ const nextConfig: NextConfig = {
     formats: ["image/webp", "image/avif"],
   },
   webpack: (config, { isServer }) => {
+    // Deaktiviere Polyfills für moderne Browser-Features
+    // Diese Features sind in modernen Browsern nativ verfügbar
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        // Deaktiviere Polyfills für moderne JavaScript-Features
+        // Diese werden von modernen Browsern nativ unterstützt
+      };
+    }
+
     // Stelle sicher, dass Prisma Client nur server-seitig verwendet wird
     if (isServer) {
       // Für Server-Side: Stelle sicher, dass @prisma/client und .prisma/client nicht gebundelt werden

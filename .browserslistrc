@@ -1,0 +1,12 @@
+# Moderne Browser unterstützen - keine Polyfills für ES2019+ Features
+# Diese Browser unterstützen nativ: Array.at, Array.flat, Object.fromEntries, String.trimStart/trimEnd, etc.
+
+> 0.2%
+not dead
+not op_mini all
+not ie 11
+not chrome < 90
+not firefox < 88
+not safari < 14
+not edge < 90
+
