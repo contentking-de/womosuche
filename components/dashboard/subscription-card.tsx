@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, XCircle, Clock, AlertCircle, Loader2, RefreshCw, Car, Settings, ArrowUpDown, X } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, AlertCircle, Loader2, RefreshCw, Car, Settings, ArrowUpDown, X, CreditCard } from "lucide-react";
+import Link from "next/link";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { getPlanLimit } from "@/lib/plan-limits";
@@ -120,7 +121,7 @@ export function SubscriptionCard({ subscription, currentVehiclesCount = 0, showA
       <Card>
         <CardHeader>
           <CardTitle>Abonnement</CardTitle>
-          <CardDescription>Ihr aktuelles Abonnement</CardDescription>
+          <CardDescription>Dein aktuelles Abonnement</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -128,12 +129,20 @@ export function SubscriptionCard({ subscription, currentVehiclesCount = 0, showA
               <div>
                 <p className="text-sm text-muted-foreground">Kein aktives Abonnement</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Bitte registrieren Sie sich, um ein Abonnement abzuschließen.
+                  Bitte wähle einen Plan aus, um Wohnmobile anzulegen.
                 </p>
               </div>
               <XCircle className="h-8 w-8 text-muted-foreground" />
             </div>
-            <SyncSubscriptionButton />
+            <div className="space-y-2">
+              <Link href="/dashboard/change-plan" className="block">
+                <Button className="w-full">
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  Abonnement Übersicht
+                </Button>
+              </Link>
+              <SyncSubscriptionButton />
+            </div>
           </div>
         </CardContent>
       </Card>
