@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { List, MessageSquare, Plus, Users, TrendingUp, TrendingDown } from "lucide-react";
 import { InquiriesChart } from "@/components/dashboard/inquiries-chart";
 import { LandlordsRanking } from "@/components/dashboard/landlords-ranking";
+import { LandlordsVehiclesRanking } from "@/components/dashboard/landlords-vehicles-ranking";
+import { VehiclesBreakdownChart } from "@/components/dashboard/vehicles-breakdown-chart";
 import { NewsletterSubscribersChart } from "@/components/dashboard/newsletter-subscribers-chart";
 import { SubscriptionCard } from "@/components/dashboard/subscription-card";
 import { NewListingButton } from "@/components/listings/new-listing-button";
@@ -86,6 +88,8 @@ export default async function DashboardPage() {
   let landlordsStats = null;
   let inquiriesPerDay = null;
   let topLandlords = null;
+  let topLandlordsByVehicles = null;
+  let vehiclesBreakdown = null;
   let newsletterStats = null;
   let newsletterSubscribersPerDay = null;
 
@@ -193,6 +197,67 @@ export default async function DashboardPage() {
       .slice(0, 10); // Top 10
 
     topLandlords = landlordsRanking;
+
+    // Rangliste der Vermieter nach Fahrzeugbestand
+    const landlordsWithVehicles = await prisma.user.findMany({
+      where: {
+        role: "LANDLORD",
+      },
+      include: {
+        Listing: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+
+    type LandlordVehicleRankingItem = {
+      id: string;
+      name: string;
+      email: string;
+      vehicleCount: number;
+    };
+
+    const landlordsVehiclesRanking: LandlordVehicleRankingItem[] = landlordsWithVehicles
+      .map((landlord: typeof landlordsWithVehicles[number]) => {
+        return {
+          id: landlord.id,
+          name: landlord.name || landlord.email,
+          email: landlord.email,
+          vehicleCount: landlord.Listing.length,
+        };
+      })
+      .filter((landlord: LandlordVehicleRankingItem) => landlord.vehicleCount > 0)
+      .sort((a: LandlordVehicleRankingItem, b: LandlordVehicleRankingItem) => b.vehicleCount - a.vehicleCount)
+      .slice(0, 10); // Top 10
+
+    topLandlordsByVehicles = landlordsVehiclesRanking;
+
+    // Breakdown nach Fahrzeuganzahl
+    const breakdownData = {
+      "1 Fahrzeug": 0,
+      "2-3 Fahrzeuge": 0,
+      "4-10 Fahrzeuge": 0,
+      "Über 10 Fahrzeuge": 0,
+    };
+
+    landlordsWithVehicles.forEach((landlord: typeof landlordsWithVehicles[number]) => {
+      const vehicleCount = landlord.Listing.length;
+      if (vehicleCount === 1) {
+        breakdownData["1 Fahrzeug"]++;
+      } else if (vehicleCount >= 2 && vehicleCount <= 3) {
+        breakdownData["2-3 Fahrzeuge"]++;
+      } else if (vehicleCount >= 4 && vehicleCount <= 10) {
+        breakdownData["4-10 Fahrzeuge"]++;
+      } else if (vehicleCount > 10) {
+        breakdownData["Über 10 Fahrzeuge"]++;
+      }
+    });
+
+    vehiclesBreakdown = Object.entries(breakdownData)
+      .map(([name, value]) => ({ name, value }))
+      .filter((item) => item.value > 0); // Nur Kategorien mit Vermietern anzeigen
 
     // Newsletter-Abonnenten Statistiken
     const confirmedSubscribersCount = await prisma.newsletterSubscriber.count({
@@ -389,6 +454,28 @@ export default async function DashboardPage() {
               </CardHeader>
               <CardContent>
                 {topLandlords && <LandlordsRanking landlords={topLandlords} />}
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Top Vermieter nach Fahrzeugbestand</CardTitle>
+                <CardDescription>Vermieter mit den meisten Wohnmobilen</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {topLandlordsByVehicles && <LandlordsVehiclesRanking landlords={topLandlordsByVehicles} />}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Verteilung nach Fahrzeuganzahl</CardTitle>
+                <CardDescription>Breakdown der Vermieter nach Anzahl ihrer Wohnmobile</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {vehiclesBreakdown && <VehiclesBreakdownChart data={vehiclesBreakdown} />}
               </CardContent>
             </Card>
           </div>

@@ -41,12 +41,13 @@ type ListingWithRelations = Listing & {
 export default async function ListingsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; status?: string }>;
+  searchParams: Promise<{ q?: string; status?: string; landlord?: string }>;
 }) {
   const user = await requireAuth();
   const params = await searchParams;
   const q = (params?.q || "").trim();
   const status = params?.status;
+  const landlordId = params?.landlord;
 
   // Baue WHERE-Bedingung auf
   const whereConditions: any[] = [];
@@ -71,6 +72,11 @@ export default async function ListingsPage({
     whereConditions.push({ published: true });
   } else if (status === "draft") {
     whereConditions.push({ published: false });
+  }
+
+  // Vermieter-Filter (nur für ADMIN)
+  if (user.role === "ADMIN" && landlordId) {
+    whereConditions.push({ ownerId: landlordId });
   }
 
   // Kombiniere alle Bedingungen
@@ -131,6 +137,24 @@ export default async function ListingsPage({
   let vehicleLimitInfo = null;
   if (user.role === "LANDLORD") {
     vehicleLimitInfo = await checkVehicleLimit(user.id);
+  }
+
+  // Hole alle Vermieter für Filter (nur für ADMIN)
+  let landlords = null;
+  if (user.role === "ADMIN") {
+    landlords = await prisma.user.findMany({
+      where: {
+        role: "LANDLORD",
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+      orderBy: {
+        name: "asc",
+      },
+    });
   }
 
   // Zähle alle Listings des Users (unabhängig von Filtern)
@@ -243,11 +267,26 @@ export default async function ListingsPage({
               <SelectItem value="draft">Entwurf</SelectItem>
             </SelectContent>
           </Select>
+          {user.role === "ADMIN" && landlords && (
+            <Select name="landlord" defaultValue={landlordId || "all"}>
+              <SelectTrigger className="w-full sm:w-[200px]">
+                <SelectValue placeholder="Vermieter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle Vermieter</SelectItem>
+                {landlords.map((landlord: { id: string; name: string | null; email: string }) => (
+                  <SelectItem key={landlord.id} value={landlord.id}>
+                    {landlord.name || landlord.email}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
           <Button type="submit" variant="outline">
             <Search className="mr-2 h-4 w-4" />
             Suchen
           </Button>
-          {(q || status) && (
+          {(q || status || landlordId) && (
             <Link href="/dashboard/listings">
               <Button type="button" variant="ghost">
                 Zurücksetzen
