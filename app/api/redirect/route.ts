@@ -14,11 +14,14 @@ export async function GET(request: Request) {
     });
 
     if (!redirect) {
-      return NextResponse.json({ found: false }, { status: 404 });
+      // 404 ist hier normal - bedeutet einfach "kein Redirect vorhanden"
+      // Verwende 200 statt 404, um Logs zu reduzieren
+      return NextResponse.json({ found: false }, { status: 200 });
     }
 
     return NextResponse.json({ found: true, toPath: redirect.toPath });
   } catch (err) {
+    console.error("Redirect lookup error:", err);
     return NextResponse.json({ error: "server error" }, { status: 500 });
   }
 }
