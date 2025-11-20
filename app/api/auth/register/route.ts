@@ -89,7 +89,8 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { 
         message: "Registrierung erfolgreich. Bitte bestätige deine E-Mail-Adresse.", 
-        requiresVerification: true 
+        requiresVerification: true,
+        userId: user.id
       },
       { status: 201 }
     );

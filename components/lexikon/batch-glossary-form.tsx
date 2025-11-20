@@ -48,6 +48,11 @@ export function BatchGlossaryForm() {
       return;
     }
 
+    if (termList.length > 10) {
+      setError(`Zu viele Begriffe. Maximum sind 10 Begriffe pro Batch. Bitte teilen Sie die Liste auf.`);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     setResults([]);
@@ -59,6 +64,13 @@ export function BatchGlossaryForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ terms: termList }),
       });
+
+      // Bei 504 Timeout-Fehler spezielle Behandlung
+      if (response.status === 504) {
+        setError("Die Verarbeitung hat zu lange gedauert (Timeout). Einige Begriffe wurden möglicherweise bereits erstellt. Bitte prüfen Sie das Lexikon.");
+        setIsLoading(false);
+        return;
+      }
 
       const data = await response.json();
 
@@ -72,7 +84,13 @@ export function BatchGlossaryForm() {
       setIsComplete(true);
       setIsLoading(false);
     } catch (err) {
-      setError("Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.");
+      // Bei Timeout-Fehlern (504) informieren, dass möglicherweise einige Begriffe bereits erstellt wurden
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      if (errorMessage.includes('504') || errorMessage.includes('timeout')) {
+        setError("Die Verarbeitung hat zu lange gedauert (Timeout). Einige Begriffe wurden möglicherweise bereits erstellt. Bitte prüfen Sie das Lexikon.");
+      } else {
+        setError("Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.");
+      }
       setIsLoading(false);
     }
   };
@@ -117,6 +135,11 @@ export function BatchGlossaryForm() {
             />
             <p className="text-sm text-muted-foreground">
               {terms.split("\n").filter((t) => t.trim().length > 0).length} Begriff(e) erkannt
+              {terms.split("\n").filter((t) => t.trim().length > 0).length > 10 && (
+                <span className="text-destructive ml-2">
+                  ⚠️ Maximum sind 10 Begriffe pro Batch. Bitte teilen Sie die Liste auf.
+                </span>
+              )}
             </p>
           </div>
 
@@ -148,13 +171,35 @@ export function BatchGlossaryForm() {
 
           {isComplete && (
             <div className="space-y-4">
-              <div className="rounded-md bg-muted p-4">
+              <div className={`rounded-md p-4 ${
+                successCount > 0 && errorCount === 0
+                  ? "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
+                  : successCount > 0
+                  ? "bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800"
+                  : "bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800"
+              }`}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium">
-                      Verarbeitung abgeschlossen
+                    <p className={`font-medium ${
+                      successCount > 0 && errorCount === 0
+                        ? "text-green-800 dark:text-green-200"
+                        : successCount > 0
+                        ? "text-yellow-800 dark:text-yellow-200"
+                        : "text-red-800 dark:text-red-200"
+                    }`}>
+                      {successCount > 0 && errorCount === 0
+                        ? "✓ Alle Begriffe erfolgreich erstellt!"
+                        : successCount > 0
+                        ? "⚠ Verarbeitung teilweise erfolgreich"
+                        : "✗ Verarbeitung fehlgeschlagen"}
                     </p>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className={`text-sm mt-1 ${
+                      successCount > 0 && errorCount === 0
+                        ? "text-green-700 dark:text-green-300"
+                        : successCount > 0
+                        ? "text-yellow-700 dark:text-yellow-300"
+                        : "text-red-700 dark:text-red-300"
+                    }`}>
                       {successCount} erfolgreich, {errorCount} Fehler
                     </p>
                   </div>

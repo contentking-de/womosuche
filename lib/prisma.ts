@@ -20,8 +20,10 @@ function getPrismaClient(): PrismaClientType {
       // We check by trying to access the model's update method signature
       const inquiryModel = (globalForPrisma.prisma as any).inquiry;
       const hasNewFields = inquiryModel && typeof inquiryModel.update === 'function';
+      // Check if subscription model exists
+      const hasSubscription = typeof (globalForPrisma.prisma as any).subscription !== 'undefined';
       
-      if (!hasOutreachPlace || !hasNewFields) {
+      if (!hasOutreachPlace || !hasNewFields || !hasSubscription) {
         console.log("Prisma Client missing models or fields, creating new instance...");
         // Disconnect existing client (fire and forget)
         if (typeof (globalForPrisma.prisma as any).$disconnect === 'function') {

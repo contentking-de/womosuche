@@ -20,6 +20,7 @@ const listingSchema = z.object({
   equipment: z.any().optional(), // JSON-Feld für strukturierte Ausstattungsdaten
   published: z.boolean().default(false),
   ownerId: z.string().optional(),
+  imageUrls: z.array(z.string().url()).optional(), // URLs von hochgeladenen Bildern
 });
 
 async function generateListingDescription(data: {
@@ -231,22 +232,6 @@ export async function POST(request: Request) {
 
     const validatedData = listingSchema.parse(body);
 
-    // Generiere eindeutigen Slug
-    const slug = await generateUniqueSlug(
-      validatedData.title,
-      async (slug) => {
-        const existing = await prisma.listing.findUnique({
-          where: { slug },
-        });
-        return !existing;
-      }
-    );
-
-    // Geocode Location (im Hintergrund, blockiert nicht die Antwort)
-    const coordinates = await geocodeLocation(validatedData.location).catch(
-      () => null
-    );
-
     // Bestimme ownerId: Admin kann ownerId setzen, sonst aktueller User
     let finalOwnerId = session.user.id;
     if (session.user.role === "ADMIN" && validatedData.ownerId) {
@@ -262,6 +247,35 @@ export async function POST(request: Request) {
       }
       finalOwnerId = validatedData.ownerId;
     }
+
+    // Prüfe Fahrzeug-Limit für LANDLORD (nicht für ADMIN)
+    if (session.user.role === "LANDLORD") {
+      const { checkVehicleLimit } = await import("@/lib/subscription-limits");
+      const limitCheck = await checkVehicleLimit(finalOwnerId);
+      
+      if (!limitCheck.canCreate) {
+        return NextResponse.json(
+          { error: limitCheck.reason || "Fahrzeug-Limit erreicht" },
+          { status: 403 }
+        );
+      }
+    }
+
+    // Generiere eindeutigen Slug
+    const slug = await generateUniqueSlug(
+      validatedData.title,
+      async (slug) => {
+        const existing = await prisma.listing.findUnique({
+          where: { slug },
+        });
+        return !existing;
+      }
+    );
+
+    // Geocode Location (im Hintergrund, blockiert nicht die Antwort)
+    const coordinates = await geocodeLocation(validatedData.location).catch(
+      () => null
+    );
 
     // LANDLORDS können nur Entwürfe erstellen - published immer false setzen
     const finalPublished = session.user.role === "ADMIN" 
@@ -284,6 +298,18 @@ export async function POST(request: Request) {
         updatedAt: now,
       },
     });
+
+    // Speichere hochgeladene Bilder in der Datenbank
+    if (validatedData.imageUrls && validatedData.imageUrls.length > 0) {
+      await prisma.image.createMany({
+        data: validatedData.imageUrls.map((url) => ({
+          id: randomUUID(),
+          listingId: listing.id,
+          url,
+          alt: validatedData.title,
+        })),
+      });
+    }
 
     // Sende Benachrichtigung an alle Admins, wenn ein LANDLORD ein Wohnmobil erstellt hat
     if (session.user.role === "LANDLORD") {

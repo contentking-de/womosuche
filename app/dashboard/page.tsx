@@ -7,6 +7,8 @@ import { List, MessageSquare, Plus, Users, TrendingUp, TrendingDown } from "luci
 import { InquiriesChart } from "@/components/dashboard/inquiries-chart";
 import { LandlordsRanking } from "@/components/dashboard/landlords-ranking";
 import { NewsletterSubscribersChart } from "@/components/dashboard/newsletter-subscribers-chart";
+import { SubscriptionCard } from "@/components/dashboard/subscription-card";
+import { NewListingButton } from "@/components/listings/new-listing-button";
 
 export default async function DashboardPage() {
   const user = await requireAuth();
@@ -72,6 +74,25 @@ export default async function DashboardPage() {
   ]);
 
   const [listingsCount, inquiriesCount] = stats;
+
+  // Lade Subscription für LANDLORD
+  let subscription = null;
+  if (user.role === "LANDLORD") {
+    subscription = await prisma.subscription.findUnique({
+      where: { userId: user.id },
+    });
+    
+    // Debug: Log für Subscription-Status
+    if (!subscription) {
+      console.log(`[Dashboard] Keine Subscription gefunden für User ${user.id} (${user.email})`);
+    } else {
+      console.log(`[Dashboard] Subscription gefunden:`, {
+        userId: subscription.userId,
+        status: subscription.status,
+        priceId: subscription.stripePriceId,
+      });
+    }
+  }
 
   // Zusätzliche Statistiken für ADMIN
   let landlordsStats = null;
@@ -301,12 +322,20 @@ export default async function DashboardPage() {
             <CardDescription>Häufig verwendete Aktionen</CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/dashboard/listings/new">
-              <Button className="mt-4 w-full">
-                <Plus className="mr-2 h-4 w-4" />
-                Neues Wohnmobil anlegen
-              </Button>
-            </Link>
+            {user.role === "LANDLORD" ? (
+              <NewListingButton 
+                userId={user.id} 
+                userRole={user.role} 
+                className="mt-4 w-full"
+              />
+            ) : (
+              <Link href="/dashboard/listings/new">
+                <Button className="mt-4 w-full">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Neues Wohnmobil anlegen
+                </Button>
+              </Link>
+            )}
           </CardContent>
         </Card>
 
@@ -342,6 +371,13 @@ export default async function DashboardPage() {
         )}
 
       </div>
+
+      {/* Subscription-Anzeige für LANDLORD */}
+      {user.role === "LANDLORD" && (
+        <div className="mt-4">
+          <SubscriptionCard subscription={subscription} currentVehiclesCount={listingsCount} />
+        </div>
+      )}
 
       {/* Admin-spezifische Statistiken */}
       {user.role === "ADMIN" && landlordsStats && (

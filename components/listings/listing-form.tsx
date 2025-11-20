@@ -138,15 +138,17 @@ interface ListingFormProps {
   userRole?: "ADMIN" | "LANDLORD" | "EDITOR";
   ownerId?: string;
   availableUsers?: User[];
+  disabled?: boolean;
 }
 
-export function ListingForm({ listing, userRole, ownerId: initialOwnerId, availableUsers = [] }: ListingFormProps) {
+export function ListingForm({ listing, userRole, ownerId: initialOwnerId, availableUsers = [], disabled = false }: ListingFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [showSpecialCharWarning, setShowSpecialCharWarning] = useState(false);
+  const [uploadedImages, setUploadedImages] = useState<Array<{ url: string }>>([]);
 
   const {
     register,
@@ -236,10 +238,16 @@ export function ListingForm({ listing, userRole, ownerId: initialOwnerId, availa
       const url = listing ? `/api/listings/${listing.id}` : "/api/listings";
       const method = listing ? "PUT" : "POST";
 
+      // Füge hochgeladene Bilder-URLs hinzu (nur bei neuen Listings)
+      const requestBody = {
+        ...data,
+        ...(listing ? {} : { imageUrls: uploadedImages.map(img => img.url) }),
+      };
+
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(requestBody),
       });
 
       const result = await response.json();
@@ -453,6 +461,9 @@ export function ListingForm({ listing, userRole, ownerId: initialOwnerId, availa
             <ImageUpload
               listingId={listing?.id}
               existingImages={listing?.images || []}
+              onImagesChange={(images) => {
+                setUploadedImages(images);
+              }}
             />
             <p className="text-sm text-muted-foreground">
               Laden Sie Bilder Ihres Wohnmobils hoch. Sie können später weitere hinzufügen.
@@ -520,7 +531,7 @@ export function ListingForm({ listing, userRole, ownerId: initialOwnerId, availa
           )}
 
           <div className="flex gap-4">
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading || disabled}>
               {isLoading ? "Wird gespeichert..." : listing ? "Aktualisieren" : "Erstellen"}
             </Button>
             <Button

@@ -26,6 +26,10 @@ import { de } from "date-fns/locale";
 import { DeleteListingButton } from "@/components/listings/delete-listing-button";
 import { GeocodeMissingButton } from "@/components/listings/geocode-missing-button";
 import { PublishListingButton } from "@/components/listings/publish-listing-button";
+import { NewListingButton } from "@/components/listings/new-listing-button";
+import { checkVehicleLimit } from "@/lib/subscription-limits";
+import { Card, CardContent } from "@/components/ui/card";
+import { Car } from "lucide-react";
 import type { Listing } from "@prisma/client";
 
 type ListingWithRelations = Listing & {
@@ -123,23 +127,88 @@ export default async function ListingsPage({
     },
   });
 
+  // Hole Vehicle-Limit für LANDLORD
+  let vehicleLimitInfo = null;
+  if (user.role === "LANDLORD") {
+    vehicleLimitInfo = await checkVehicleLimit(user.id);
+  }
+
+  // Zähle alle Listings des Users (unabhängig von Filtern)
+  const totalListingsCount = user.role === "ADMIN" 
+    ? await prisma.listing.count()
+    : await prisma.listing.count({
+        where: { ownerId: user.id },
+      });
+
   return (
     <div>
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
+      <div className="mb-6">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          {/* Überschrift */}
+          <div className="flex-shrink-0">
             <h1 className="text-3xl font-bold">Wohnmobile</h1>
             <p className="mt-2 text-muted-foreground">
               Verwalten Sie Ihre Wohnmobile
             </p>
           </div>
-          <Link href="/dashboard/listings/new">
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Neues Wohnmobil
-            </Button>
-          </Link>
+
+          {/* Vehicle-Limit Anzeige für LANDLORD - zwischen Überschrift und Buttons */}
+          {user.role === "LANDLORD" && vehicleLimitInfo && (
+            <Card className="flex-1 min-w-[200px] max-w-[400px]">
+              <CardContent className="py-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Car className="h-4 w-4 text-primary" />
+                    <div>
+                      <p className="text-sm font-medium">
+                        Wohnmobile im Plan enthalten
+                      </p>
+                      {vehicleLimitInfo.planName && (
+                        <p className="text-xs text-muted-foreground">
+                          {vehicleLimitInfo.planName} Plan
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    {vehicleLimitInfo.maxCount === null ? (
+                      <p className="text-xl font-bold text-foreground">
+                        {totalListingsCount} / ∞
+                      </p>
+                    ) : (
+                      <p className={`text-xl font-bold ${
+                        totalListingsCount >= vehicleLimitInfo.maxCount 
+                          ? "text-red-600" 
+                          : totalListingsCount >= vehicleLimitInfo.maxCount * 0.8 
+                          ? "text-yellow-600" 
+                          : "text-foreground"
+                      }`}>
+                        {totalListingsCount} / {vehicleLimitInfo.maxCount}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Buttons */}
+          <div className="flex-shrink-0">
+            {user.role === "LANDLORD" ? (
+              <NewListingButton userId={user.id} userRole={user.role} />
+            ) : (
+              <Link href="/dashboard/listings/new">
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Neues Wohnmobil
+                </Button>
+              </Link>
+            )}
+          </div>
         </div>
+      </div>
+
+      <div className="mb-8">
 
         {/* Such- und Filter-Bereich */}
         <form action="/dashboard/listings" method="get" className="flex flex-col sm:flex-row gap-3">
@@ -218,11 +287,20 @@ export default async function ListingsPage({
               <TableRow>
                 <TableCell colSpan={user.role === "ADMIN" ? 9 : 8} className="text-center py-8">
                   <p className="text-muted-foreground">Noch keine Wohnmobile vorhanden</p>
-                  <Link href="/dashboard/listings/new">
-                    <Button variant="outline" className="mt-4">
-                      Erstes Wohnmobil anlegen
-                    </Button>
-                  </Link>
+                  {user.role === "LANDLORD" ? (
+                    <NewListingButton 
+                      userId={user.id} 
+                      userRole={user.role} 
+                      variant="outline"
+                      className="mt-4"
+                    />
+                  ) : (
+                    <Link href="/dashboard/listings/new">
+                      <Button variant="outline" className="mt-4">
+                        Erstes Wohnmobil anlegen
+                      </Button>
+                    </Link>
+                  )}
                 </TableCell>
               </TableRow>
             ) : (

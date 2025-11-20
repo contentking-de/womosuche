@@ -12,6 +12,7 @@ import {
   Users,
   Mail,
   Send,
+  Receipt,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -81,20 +82,28 @@ export default async function DashboardLayout({
             <p className="text-sm text-muted-foreground">{user.email}</p>
           </div>
           <nav className="flex-1 space-y-1 p-4">
-            {user.role !== "EDITOR" && navItems.map((item) => (
-              <Link key={item.href} href={item.href}>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start"
-                  asChild
-                >
-                  <span>
-                    <item.icon className="mr-2 h-4 w-4" />
-                    {item.title}
-                  </span>
-                </Button>
-              </Link>
-            ))}
+            {user.role !== "EDITOR" && navItems
+              .filter((item) => {
+                // Rechnungen nur für LANDLORDs anzeigen
+                if (item.href === "/dashboard/rechnungen" && user.role !== "LANDLORD") {
+                  return false;
+                }
+                return true;
+              })
+              .map((item) => (
+                <Link key={item.href} href={item.href}>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    asChild
+                  >
+                    <span>
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {item.title}
+                    </span>
+                  </Button>
+                </Link>
+              ))}
             {(user.role === "ADMIN" || user.role === "EDITOR") && (
               <>
                 <div className="my-4 border-t" />
@@ -142,6 +151,16 @@ export default async function DashboardLayout({
                 </span>
               </Button>
             </Link>
+            {user.role === "LANDLORD" && (
+              <Link href="/dashboard/rechnungen">
+                <Button variant="ghost" className="w-full justify-start" asChild>
+                  <span>
+                    <Receipt className="mr-2 h-4 w-4" />
+                    Rechnungen
+                  </span>
+                </Button>
+              </Link>
+            )}
           </nav>
         </div>
       </aside>

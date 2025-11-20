@@ -38,6 +38,10 @@ async function generateContent(term: string): Promise<string | null> {
   ].join("\n");
 
   try {
+    // Timeout von 60 Sekunden für OpenAI API-Aufruf
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 Sekunden Timeout
+
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -51,8 +55,12 @@ async function generateContent(term: string): Promise<string | null> {
           { role: "user", content: prompt },
         ],
         temperature: 0.6,
+        max_tokens: 2000, // Begrenze Token-Anzahl für schnellere Antworten
       }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!res.ok) {
       const err = await res.text().catch(() => "");
@@ -69,7 +77,11 @@ async function generateContent(term: string): Promise<string | null> {
 
     return sanitizeAiHtml(raw);
   } catch (error) {
-    console.error(`Error generating content for term "${term}":`, error);
+    if (error instanceof Error && error.name === 'AbortError') {
+      console.error(`OpenAI API timeout for term "${term}"`);
+    } else {
+      console.error(`Error generating content for term "${term}":`, error);
+    }
     return null;
   }
 }
@@ -85,8 +97,9 @@ export async function POST(request: Request) {
     const { terms } = batchSchema.parse(body);
 
     // Begrenze die Anzahl der Begriffe pro Batch, um Timeouts zu vermeiden
-    // Vercel hat ein 300 Sekunden Limit, bei ~10-15 Sekunden pro Begriff sind max 20 Begriffe sicher
-    const MAX_TERMS_PER_BATCH = 20;
+    // Vercel hat ein 300 Sekunden Limit, bei ~30-60 Sekunden pro Begriff (OpenAI API kann langsam sein)
+    // sind max 10 Begriffe sicherer
+    const MAX_TERMS_PER_BATCH = 10;
     if (terms.length > MAX_TERMS_PER_BATCH) {
       return NextResponse.json(
         { 
@@ -104,14 +117,10 @@ export async function POST(request: Request) {
       error?: string;
     }> = [];
 
-    // Verarbeite jeden Begriff sequenziell mit reduziertem Rate-Limiting
+    // Verarbeite jeden Begriff sequenziell ohne zusätzliches Rate-Limiting
+    // OpenAI hat eigene Rate Limits, zusätzliche Wartezeiten sind nicht nötig
     for (let i = 0; i < terms.length; i++) {
       const term = terms[i];
-      
-      // Reduziertes Rate-Limiting: Nur 200ms zwischen Anfragen (OpenAI hat eigene Rate Limits)
-      if (i > 0) {
-        await new Promise((resolve) => setTimeout(resolve, 200));
-      }
       
       try {
         // Prüfe ob Begriff bereits existiert
