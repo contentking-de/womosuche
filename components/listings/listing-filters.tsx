@@ -220,13 +220,15 @@ export function ListingFilters({ brand, location: initialLocation }: ListingFilt
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <Label htmlFor="radius">Umkreis</Label>
+            <Label htmlFor="radius" id="radius-label">Umkreis</Label>
             <span className="text-sm font-medium text-primary">
               {radius} km
             </span>
           </div>
           <Slider
             id="radius"
+            aria-labelledby="radius-label"
+            aria-label={`Umkreis: ${radius} Kilometer`}
             min={1}
             max={200}
             step={1}

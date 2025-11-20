@@ -58,7 +58,7 @@ export function HeroSearch() {
           </div>
           <div className="w-full md:flex-1 flex flex-col gap-1">
             <div className="flex items-center justify-between">
-              <Label htmlFor="radius" className="text-xs font-medium text-gray-700">
+              <Label htmlFor="radius" id="radius-label" className="text-xs font-medium text-gray-700">
                 Umkreis
               </Label>
               <span className="text-xs font-medium text-primary">
@@ -67,6 +67,8 @@ export function HeroSearch() {
             </div>
             <Slider
               id="radius"
+              aria-labelledby="radius-label"
+              aria-label={`Umkreis: ${radius} Kilometer`}
               min={1}
               max={200}
               step={1}

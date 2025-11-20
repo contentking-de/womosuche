@@ -165,32 +165,17 @@ export function TestimonialsSection() {
           </div>
 
           {/* Navigation Buttons */}
-          <div className="flex items-center justify-center gap-4 mt-8">
+          <div className="flex items-center justify-center gap-6 mt-8">
             <Button
               variant="outline"
               size="icon"
               onClick={prevSlide}
               className="rounded-full"
               aria-label="Vorherige Testimonials"
+              disabled={currentIndex === 0}
             >
               <ChevronLeft className="h-5 w-5" />
             </Button>
-            
-            {/* Dots Indicator */}
-            <div className="flex gap-2">
-              {Array.from({ length: maxIndex + 1 }).map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentIndex(index)}
-                  className={`h-2 w-2 rounded-full transition-colors ${
-                    index === currentIndex
-                      ? "bg-primary"
-                      : "bg-muted-foreground/30"
-                  }`}
-                  aria-label={`Gehe zu Seite ${index + 1}`}
-                />
-              ))}
-            </div>
 
             <Button
               variant="outline"
@@ -198,6 +183,7 @@ export function TestimonialsSection() {
               onClick={nextSlide}
               className="rounded-full"
               aria-label="Nächste Testimonials"
+              disabled={currentIndex >= maxIndex}
             >
               <ChevronRight className="h-5 w-5" />
             </Button>
