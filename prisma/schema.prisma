@@ -171,6 +171,10 @@ model User {
   name          String?
   password      String
   role          Role      @default(LANDLORD)
+  street        String?
+  city          String?
+  postalCode    String?
+  country       String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime
   editorProfile Json?

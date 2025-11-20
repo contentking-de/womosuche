@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { requireAuth } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +16,7 @@ import {
   Receipt,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AddressModalWrapper } from "@/components/dashboard/address-modal-wrapper";
 
 export default async function DashboardLayout({
   children,
@@ -22,6 +24,21 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const user = await requireAuth();
+  
+  // Hole User mit Adressfeldern aus der Datenbank
+  const userWithAddress = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      street: true,
+      city: true,
+      postalCode: true,
+      country: true,
+    },
+  });
 
   const navItems = [
     {
@@ -169,6 +186,12 @@ export default async function DashboardLayout({
       <div className="flex-1">
         <div className="container mx-auto px-4 py-8">{children}</div>
       </div>
+
+      {/* Address Modal für LANDLORDS ohne Adresse */}
+      <AddressModalWrapper 
+        userRole={user.role} 
+        hasAddress={!!(userWithAddress?.street && userWithAddress?.city && userWithAddress?.postalCode && userWithAddress?.country)}
+      />
     </div>
   );
 }

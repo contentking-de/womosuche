@@ -42,23 +42,27 @@ export default async function NewListingPage() {
       </div>
 
       {limitCheck && !canCreate && (
-        <div className="mb-6 p-4 border border-destructive/50 rounded-lg bg-destructive/10">
-          <div className="flex flex-col items-start gap-3">
-            <p className="text-sm font-medium text-destructive">
-              Limit erreicht
-            </p>
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>
+            {limitCheck.maxCount === null ? "Kein aktives Abonnement" : "Limit erreicht"}
+          </AlertTitle>
+          <AlertDescription className="space-y-2">
+            {limitCheck.reason && (
+              <p>{limitCheck.reason}</p>
+            )}
             {limitCheck.maxCount !== null && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm">
                 Aktuell: {limitCheck.currentCount} / {limitCheck.maxCount} Fahrzeuge
               </p>
             )}
             <Link href="/dashboard/change-plan">
-              <Button variant="secondary" size="sm">
-                Jetzt upgraden
+              <Button variant="secondary" size="sm" className="mt-2">
+                {limitCheck.maxCount === null ? "Plan auswählen" : "Jetzt upgraden"}
               </Button>
             </Link>
-          </div>
-        </div>
+          </AlertDescription>
+        </Alert>
       )}
 
       {limitCheck && canCreate && limitCheck.maxCount !== null && (

@@ -59,14 +59,26 @@ export async function POST(request: Request) {
           customerId = subscription.stripeCustomerId;
         } catch (error) {
           // Customer existiert nicht mehr in Stripe, erstelle neuen
-          const customer = await stripe.customers.create({
+          const customerData: any = {
             email: user.email,
             name: user.name || undefined,
             metadata: {
               userId: user.id,
             },
             preferred_locales: ["de"],
-          });
+          };
+
+          // Füge Adresse hinzu, falls vorhanden
+          if (user.street && user.city && user.postalCode && user.country) {
+            customerData.address = {
+              line1: user.street,
+              city: user.city,
+              postal_code: user.postalCode,
+              country: user.country,
+            };
+          }
+
+          const customer = await stripe.customers.create(customerData);
           customerId = customer.id;
           
           // Aktualisiere Subscription mit neuer Customer-ID
@@ -79,14 +91,26 @@ export async function POST(request: Request) {
         }
       } else {
         // Keine Customer-ID vorhanden, erstelle neuen Customer
-        const customer = await stripe.customers.create({
+        const customerData: any = {
           email: user.email,
           name: user.name || undefined,
           metadata: {
             userId: user.id,
           },
           preferred_locales: ["de"],
-        });
+        };
+
+        // Füge Adresse hinzu, falls vorhanden
+        if (user.street && user.city && user.postalCode && user.country) {
+          customerData.address = {
+            line1: user.street,
+            city: user.city,
+            postal_code: user.postalCode,
+            country: user.country,
+          };
+        }
+
+        const customer = await stripe.customers.create(customerData);
         customerId = customer.id;
         
         // Erstelle Subscription-Eintrag in DB (falls noch nicht vorhanden)
@@ -118,6 +142,9 @@ export async function POST(request: Request) {
         automatic_tax: {
           enabled: true,
         },
+        customer_update: {
+          address: "auto", // Speichere die im Checkout eingegebene Adresse automatisch beim Customer
+        },
         success_url: `${baseUrl}/dashboard/settings?plan=changed`,
         cancel_url: `${baseUrl}/dashboard/change-plan?plan=canceled`,
         metadata: {
@@ -145,14 +172,26 @@ export async function POST(request: Request) {
       await stripe.customers.retrieve(customerId);
     } catch (error) {
       // Customer existiert nicht mehr, erstelle neuen
-      const customer = await stripe.customers.create({
+      const customerData: any = {
         email: user.email,
         name: user.name || undefined,
         metadata: {
           userId: user.id,
         },
         preferred_locales: ["de"],
-      });
+      };
+
+      // Füge Adresse hinzu, falls vorhanden
+      if (user.street && user.city && user.postalCode && user.country) {
+        customerData.address = {
+          line1: user.street,
+          city: user.city,
+          postal_code: user.postalCode,
+          country: user.country,
+        };
+      }
+
+      const customer = await stripe.customers.create(customerData);
       customerId = customer.id;
       
       // Aktualisiere Subscription mit neuer Customer-ID
@@ -172,6 +211,9 @@ export async function POST(request: Request) {
         locale: "de",
         automatic_tax: {
           enabled: true,
+        },
+        customer_update: {
+          address: "auto", // Speichere die im Checkout eingegebene Adresse automatisch beim Customer
         },
         success_url: `${baseUrl}/dashboard/settings?plan=changed`,
         cancel_url: `${baseUrl}/dashboard/change-plan?plan=canceled`,
@@ -209,6 +251,9 @@ export async function POST(request: Request) {
       locale: "de",
       automatic_tax: {
         enabled: true,
+      },
+      customer_update: {
+        address: "auto", // Speichere die im Checkout eingegebene Adresse automatisch beim Customer
       },
       success_url: `${baseUrl}/dashboard/settings?plan=changed`,
       cancel_url: `${baseUrl}/dashboard/change-plan?plan=canceled`,

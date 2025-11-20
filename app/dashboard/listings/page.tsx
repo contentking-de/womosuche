@@ -160,21 +160,33 @@ export default async function ListingsPage({
                   <div className="flex items-center gap-2">
                     <Car className="h-4 w-4 text-primary" />
                     <div>
-                      <p className="text-sm font-medium">
-                        Wohnmobile im Plan enthalten
-                      </p>
-                      {vehicleLimitInfo.planName && (
-                        <p className="text-xs text-muted-foreground">
-                          {vehicleLimitInfo.planName} Plan
+                      {vehicleLimitInfo.planName ? (
+                        <>
+                          <p className="text-sm font-medium">
+                            Wohnmobile im Plan enthalten
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {vehicleLimitInfo.planName} Plan
+                          </p>
+                        </>
+                      ) : (
+                        <p className="text-sm font-medium text-muted-foreground">
+                          Kein aktives Abonnement
                         </p>
                       )}
                     </div>
                   </div>
                   <div className="text-right">
                     {vehicleLimitInfo.maxCount === null ? (
-                      <p className="text-xl font-bold text-foreground">
-                        {totalListingsCount} / ∞
-                      </p>
+                      vehicleLimitInfo.planName ? (
+                        <p className="text-xl font-bold text-foreground">
+                          {totalListingsCount} / ∞
+                        </p>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          {totalListingsCount} vorhanden
+                        </p>
+                      )
                     ) : (
                       <p className={`text-xl font-bold ${
                         totalListingsCount >= vehicleLimitInfo.maxCount 

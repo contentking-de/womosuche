@@ -15,6 +15,10 @@ const updateUserSchema = z.object({
     referenzen: z.string().optional(),
   }).optional().nullable(),
   profileImage: z.string().url().optional().nullable().or(z.literal("")),
+  street: z.string().min(3).optional().nullable().or(z.literal("")),
+  city: z.string().min(2).optional().nullable().or(z.literal("")),
+  postalCode: z.string().min(4).optional().nullable().or(z.literal("")),
+  country: z.string().min(2).optional().nullable().or(z.literal("")),
 });
 
 export async function GET(
@@ -28,7 +32,7 @@ export async function GET(
   }
   const user = await prisma.user.findUnique({
     where: { id },
-    select: { id: true, name: true, email: true, role: true, editorProfile: true, profileImage: true, createdAt: true },
+    select: { id: true, name: true, email: true, role: true, editorProfile: true, profileImage: true, createdAt: true, street: true, city: true, postalCode: true, country: true },
   });
   if (!user) {
     return NextResponse.json({ error: "Benutzer nicht gefunden" }, { status: 404 });
@@ -98,6 +102,20 @@ export async function PUT(
       updateData.profileImage = data.profileImage;
     }
     
+    // Adressfelder setzen, wenn sie übergeben werden
+    if (data.street !== undefined) {
+      updateData.street = data.street || null;
+    }
+    if (data.city !== undefined) {
+      updateData.city = data.city || null;
+    }
+    if (data.postalCode !== undefined) {
+      updateData.postalCode = data.postalCode || null;
+    }
+    if (data.country !== undefined) {
+      updateData.country = data.country || null;
+    }
+    
     // Wenn Rolle von EDITOR zu etwas anderem geändert wird, Editor-Profil und Profilbild löschen (nur für ADMINs)
     if (currentUser?.role === "EDITOR" && data.role && data.role !== "EDITOR" && session.user.role === "ADMIN") {
       updateData.editorProfile = null;
@@ -107,8 +125,38 @@ export async function PUT(
     const updated = await prisma.user.update({
       where: { id },
       data: updateData,
-      select: { id: true, name: true, email: true, role: true, editorProfile: true, profileImage: true, createdAt: true },
+      select: { id: true, name: true, email: true, role: true, editorProfile: true, profileImage: true, createdAt: true, street: true, city: true, postalCode: true, country: true },
     });
+
+    // Wenn User ein LANDLORD ist und eine Stripe Customer-ID hat, aktualisiere auch die Adresse bei Stripe
+    if (session.user.role === "LANDLORD" && (data.street !== undefined || data.city !== undefined || data.postalCode !== undefined || data.country !== undefined)) {
+      const subscription = await prisma.subscription.findUnique({
+        where: { userId: id },
+      });
+
+      if (subscription?.stripeCustomerId) {
+        try {
+          const { stripe } = await import("@/lib/stripe");
+          const addressData: any = {};
+          
+          if (data.street !== undefined) addressData.line1 = data.street || undefined;
+          if (data.city !== undefined) addressData.city = data.city || undefined;
+          if (data.postalCode !== undefined) addressData.postal_code = data.postalCode || undefined;
+          if (data.country !== undefined) addressData.country = data.country || undefined;
+
+          // Nur aktualisieren, wenn mindestens ein Feld gesetzt ist
+          if (Object.keys(addressData).length > 0) {
+            await stripe.customers.update(subscription.stripeCustomerId, {
+              address: addressData,
+            });
+          }
+        } catch (stripeError) {
+          console.error("Error updating Stripe customer address:", stripeError);
+          // Nicht kritisch, weiter machen
+        }
+      }
+    }
+
     return NextResponse.json(updated);
   } catch (error) {
     if (error instanceof z.ZodError) {

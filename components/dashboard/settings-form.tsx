@@ -23,6 +23,10 @@ const schema = z.object({
   editorSchwerpunkt: z.string().optional(),
   editorReferenzen: z.string().optional(),
   profileImage: z.union([z.string().url(), z.literal(""), z.null()]).optional(),
+  street: z.string().min(3, "Straße und Hausnummer ist erforderlich").optional().or(z.literal("")),
+  city: z.string().min(2, "Stadt ist erforderlich").optional().or(z.literal("")),
+  postalCode: z.string().min(4, "Postleitzahl ist erforderlich").optional().or(z.literal("")),
+  country: z.string().min(2, "Land ist erforderlich").optional().or(z.literal("")),
 }).refine((data) => {
   if (data.password && data.password.length > 0) {
     return data.password === data.confirmPassword;
@@ -43,6 +47,10 @@ interface SettingsFormProps {
     role: "ADMIN" | "LANDLORD" | "EDITOR";
     editorProfile?: { biographie?: string; schwerpunkt?: string; referenzen?: string } | null;
     profileImage?: string | null;
+    street?: string | null;
+    city?: string | null;
+    postalCode?: string | null;
+    country?: string | null;
   };
 }
 
@@ -77,6 +85,10 @@ export function SettingsForm({ user }: SettingsFormProps) {
         ? String(user.editorProfile.referenzen || "") 
         : "",
       profileImage: user?.profileImage || "",
+      street: user?.street ?? "",
+      city: user?.city ?? "",
+      postalCode: user?.postalCode ?? "",
+      country: user?.country ?? "DE",
     },
   });
 
@@ -131,6 +143,10 @@ export function SettingsForm({ user }: SettingsFormProps) {
       const payload: any = {
         name: data.name || null,
         email: data.email,
+        street: data.street || null,
+        city: data.city || null,
+        postalCode: data.postalCode || null,
+        country: data.country || null,
       };
       
       // Profilbild nur senden, wenn es gesetzt wurde
@@ -364,6 +380,76 @@ export function SettingsForm({ user }: SettingsFormProps) {
               </div>
             </>
           )}
+
+          <Separator />
+
+          {/* Rechnungsadresse */}
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-lg font-semibold">Rechnungsadresse</h3>
+              <p className="text-sm text-muted-foreground">
+                Diese Adresse wird für die Steuerberechnung verwendet.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="street">Straße und Hausnummer</Label>
+              <Input
+                id="street"
+                type="text"
+                placeholder="Musterstraße 123"
+                {...register("street")}
+                disabled={submitting}
+              />
+              {errors.street && (
+                <p className="text-sm text-destructive">{errors.street.message}</p>
+              )}
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="postalCode">Postleitzahl</Label>
+                <Input
+                  id="postalCode"
+                  type="text"
+                  placeholder="12345"
+                  {...register("postalCode")}
+                  disabled={submitting}
+                />
+                {errors.postalCode && (
+                  <p className="text-sm text-destructive">{errors.postalCode.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="city">Stadt</Label>
+                <Input
+                  id="city"
+                  type="text"
+                  placeholder="Berlin"
+                  {...register("city")}
+                  disabled={submitting}
+                />
+                {errors.city && (
+                  <p className="text-sm text-destructive">{errors.city.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="country">Land</Label>
+              <Input
+                id="country"
+                type="text"
+                placeholder="DE"
+                {...register("country", { value: "DE" })}
+                disabled={submitting}
+              />
+              {errors.country && (
+                <p className="text-sm text-destructive">{errors.country.message}</p>
+              )}
+            </div>
+          </div>
 
           <Separator />
 

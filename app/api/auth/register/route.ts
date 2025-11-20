@@ -9,6 +9,10 @@ const registerSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
   password: z.string().min(6),
+  street: z.string().min(3).optional(),
+  city: z.string().min(2).optional(),
+  postalCode: z.string().min(4).optional(),
+  country: z.string().min(2).optional(),
 });
 
 export async function POST(request: Request) {
@@ -44,6 +48,10 @@ export async function POST(request: Request) {
         email: validatedData.email,
         password: hashedPassword,
         role: "LANDLORD",
+        street: validatedData.street || null,
+        city: validatedData.city || null,
+        postalCode: validatedData.postalCode || null,
+        country: validatedData.country || null,
         updatedAt: new Date(),
         emailVerified: null, // Noch nicht verifiziert
       },

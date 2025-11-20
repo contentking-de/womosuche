@@ -24,6 +24,10 @@ export default async function SettingsPage({
       role: true,
       editorProfile: true,
       profileImage: true,
+      street: true,
+      city: true,
+      postalCode: true,
+      country: true,
     },
   });
 

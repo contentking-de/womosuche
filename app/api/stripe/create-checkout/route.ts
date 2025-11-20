@@ -42,26 +42,50 @@ export async function POST(request: Request) {
     if (existingSubscription) {
       customerId = existingSubscription.stripeCustomerId;
     } else {
-      // Erstelle neuen Stripe Customer mit deutscher Sprache
-      const customer = await stripe.customers.create({
+      // Erstelle neuen Stripe Customer mit deutscher Sprache und Adresse
+      const customerData: any = {
         email: user.email,
         name: user.name || undefined,
         metadata: {
           userId: user.id,
         },
         preferred_locales: ["de"], // Setze Sprache auf Deutsch
-      });
+      };
+
+      // Füge Adresse hinzu, falls vorhanden
+      if (user.street && user.city && user.postalCode && user.country) {
+        customerData.address = {
+          line1: user.street,
+          city: user.city,
+          postal_code: user.postalCode,
+          country: user.country,
+        };
+      }
+
+      const customer = await stripe.customers.create(customerData);
       customerId = customer.id;
     }
     
-    // Aktualisiere bestehenden Customer mit deutscher Sprache (falls noch nicht gesetzt)
+    // Aktualisiere bestehenden Customer mit deutscher Sprache und Adresse (falls noch nicht gesetzt)
     if (existingSubscription) {
       try {
-        await stripe.customers.update(existingSubscription.stripeCustomerId, {
+        const updateData: any = {
           preferred_locales: ["de"],
-        });
+        };
+
+        // Füge Adresse hinzu, falls vorhanden
+        if (user.street && user.city && user.postalCode && user.country) {
+          updateData.address = {
+            line1: user.street,
+            city: user.city,
+            postal_code: user.postalCode,
+            country: user.country,
+          };
+        }
+
+        await stripe.customers.update(existingSubscription.stripeCustomerId, updateData);
       } catch (error) {
-        console.error("Error updating customer locale:", error);
+        console.error("Error updating customer locale/address:", error);
         // Nicht kritisch, weiter machen
       }
     }
@@ -82,6 +106,9 @@ export async function POST(request: Request) {
       locale: "de", // Setze Sprache auf Deutsch für Checkout
       automatic_tax: {
         enabled: true,
+      },
+      customer_update: {
+        address: "auto", // Speichere die im Checkout eingegebene Adresse automatisch beim Customer
       },
       success_url: `${baseUrl}/dashboard?subscription=success`,
       cancel_url: `${baseUrl}/register?subscription=canceled`,

@@ -42,8 +42,13 @@ export function NewListingButton({
       })
       .catch((err) => {
         console.error("Error checking limit:", err);
-        // Bei Fehler erlauben wir das Anlegen (Fail-Open)
-        setLimitCheck({ canCreate: true, currentCount: 0, maxCount: null });
+        // Bei Fehler erlauben wir das Anlegen NICHT (Fail-Closed für Sicherheit)
+        setLimitCheck({ 
+          canCreate: false, 
+          currentCount: 0, 
+          maxCount: null,
+          reason: "Fehler beim Prüfen des Limits. Bitte versuche es erneut oder kontaktiere den Support."
+        });
       })
       .finally(() => {
         setLoading(false);

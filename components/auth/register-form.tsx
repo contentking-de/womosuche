@@ -20,9 +20,10 @@ const registerSchema = z.object({
   password: z.string().min(6, "Passwort muss mindestens 6 Zeichen lang sein"),
   confirmPassword: z.string(),
   priceId: z.string().min(1, "Bitte wählen Sie einen Plan aus"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwörter stimmen nicht überein",
-  path: ["confirmPassword"],
+  street: z.string().min(3, "Straße und Hausnummer ist erforderlich"),
+  city: z.string().min(2, "Stadt ist erforderlich"),
+  postalCode: z.string().min(4, "Postleitzahl ist erforderlich"),
+  country: z.string().min(2, "Land ist erforderlich"),
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
@@ -95,6 +96,10 @@ export function RegisterForm() {
           name: data.name,
           email: data.email,
           password: data.password,
+          street: data.street,
+          city: data.city,
+          postalCode: data.postalCode,
+          country: data.country || "DE",
         }),
       });
 
@@ -232,6 +237,69 @@ export function RegisterForm() {
             {errors.confirmPassword && (
               <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
             )}
+          </div>
+
+          {/* Adressfelder */}
+          <div className="space-y-4 border-t pt-4">
+            <h3 className="text-sm font-semibold">Rechnungsadresse</h3>
+            
+            <div className="space-y-2">
+              <Label htmlFor="street">Straße und Hausnummer *</Label>
+              <Input
+                id="street"
+                type="text"
+                placeholder="Musterstraße 123"
+                {...register("street")}
+                disabled={isLoading}
+              />
+              {errors.street && (
+                <p className="text-sm text-destructive">{errors.street.message}</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="postalCode">Postleitzahl *</Label>
+                <Input
+                  id="postalCode"
+                  type="text"
+                  placeholder="12345"
+                  {...register("postalCode")}
+                  disabled={isLoading}
+                />
+                {errors.postalCode && (
+                  <p className="text-sm text-destructive">{errors.postalCode.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="city">Stadt *</Label>
+                <Input
+                  id="city"
+                  type="text"
+                  placeholder="Berlin"
+                  {...register("city")}
+                  disabled={isLoading}
+                />
+                {errors.city && (
+                  <p className="text-sm text-destructive">{errors.city.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="country">Land *</Label>
+              <Input
+                id="country"
+                type="text"
+                placeholder="DE"
+                {...register("country", { value: "DE" })}
+                disabled={isLoading}
+              />
+              {errors.country && (
+                <p className="text-sm text-destructive">{errors.country.message}</p>
+              )}
+            </div>
           </div>
 
           {/* Subscription Plan Auswahl */}
