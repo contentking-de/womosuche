@@ -75,7 +75,27 @@ export function NewListingButton({
     );
   }
 
-  if (limitCheck && !limitCheck.canCreate) {
+  // Wenn limitCheck null ist (Fehler oder noch nicht geladen), Button deaktivieren
+  if (!limitCheck) {
+    return (
+      <div className="space-y-2">
+        <Button className={className} variant={variant} size={size} disabled>
+          <Plus className="mr-2 h-4 w-4" />
+          Neues Wohnmobil
+        </Button>
+        <Link href="/dashboard/change-plan" className="block">
+          <Button variant="secondary" className="w-full" size={size}>
+            Plan auswählen
+          </Button>
+        </Link>
+        <p className="text-xs text-muted-foreground text-center mt-1">
+          Bitte wähle zuerst einen Plan aus.
+        </p>
+      </div>
+    );
+  }
+
+  if (!limitCheck.canCreate) {
     return (
       <div className="space-y-2">
         <Button className={className} variant={variant} size={size} disabled>

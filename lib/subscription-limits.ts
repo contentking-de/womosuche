@@ -43,6 +43,16 @@ export async function checkVehicleLimit(userId: string): Promise<{
     };
   }
 
+  // Prüfe ob stripePriceId vorhanden ist
+  if (!subscription.stripePriceId) {
+    return {
+      canCreate: false,
+      reason: "Kein aktives Abonnement. Bitte registriere dich für einen Plan.",
+      currentCount,
+      maxCount: null,
+    };
+  }
+
   // Hole Plan-Informationen von Stripe
   try {
     const price = await stripe.prices.retrieve(subscription.stripePriceId, {
@@ -89,12 +99,12 @@ export async function checkVehicleLimit(userId: string): Promise<{
     };
   } catch (error) {
     console.error("Error checking vehicle limit:", error);
-    // Bei Fehler erlauben wir das Anlegen (Fail-Open), aber loggen den Fehler
+    // Bei Fehler erlauben wir das Anlegen NICHT (Fail-Closed für Sicherheit)
     return {
-      canCreate: true,
+      canCreate: false,
       currentCount,
       maxCount: null,
-      reason: "Fehler beim Prüfen des Limits. Bitte versuche es erneut.",
+      reason: "Fehler beim Prüfen des Limits. Bitte versuche es erneut oder kontaktiere den Support.",
     };
   }
 }

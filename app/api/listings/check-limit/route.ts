@@ -40,10 +40,13 @@ export async function GET(request: Request) {
     return NextResponse.json(limitCheck);
   } catch (error) {
     console.error("Error checking vehicle limit:", error);
-    return NextResponse.json(
-      { error: "Fehler beim Prüfen des Limits" },
-      { status: 500 }
-    );
+    // Bei Fehler erlauben wir das Anlegen NICHT (Fail-Closed)
+    return NextResponse.json({
+      canCreate: false,
+      currentCount: 0,
+      maxCount: null,
+      reason: "Fehler beim Prüfen des Limits. Bitte versuche es erneut oder kontaktiere den Support.",
+    });
   }
 }
 
