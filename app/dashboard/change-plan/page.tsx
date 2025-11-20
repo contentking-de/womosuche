@@ -61,8 +61,13 @@ export default function ChangePlanPage() {
   }, []);
 
   const handleChangePlan = async () => {
-    if (!selectedPriceId || selectedPriceId === currentPlanPriceId) {
-      setError("Bitte wähle einen anderen Plan aus");
+    if (!selectedPriceId) {
+      setError("Bitte wähle einen Plan aus");
+      return;
+    }
+    
+    if (selectedPriceId === currentPlanPriceId) {
+      setError("Dieser Plan ist bereits aktiv");
       return;
     }
 
@@ -82,11 +87,11 @@ export default function ChangePlanPage() {
         // Weiterleitung zu Checkout Session für Zahlungsbestätigung
         window.location.href = data.url;
       } else {
-        setError(data.error || "Fehler beim Ändern des Plans");
+        setError(data.error || "Fehler beim Auswählen des Plans");
         setChanging(false);
       }
     } catch (err) {
-      setError("Fehler beim Ändern des Plans");
+      setError("Fehler beim Auswählen des Plans");
       setChanging(false);
     }
   };
@@ -114,9 +119,13 @@ export default function ChangePlanPage() {
             Zurück zu Einstellungen
           </Button>
         </Link>
-        <h1 className="text-3xl font-bold">Plan ändern</h1>
+        <h1 className="text-3xl font-bold">
+          {currentPlanPriceId ? "Plan ändern" : "Plan auswählen"}
+        </h1>
         <p className="mt-2 text-muted-foreground">
-          Wähle einen neuen Plan für dein Abonnement
+          {currentPlanPriceId 
+            ? "Wähle einen neuen Plan für dein Abonnement"
+            : "Wähle einen Plan für dein Abonnement"}
         </p>
       </div>
 
@@ -194,12 +203,17 @@ export default function ChangePlanPage() {
           {changing ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Wird geändert...
+              Wird geladen...
+            </>
+          ) : currentPlanPriceId ? (
+            <>
+              <CheckCircle2 className="mr-2 h-4 w-4" />
+              Plan ändern
             </>
           ) : (
             <>
               <CheckCircle2 className="mr-2 h-4 w-4" />
-              Plan ändern
+              Plan auswählen
             </>
           )}
         </Button>

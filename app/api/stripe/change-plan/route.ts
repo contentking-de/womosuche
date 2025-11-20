@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { randomUUID } from "crypto";
 
 const changePlanSchema = z.object({
   priceId: z.string().min(1, "Price ID ist erforderlich"),
@@ -27,23 +28,163 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { priceId } = changePlanSchema.parse(body);
 
+    // Hole User-Daten für Customer-Erstellung falls nötig
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Benutzer nicht gefunden" },
+        { status: 404 }
+      );
+    }
+
     // Hole aktuelle Subscription
     const subscription = await prisma.subscription.findUnique({
       where: { userId },
     });
 
-    if (!subscription || !subscription.stripeCustomerId || !subscription.stripeSubscriptionId) {
-      return NextResponse.json(
-        { error: "Keine Subscription gefunden" },
-        { status: 404 }
-      );
+    const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+    // Fall 1: Keine Subscription vorhanden - Erstelle neue Subscription
+    if (!subscription || !subscription.stripeCustomerId) {
+      // Erstelle oder hole Stripe Customer
+      let customerId: string;
+      
+      if (subscription?.stripeCustomerId) {
+        // Customer-ID existiert in DB, aber prüfe ob sie in Stripe noch existiert
+        try {
+          await stripe.customers.retrieve(subscription.stripeCustomerId);
+          customerId = subscription.stripeCustomerId;
+        } catch (error) {
+          // Customer existiert nicht mehr in Stripe, erstelle neuen
+          const customer = await stripe.customers.create({
+            email: user.email,
+            name: user.name || undefined,
+            metadata: {
+              userId: user.id,
+            },
+            preferred_locales: ["de"],
+          });
+          customerId = customer.id;
+          
+          // Aktualisiere Subscription mit neuer Customer-ID
+          if (subscription) {
+            await prisma.subscription.update({
+              where: { userId },
+              data: { stripeCustomerId: customerId },
+            });
+          }
+        }
+      } else {
+        // Keine Customer-ID vorhanden, erstelle neuen Customer
+        const customer = await stripe.customers.create({
+          email: user.email,
+          name: user.name || undefined,
+          metadata: {
+            userId: user.id,
+          },
+          preferred_locales: ["de"],
+        });
+        customerId = customer.id;
+        
+        // Erstelle Subscription-Eintrag in DB (falls noch nicht vorhanden)
+        if (!subscription) {
+          await prisma.subscription.create({
+            data: {
+              id: randomUUID(),
+              userId: userId,
+              stripeCustomerId: customerId,
+              stripePriceId: priceId, // Wird später aktualisiert
+              status: "incomplete",
+            },
+          });
+        } else {
+          // Aktualisiere bestehende Subscription mit Customer-ID
+          await prisma.subscription.update({
+            where: { userId },
+            data: { stripeCustomerId: customerId },
+          });
+        }
+      }
+
+      // Erstelle Checkout Session für neue Subscription
+      const checkoutSession = await stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ["card"],
+        mode: "subscription",
+        locale: "de",
+        success_url: `${baseUrl}/dashboard/settings?plan=changed`,
+        cancel_url: `${baseUrl}/dashboard/change-plan?plan=canceled`,
+        metadata: {
+          userId: userId,
+          action: "new_subscription",
+        },
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+      });
+
+      return NextResponse.json({ 
+        url: checkoutSession.url,
+        sessionId: checkoutSession.id,
+      });
     }
 
+    // Fall 2: Subscription existiert mit Customer-ID
+    // Prüfe ob Customer in Stripe noch existiert
+    let customerId = subscription.stripeCustomerId;
+    try {
+      await stripe.customers.retrieve(customerId);
+    } catch (error) {
+      // Customer existiert nicht mehr, erstelle neuen
+      const customer = await stripe.customers.create({
+        email: user.email,
+        name: user.name || undefined,
+        metadata: {
+          userId: user.id,
+        },
+        preferred_locales: ["de"],
+      });
+      customerId = customer.id;
+      
+      // Aktualisiere Subscription mit neuer Customer-ID
+      await prisma.subscription.update({
+        where: { userId },
+        data: { stripeCustomerId: customerId },
+      });
+    }
+
+    // Prüfe ob Subscription aktiv ist
     if (subscription.status !== "active" && subscription.status !== "trialing") {
-      return NextResponse.json(
-        { error: "Subscription ist nicht aktiv" },
-        { status: 400 }
-      );
+      // Subscription ist nicht aktiv, erstelle neue Subscription
+      const checkoutSession = await stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ["card"],
+        mode: "subscription",
+        locale: "de",
+        success_url: `${baseUrl}/dashboard/settings?plan=changed`,
+        cancel_url: `${baseUrl}/dashboard/change-plan?plan=canceled`,
+        metadata: {
+          userId: userId,
+          action: "new_subscription",
+        },
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+      });
+
+      return NextResponse.json({ 
+        url: checkoutSession.url,
+        sessionId: checkoutSession.id,
+      });
     }
 
     // Prüfe ob der neue Preis bereits aktiv ist
@@ -54,12 +195,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // Erstelle immer eine Checkout Session, damit der User die Zahlung bestätigt
-    // und eine Rechnung generiert wird
-    const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    
+    // Fall 3: Aktive Subscription vorhanden - Plan-Wechsel
+    // Erstelle Checkout Session für Plan-Wechsel
     const checkoutSession = await stripe.checkout.sessions.create({
-      customer: subscription.stripeCustomerId,
+      customer: customerId,
       mode: "subscription",
       locale: "de",
       success_url: `${baseUrl}/dashboard/settings?plan=changed`,
@@ -67,7 +206,7 @@ export async function POST(request: Request) {
       metadata: {
         userId: userId,
         action: "change_plan",
-        existingSubscriptionId: subscription.stripeSubscriptionId,
+        existingSubscriptionId: subscription.stripeSubscriptionId || undefined,
         oldPriceId: subscription.stripePriceId,
       },
       line_items: [
@@ -80,7 +219,7 @@ export async function POST(request: Request) {
         metadata: {
           userId: userId,
           action: "change_plan",
-          existingSubscriptionId: subscription.stripeSubscriptionId,
+          existingSubscriptionId: subscription.stripeSubscriptionId || undefined,
         },
       },
       // Erlaube Proration für Plan-Wechsel
