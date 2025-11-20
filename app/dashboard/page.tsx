@@ -1,5 +1,6 @@
 import { requireAuth } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
+import { getCachedSubscription } from "@/lib/subscription-cache";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -75,23 +76,10 @@ export default async function DashboardPage() {
 
   const [listingsCount, inquiriesCount] = stats;
 
-  // Lade Subscription für LANDLORD
+  // Lade Subscription für LANDLORD mit automatischem Caching
   let subscription = null;
   if (user.role === "LANDLORD") {
-    subscription = await prisma.subscription.findUnique({
-      where: { userId: user.id },
-    });
-    
-    // Debug: Log für Subscription-Status
-    if (!subscription) {
-      console.log(`[Dashboard] Keine Subscription gefunden für User ${user.id} (${user.email})`);
-    } else {
-      console.log(`[Dashboard] Subscription gefunden:`, {
-        userId: subscription.userId,
-        status: subscription.status,
-        priceId: subscription.stripePriceId,
-      });
-    }
+    subscription = await getCachedSubscription(user.id);
   }
 
   // Zusätzliche Statistiken für ADMIN

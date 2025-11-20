@@ -44,24 +44,66 @@ export async function POST(request: Request) {
         const userId = session.metadata?.userId;
         const action = session.metadata?.action;
 
+        console.log(`[Webhook] checkout.session.completed - Session ID: ${session.id}`);
+        console.log(`[Webhook] Metadata:`, session.metadata);
+        console.log(`[Webhook] Customer:`, session.customer);
+        console.log(`[Webhook] Subscription:`, session.subscription);
+
         if (!userId || !session.customer) {
-          console.error("Fehlende Metadaten in Checkout Session");
+          console.error("[Webhook] Fehlende Metadaten in Checkout Session:", {
+            userId,
+            customer: session.customer,
+            metadata: session.metadata,
+          });
           break;
         }
 
         // Hole Subscription-Details von Stripe
-        const subscriptionId = session.subscription as string;
+        let subscriptionId = session.subscription as string;
         if (!subscriptionId) {
-          console.error("Keine Subscription ID in Checkout Session");
+          console.error("[Webhook] Keine Subscription ID in Checkout Session");
           break;
         }
 
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        let subscription: Stripe.Subscription;
+        try {
+          subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        } catch (retrieveError: any) {
+          console.error(`[Webhook] Fehler beim Abrufen der Subscription ${subscriptionId}:`, retrieveError.message);
+          // Versuche, die Subscription über den Customer zu finden
+          if (session.customer) {
+            const subscriptions = await stripe.subscriptions.list({
+              customer: session.customer as string,
+              status: "all",
+              limit: 10,
+            });
+            
+            const sortedSubscriptions = subscriptions.data.sort(
+              (a, b) => b.created - a.created
+            );
+            
+            const activeSubscription = sortedSubscriptions.find(
+              (sub) => sub.status === "active" || sub.status === "trialing" || sub.status === "incomplete"
+            );
+            
+            if (activeSubscription) {
+              subscription = activeSubscription;
+              subscriptionId = activeSubscription.id; // Aktualisiere subscriptionId mit der gefundenen ID
+              console.log(`[Webhook] Alternative Subscription gefunden: ${activeSubscription.id}`);
+            } else {
+              console.error(`[Webhook] Keine aktive Subscription für Customer ${session.customer} gefunden`);
+              break;
+            }
+          } else {
+            break;
+          }
+        }
+        
         const sub = subscription as any;
         const priceId = sub.items.data[0]?.price.id;
 
         if (!priceId) {
-          console.error("Keine Price ID in Subscription gefunden");
+          console.error("[Webhook] Keine Price ID in Subscription gefunden");
           break;
         }
 
@@ -119,7 +161,7 @@ export async function POST(request: Request) {
           }
         } else {
           // Normale Subscription-Erstellung oder Update
-          await prisma.subscription.upsert({
+          const savedSubscription = await prisma.subscription.upsert({
             where: { userId },
             create: {
               id: randomUUID(),
@@ -132,12 +174,21 @@ export async function POST(request: Request) {
               cancelAtPeriodEnd: sub.cancel_at_period_end || false,
             },
             update: {
+              stripeCustomerId: session.customer as string, // Stelle sicher, dass Customer-ID aktualisiert wird
               stripeSubscriptionId: subscriptionId,
               stripePriceId: priceId,
               status: sub.status,
               currentPeriodEnd: new Date(sub.current_period_end * 1000),
               cancelAtPeriodEnd: sub.cancel_at_period_end || false,
             },
+          });
+          
+          console.log(`[Webhook] Subscription erfolgreich gespeichert für User ${userId}:`, {
+            subscriptionId: savedSubscription.id,
+            stripeSubscriptionId: savedSubscription.stripeSubscriptionId,
+            stripeCustomerId: savedSubscription.stripeCustomerId,
+            status: savedSubscription.status,
+            priceId: savedSubscription.stripePriceId,
           });
         }
 

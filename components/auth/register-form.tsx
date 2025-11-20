@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -9,86 +8,44 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Link from "next/link";
-import { Loader2, CheckCircle2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Loader2, CheckCircle2, Mail } from "lucide-react";
 
 const registerSchema = z.object({
   name: z.string().min(2, "Name muss mindestens 2 Zeichen lang sein"),
   email: z.string().email("Ungültige E-Mail-Adresse"),
   password: z.string().min(6, "Passwort muss mindestens 6 Zeichen lang sein"),
   confirmPassword: z.string(),
-  priceId: z.string().min(1, "Bitte wählen Sie einen Plan aus"),
   street: z.string().min(3, "Straße und Hausnummer ist erforderlich"),
   city: z.string().min(2, "Stadt ist erforderlich"),
   postalCode: z.string().min(4, "Postleitzahl ist erforderlich"),
   country: z.string().min(2, "Land ist erforderlich"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwörter stimmen nicht überein",
+  path: ["confirmPassword"],
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
-interface StripePlan {
-  id: string;
-  name: string;
-  description: string | null;
-  priceId: string;
-  amount: number;
-  currency: string;
-  interval: string;
-}
-
 export function RegisterForm() {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [plans, setPlans] = useState<StripePlan[]>([]);
-  const [loadingPlans, setLoadingPlans] = useState(true);
 
   const {
     register,
     handleSubmit,
-    watch,
-    setValue,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
   });
-
-  const selectedPriceId = watch("priceId");
-
-  // Lade Stripe-Pläne beim Mount
-  useEffect(() => {
-    const fetchPlans = async () => {
-      try {
-        const response = await fetch("/api/stripe/plans");
-        const data = await response.json();
-        if (response.ok && data.plans) {
-          setPlans(data.plans);
-          // Wähle automatisch den ersten Plan aus
-          if (data.plans.length > 0) {
-            setValue("priceId", data.plans[0].priceId);
-          }
-        }
-      } catch (err) {
-        console.error("Error fetching plans:", err);
-        setError("Fehler beim Laden der Pläne. Bitte laden Sie die Seite neu.");
-      } finally {
-        setLoadingPlans(false);
-      }
-    };
-
-    fetchPlans();
-  }, [setValue]);
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Schritt 1: User registrieren
       const registerResponse = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -111,31 +68,10 @@ export function RegisterForm() {
         return;
       }
 
-      // Schritt 2: Stripe Checkout Session erstellen
-      const checkoutResponse = await fetch("/api/stripe/create-checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          priceId: data.priceId,
-          userId: registerResult.userId,
-        }),
-      });
-
-      const checkoutResult = await checkoutResponse.json();
-
-      if (!checkoutResponse.ok) {
-        setError(checkoutResult.error || "Fehler beim Erstellen der Checkout-Session");
-        setIsLoading(false);
-        return;
-      }
-
-      // Schritt 3: Weiterleitung zu Stripe Checkout
-      if (checkoutResult.url) {
-        window.location.href = checkoutResult.url;
-      } else {
-        setError("Keine Checkout-URL erhalten");
-        setIsLoading(false);
-      }
+      // Erfolg: Zeige Erfolgsmeldung
+      setSuccess(true);
+      setUserEmail(data.email);
+      setIsLoading(false);
     } catch (err) {
       setError("Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.");
       setIsLoading(false);
@@ -153,19 +89,29 @@ export function RegisterForm() {
       <CardContent>
         {success ? (
           <div className="space-y-4">
-            <div className="rounded-md bg-green-50 border border-green-200 p-4">
-              <h3 className="text-lg font-semibold text-green-900 mb-2">
+            <div className="rounded-md bg-green-50 dark:bg-green-900/20 p-6 text-center">
+              <CheckCircle2 className="mx-auto h-12 w-12 text-green-600 mb-4" />
+              <h3 className="text-lg font-semibold text-green-800 dark:text-green-200 mb-2">
                 Registrierung erfolgreich!
               </h3>
-              <p className="text-sm text-green-800 mb-4">
-                Wir haben dir eine Bestätigungsmail an <strong>{userEmail}</strong> gesendet.
+              <p className="text-sm text-green-700 dark:text-green-300 mb-4">
+                Wir haben eine Bestätigungs-E-Mail an <strong>{userEmail}</strong> gesendet.
               </p>
-              <p className="text-sm text-green-800 mb-4">
-                Bitte öffne dein E-Mail-Postfach und klicke auf den Bestätigungslink, um dein Konto zu aktivieren.
-              </p>
-              <p className="text-sm text-green-800">
-                Nach der Bestätigung kannst du dich mit deinen Zugangsdaten anmelden.
-              </p>
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-green-200 dark:border-green-800">
+                <div className="flex items-start gap-3">
+                  <Mail className="h-5 w-5 text-green-600 mt-0.5" />
+                  <div className="text-left">
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">
+                      Nächste Schritte:
+                    </p>
+                    <ol className="text-sm text-gray-700 dark:text-gray-300 space-y-1 list-decimal list-inside">
+                      <li>Öffne dein E-Mail-Postfach</li>
+                      <li>Klicke auf den Bestätigungslink in der E-Mail</li>
+                      <li>Melde dich dann mit deinen Zugangsdaten an</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
             </div>
             <div className="text-center">
               <Link href="/login">
@@ -302,76 +248,14 @@ export function RegisterForm() {
             </div>
           </div>
 
-          {/* Subscription Plan Auswahl */}
-          <div className="space-y-3">
-            <Label>Abonnement-Plan *</Label>
-            {loadingPlans ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                <span className="ml-2 text-sm text-muted-foreground">Pläne werden geladen...</span>
-              </div>
-            ) : plans.length === 0 ? (
-              <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-                Keine Pläne verfügbar. Bitte kontaktieren Sie den Support.
-              </div>
-            ) : (
-              <RadioGroup
-                value={selectedPriceId}
-                onValueChange={(value) => setValue("priceId", value)}
-                disabled={isLoading}
-                className="space-y-3"
-              >
-                {plans.map((plan) => (
-                  <div
-                    key={plan.priceId}
-                    className={cn(
-                      "relative flex items-start space-x-3 rounded-lg border p-4 transition-colors",
-                      selectedPriceId === plan.priceId
-                        ? "border-primary bg-primary/5"
-                        : "border-muted hover:border-primary/50"
-                    )}
-                  >
-                    <RadioGroupItem
-                      value={plan.priceId}
-                      id={plan.priceId}
-                      className="mt-1"
-                    />
-                    <Label
-                      htmlFor={plan.priceId}
-                      className="flex-1 cursor-pointer space-y-1"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold">{plan.name}</span>
-                        <span className="text-lg font-bold">
-                          {plan.amount.toFixed(2)} €
-                          <span className="text-sm font-normal text-muted-foreground">
-                            /{plan.interval === "month" ? "Monat" : "Jahr"}
-                          </span>
-                        </span>
-                      </div>
-                      {plan.description && (
-                        <p className="text-sm text-muted-foreground">
-                          {plan.description}
-                        </p>
-                      )}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            )}
-            {errors.priceId && (
-              <p className="text-sm text-destructive">{errors.priceId.message}</p>
-            )}
-          </div>
-
-          <Button type="submit" className="w-full" disabled={isLoading || loadingPlans || plans.length === 0}>
+          <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Wird registriert...
               </>
             ) : (
-              "Registrieren und zur Zahlung"
+              "Registrieren"
             )}
           </Button>
 

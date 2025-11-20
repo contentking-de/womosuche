@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getPlanLimit } from "@/lib/plan-limits";
+import { getCachedSubscription } from "@/lib/subscription-cache";
 import { stripe } from "@/lib/stripe";
 
 /**
@@ -18,10 +19,8 @@ export async function checkVehicleLimit(userId: string): Promise<{
     where: { ownerId: userId },
   });
 
-  // Hole Subscription
-  const subscription = await prisma.subscription.findUnique({
-    where: { userId },
-  });
+  // Hole Subscription mit automatischem Caching
+  const subscription = await getCachedSubscription(userId);
 
   // Wenn keine Subscription vorhanden, kann der User kein Fahrzeug anlegen
   if (!subscription) {

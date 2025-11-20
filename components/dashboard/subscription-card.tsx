@@ -135,13 +135,12 @@ export function SubscriptionCard({ subscription, currentVehiclesCount = 0, showA
               <XCircle className="h-8 w-8 text-muted-foreground" />
             </div>
             <div className="space-y-2">
-              <Link href="/dashboard/change-plan" className="block">
-                <Button className="w-full">
+              <Link href="/dashboard/change-plan">
+                <Button>
                   <CreditCard className="mr-2 h-4 w-4" />
                   Abonnement Übersicht
                 </Button>
               </Link>
-              <SyncSubscriptionButton />
             </div>
           </div>
         </CardContent>
@@ -178,6 +177,14 @@ export function SubscriptionCard({ subscription, currentVehiclesCount = 0, showA
           <Badge variant="secondary">
             <Clock className="mr-1 h-3 w-3" />
             Testphase
+          </Badge>
+        );
+      case "incomplete":
+      case "incomplete_expired":
+        return (
+          <Badge variant="destructive">
+            <AlertCircle className="mr-1 h-3 w-3" />
+            Zahlung ausstehend
           </Badge>
         );
       default:
@@ -312,6 +319,18 @@ export function SubscriptionCard({ subscription, currentVehiclesCount = 0, showA
                 <AlertCircle className="mr-1 h-4 w-4 inline" />
                 Ihr Abonnement wird am {formatDate(subscription.currentPeriodEnd)} gekündigt.
               </p>
+            </div>
+          )}
+
+          {/* Abonnement Übersicht Button - anzeigen wenn keine planInfo oder nicht aktiv */}
+          {(!planInfo || subscription.status !== "active" && subscription.status !== "trialing") && (
+            <div className="pt-4 border-t">
+              <Link href="/dashboard/change-plan">
+                <Button>
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  Abonnement Übersicht
+                </Button>
+              </Link>
             </div>
           )}
 

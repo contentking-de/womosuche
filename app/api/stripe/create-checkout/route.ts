@@ -114,7 +114,15 @@ export async function POST(request: Request) {
       cancel_url: `${baseUrl}/register?subscription=canceled`,
       metadata: {
         userId: user.id,
+        userEmail: user.email, // Zusätzliche Sicherheit: E-Mail auch in Metadaten
       },
+    });
+
+    console.log(`[Create Checkout] Session erstellt für User ${user.id} (${user.email}):`, {
+      sessionId: session.id,
+      customerId: customerId,
+      priceId: priceId,
+      metadata: session.metadata,
     });
 
     return NextResponse.json({ sessionId: session.id, url: session.url });

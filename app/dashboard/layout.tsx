@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { requireAuth } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
+import { getCachedSubscription } from "@/lib/subscription-cache";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +25,17 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const user = await requireAuth();
+  
+  // Automatische Synchronisation der Subscription mit Stripe für LANDLORDS
+  // Die getCachedSubscription-Funktion prüft automatisch den Cache und synchronisiert nur bei Bedarf
+  if (user.role === "LANDLORD") {
+    try {
+      await getCachedSubscription(user.id);
+    } catch (error) {
+      console.error("Error auto-syncing subscription in layout:", error);
+      // Nicht kritisch, weiter machen
+    }
+  }
   
   // Hole User mit Adressfeldern aus der Datenbank
   const userWithAddress = await prisma.user.findUnique({

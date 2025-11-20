@@ -48,9 +48,36 @@ export function LoginForm({ callbackUrl, passwordReset }: { callbackUrl?: string
         // Prüfe ob es eine spezifische Fehlermeldung gibt
         let errorMessage = "Ungültige Anmeldedaten";
         
-        if (result.error === "EMAIL_NOT_VERIFIED") {
-          errorMessage = "Bitte bestätige zuerst deine E-Mail-Adresse. Wir haben dir eine Bestätigungsmail gesendet.";
-        } else if (result.error !== "CredentialsSignin") {
+        // Prüfe verschiedene Fehlercodes
+        if (result.error === "EMAIL_NOT_VERIFIED" || result.error.includes("EMAIL_NOT_VERIFIED")) {
+          errorMessage = "Du musst zuerst den Bestätigungslink in der Mail anklicken, bevor du dich einloggen kannst.";
+        } else if (result.error === "Configuration") {
+          // Configuration Error kann auch bedeuten, dass E-Mail nicht verifiziert ist
+          // Prüfe zusätzlich, ob die E-Mail verifiziert ist
+          try {
+            const checkResponse = await fetch("/api/auth/check-email-verification", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: data.email }),
+            });
+            
+            if (checkResponse.ok) {
+              const checkData = await checkResponse.json();
+              if (!checkData.verified) {
+                errorMessage = "Du musst zuerst den Bestätigungslink in der Mail anklicken, bevor du dich einloggen kannst.";
+              } else {
+                // E-Mail ist verifiziert, aber Login schlägt trotzdem fehl
+                errorMessage = "Ungültige Anmeldedaten";
+              }
+            } else {
+              // Bei Fehler der Prüfung, zeige die Standard-Fehlermeldung
+              errorMessage = "Du musst zuerst den Bestätigungslink in der Mail anklicken, bevor du dich einloggen kannst.";
+            }
+          } catch (checkError) {
+            // Bei Fehler der Prüfung, zeige die Standard-Fehlermeldung
+            errorMessage = "Du musst zuerst den Bestätigungslink in der Mail anklicken, bevor du dich einloggen kannst.";
+          }
+        } else if (result.error !== "CredentialsSignin" && result.error !== "Configuration") {
           errorMessage = result.error;
         }
         
