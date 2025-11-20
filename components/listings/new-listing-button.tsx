@@ -47,7 +47,7 @@ export function NewListingButton({
           canCreate: false, 
           currentCount: 0, 
           maxCount: null,
-          reason: "Fehler beim Prüfen des Limits. Bitte versuche es erneut oder kontaktiere den Support."
+          reason: "Du musst deinen Plan upgraden, um neue Wohnmobile anzulegen."
         });
       })
       .finally(() => {

@@ -104,7 +104,7 @@ export async function checkVehicleLimit(userId: string): Promise<{
       canCreate: false,
       currentCount,
       maxCount: null,
-      reason: "Fehler beim Prüfen des Limits. Bitte versuche es erneut oder kontaktiere den Support.",
+      reason: "Du musst deinen Plan upgraden, um neue Wohnmobile anzulegen.",
     };
   }
 }
