@@ -115,6 +115,9 @@ export async function POST(request: Request) {
         payment_method_types: ["card"],
         mode: "subscription",
         locale: "de",
+        automatic_tax: {
+          enabled: true,
+        },
         success_url: `${baseUrl}/dashboard/settings?plan=changed`,
         cancel_url: `${baseUrl}/dashboard/change-plan?plan=canceled`,
         metadata: {
@@ -167,6 +170,9 @@ export async function POST(request: Request) {
         payment_method_types: ["card"],
         mode: "subscription",
         locale: "de",
+        automatic_tax: {
+          enabled: true,
+        },
         success_url: `${baseUrl}/dashboard/settings?plan=changed`,
         cancel_url: `${baseUrl}/dashboard/change-plan?plan=canceled`,
         metadata: {
@@ -201,6 +207,9 @@ export async function POST(request: Request) {
       customer: customerId,
       mode: "subscription",
       locale: "de",
+      automatic_tax: {
+        enabled: true,
+      },
       success_url: `${baseUrl}/dashboard/settings?plan=changed`,
       cancel_url: `${baseUrl}/dashboard/change-plan?plan=canceled`,
       metadata: {

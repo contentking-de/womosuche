@@ -80,6 +80,9 @@ export async function POST(request: Request) {
       ],
       mode: "subscription",
       locale: "de", // Setze Sprache auf Deutsch für Checkout
+      automatic_tax: {
+        enabled: true,
+      },
       success_url: `${baseUrl}/dashboard?subscription=success`,
       cancel_url: `${baseUrl}/register?subscription=canceled`,
       metadata: {
